@@ -1,236 +1,206 @@
-const OFF = 0, WARN = 1, ERROR = 2;
-
-module.exports = exports = {
-    env: {
-        node: true,
-        browser: true,
-        es6: true,
-        jest: true,
+module.exports = {
+  env: {
+    node: true,
+    browser: true,
+    es6: true,
+    jest: true
+  },
+  parser: '@babel/eslint-parser',
+  extends: [ 'next', 'airbnb', 'prettier' ],
+  plugins: [ 'react', 'import', 'react-hooks', 'prettier', '@typescript-eslint' ],
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true
     },
+    ecmaVersion: 2022,
+    sourceType: 'module'
+  },
+  rules: {
+    // TS
+    'react/jsx-filename-extension': [ 'error', { extensions: [ '.js', '.jsx', '.ts', '.tsx' ] } ],
+    // Possible Errors (overrides from recommended set)
+    'no-extra-parens': 'error',
+    'no-unexpected-multiline': 'error',
+    // All JSDoc comments must be valid
+    'valid-jsdoc': [
+      'error',
+      {
+        requireReturn: false,
+        requireReturnDescription: false,
+        requireParamDescription: true,
+        prefer: {
+          return: 'returns'
+        }
+      }
+    ],
 
-    parser: "@babel/eslint-parser",
-    globals: {},
-    extends: ["next", "airbnb", "prettier"],
-    plugins: ["react", "import", "react-hooks", "prettier", "@typescript-eslint"],
-    ignorePatterns: ["node_modules/"],
+    // Best Practices
+    'accessor-pairs': [ 'error', { getWithoutSet: false, setWithoutGet: true } ],
+    'block-scoped-var': 'warn',
+    'consistent-return': 'error',
+    'curly': 'error',
+    'default-case': 'warn',
+    'dot-location': [ 'warn', 'property' ],
+    'dot-notation': 'warn',
+    'eqeqeq': [ 'error', 'smart' ],
+    'guard-for-in': 'warn',
+    'no-alert': 'error',
+    'no-caller': 'error',
+    'no-case-declarations': 'warn',
+    'no-div-regex': 'warn',
+    'no-else-return': 'warn',
+    'no-labels': 'warn',
+    'no-empty-pattern': 'warn',
+    'no-eq-null': 'warn',
+    'no-eval': 'error',
+    'no-extend-native': 'error',
+    'no-extra-bind': 'warn',
+    'no-floating-decimal': 'warn',
+    'no-implicit-coercion': [ 'warn', { boolean: true, number: true, string: true } ],
+    'no-implied-eval': 'error',
+    'no-invalid-this': 'error',
+    'no-iterator': 'error',
+    'no-lone-blocks': 'warn',
+    'no-loop-func': 'error',
+    'no-magic-numbers': 'warn',
+    'no-multi-spaces': 'error',
+    'no-multi-str': 'warn',
+    'no-native-reassign': 'error',
+    'no-new-func': 'error',
+    'no-new-wrappers': 'error',
+    'no-new': 'error',
+    'no-octal-escape': 'error',
+    'no-param-reassign': 'error',
+    'no-process-env': 'warn',
+    'no-proto': 'error',
+    'no-redeclare': 'error',
+    'no-return-assign': 'error',
+    'no-script-url': 'error',
+    'no-self-compare': 'error',
+    'no-throw-literal': 'error',
+    'no-unused-expressions': 'error',
+    'no-useless-call': 'error',
+    'no-useless-concat': 'error',
+    'no-void': 'warn',
+    'no-warning-comments': [
+      'warn',
+      {
+        terms: [ 'TODO', 'FIXME' ],
+        location: 'start'
+      }
+    ],
+    'no-with': 'warn',
+    'radix': 'warn',
+    'vars-on-top': 'error',
+    'wrap-iife': [ 'error', 'outside' ],
+    'yoda': 'error',
 
-    parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-        ecmaVersion: 2022,
-        requireConfigFile: false,
-        sourceType: "module",
-      },
+    // Strict Mode - for ES6, never use strict.
+    'strict': [ 'error', 'never' ],
 
-    settings: {
-        next: {
-          'rootDir': './'
-        },
-        react: {
-            version: "detect",
-        },
-      },
+    // Variables
+    'init-declarations': [ 'error', 'always' ],
+    'no-catch-shadow': 'warn',
+    'no-delete-var': 'error',
+    'no-label-var': 'error',
+    'no-shadow-restricted-names': 'error',
+    'no-shadow': 'warn',
+    'no-undef-init': 'off',
+    'no-undef': 'error',
+    'no-undefined': 'off',
+    'no-unused-vars': 'warn',
+    'no-use-before-define': 'error',
 
-    rules: {
-        // TS
-        'react/jsx-filename-extension': [ERROR, { 'extensions': ['.js', '.jsx', '.ts', '.tsx'] }],
-        // Possible Errors (overrides from recommended set)
-        'no-extra-parens': ERROR,
-        'no-unexpected-multiline': ERROR,
-        // All JSDoc comments must be valid
-        'valid-jsdoc': [ ERROR, {
-            'requireReturn': false,
-            'requireReturnDescription': false,
-            'requireParamDescription': true,
-            'prefer': {
-                'return': 'returns'
-            }
-        }],
+    // Node.js and CommonJS
+    'callback-return': [ 'warn', [ 'callback', 'next' ] ],
+    'global-require': 'error',
+    'handle-callback-err': 'warn',
+    'no-mixed-requires': 'warn',
+    'no-new-require': 'error',
+    'no-path-concat': 'error',
+    'no-process-exit': 'error',
+    'no-restricted-modules': 'off',
+    'no-sync': 'warn',
 
-        // Best Practices
+    // ECMAScript 6 support
+    'arrow-body-style': [ 'error', 'always' ],
+    'arrow-parens': [ 'error', 'always' ],
+    'arrow-spacing': [ 'error', { before: true, after: true } ],
+    'constructor-super': 'error',
+    'generator-star-spacing': [ 'error', 'before' ],
+    'no-confusing-arrow': 'error',
+    'no-constant-condition': 'error',
+    'no-class-assign': 'error',
+    'no-const-assign': 'error',
+    'no-dupe-class-members': 'error',
+    'no-this-before-super': 'error',
+    'no-var': 'warn',
+    'object-shorthand': [ 'warn', 'never' ],
+    'prefer-arrow-callback': 'warn',
+    'prefer-spread': 'warn',
+    'prefer-template': 'warn',
+    'require-yield': 'error',
 
-        // Allowed a getter without setter, but all setters require getters
-        'accessor-pairs': [ ERROR, {
-            'getWithoutSet': false,
-            'setWithoutGet': true
-        }],
-        'block-scoped-var': WARN,
-        'consistent-return': ERROR,
-        'curly': ERROR,
-        'default-case': WARN,
-        // the dot goes with the property when doing multiline
-        'dot-location': [ WARN, 'property' ],
-        'dot-notation': WARN,
-        'eqeqeq': [ ERROR, 'smart' ],
-        'guard-for-in': WARN,
-        'no-alert': ERROR,
-        'no-caller': ERROR,
-        'no-case-declarations': WARN,
-        'no-div-regex': WARN,
-        'no-else-return': WARN,
-        'no-labels': WARN,
-        'no-empty-pattern': WARN,
-        'no-eq-null': WARN,
-        'no-eval': ERROR,
-        'no-extend-native': ERROR,
-        'no-extra-bind': WARN,
-        'no-floating-decimal': WARN,
-        'no-implicit-coercion': [ WARN, {
-            'boolean': true,
-            'number': true,
-            'string': true
-        }],
-        'no-implied-eval': ERROR,
-        'no-invalid-this': ERROR,
-        'no-iterator': ERROR,
-        'no-lone-blocks': WARN,
-        'no-loop-func': ERROR,
-        'no-magic-numbers': WARN,
-        'no-multi-spaces': ERROR,
-        'no-multi-str': WARN,
-        'no-native-reassign': ERROR,
-        'no-new-func': ERROR,
-        'no-new-wrappers': ERROR,
-        'no-new': ERROR,
-        'no-octal-escape': ERROR,
-        'no-param-reassign': ERROR,
-        'no-process-env': WARN,
-        'no-proto': ERROR,
-        'no-redeclare': ERROR,
-        'no-return-assign': ERROR,
-        'no-script-url': ERROR,
-        'no-self-compare': ERROR,
-        'no-throw-literal': ERROR,
-        'no-unused-expressions': ERROR,
-        'no-useless-call': ERROR,
-        'no-useless-concat': ERROR,
-        'no-void': WARN,
-        // Produce warnings when something is commented as TODO or FIXME
-        'no-warning-comments': [ WARN, {
-            'terms': [ 'TODO', 'FIXME' ],
-            'location': 'start'
-        }],
-        'no-with': WARN,
-        'radix': WARN,
-        'vars-on-top': ERROR,
-        // Enforces the style of wrapped functions
-        'wrap-iife': [ ERROR, 'outside' ],
-        'yoda': ERROR,
-
-        // Strict Mode - for ES6, never use strict.
-        'strict': [ ERROR, 'never' ],
-
-        // Variables
-        'init-declarations': [ ERROR, 'always' ],
-        'no-catch-shadow': WARN,
-        'no-delete-var': ERROR,
-        'no-label-var': ERROR,
-        'no-shadow-restricted-names': ERROR,
-        'no-shadow': WARN,
-        // We require all vars to be initialized (see init-declarations)
-        // If we NEED a var to be initialized to undefined, it needs to be explicit
-        'no-undef-init': OFF,
-        'no-undef': ERROR,
-        'no-undefined': OFF,
-        'no-unused-vars': WARN,
-        // Disallow hoisting - let & const don't allow hoisting anyhow
-        'no-use-before-define': ERROR,
-
-        // Node.js and CommonJS
-        'callback-return': [ WARN, [ 'callback', 'next' ]],
-        'global-require': ERROR,
-        'handle-callback-err': WARN,
-        'no-mixed-requires': WARN,
-        'no-new-require': ERROR,
-        // Use path.concat instead
-        'no-path-concat': ERROR,
-        'no-process-exit': ERROR,
-        'no-restricted-modules': OFF,
-        'no-sync': WARN,
-
-        // ECMAScript 6 support
-        'arrow-body-style': [ ERROR, 'always' ],
-        'arrow-parens': [ ERROR, 'always' ],
-        'arrow-spacing': [ ERROR, { 'before': true, 'after': true }],
-        'constructor-super': ERROR,
-        'generator-star-spacing': [ ERROR, 'before' ],
-        'no-confusing-arrow': ERROR,
-        'no-constant-condition': ERROR,
-        'no-class-assign': ERROR,
-        'no-const-assign': ERROR,
-        'no-dupe-class-members': ERROR,
-        'no-this-before-super': ERROR,
-        'no-var': WARN,
-        'object-shorthand': [ WARN, 'never' ],
-        'prefer-arrow-callback': WARN,
-        'prefer-spread': WARN,
-        'prefer-template': WARN,
-        'require-yield': ERROR,
-
-        // Stylistic - everything here is a warning because of style.
-        'array-bracket-spacing': [ WARN, 'always' ],
-        'block-spacing': [ WARN, 'always' ],
-        'brace-style': [ WARN, '1tbs', { 'allowSingleLine': false } ],
-        'camelcase': WARN,
-        'comma-spacing': [ WARN, { 'before': false, 'after': true } ],
-        'comma-style': [ WARN, 'last' ],
-        'computed-property-spacing': [ WARN, 'never' ],
-        'consistent-this': [ WARN, 'self' ],
-        'eol-last': WARN,
-        'func-names': WARN,
-        'func-style': [ WARN, 'declaration' ],
-        'id-length': [ WARN, { 'min': 2, 'max': 32 } ],
-        'indent': [ WARN, 2 ],
-        'jsx-quotes': [ WARN, 'prefer-double' ],
-        'linebreak-style': [ WARN, 'unix' ],
-        'lines-around-comment': [ WARN, { 'beforeBlockComment': true } ],
-        'max-depth': [ WARN, 8 ],
-        'max-len': [ WARN, 132 ],
-        'max-nested-callbacks': [ WARN, 8 ],
-        'max-params': [ WARN, 8 ],
-        'new-cap': WARN,
-        'new-parens': WARN,
-        'no-array-constructor': WARN,
-        'no-bitwise': OFF,
-        'no-continue': OFF,
-        'no-inline-comments': OFF,
-        'no-lonely-if': WARN,
-        'no-mixed-spaces-and-tabs': WARN,
-        'no-multiple-empty-lines': WARN,
-        'no-negated-condition': OFF,
-        'no-nested-ternary': WARN,
-        'no-new-object': WARN,
-        'no-plusplus': OFF,
-        'no-spaced-func': WARN,
-        'no-ternary': OFF,
-        'no-trailing-spaces': WARN,
-        'no-underscore-dangle': WARN,
-        'no-unneeded-ternary': WARN,
-        'object-curly-spacing': [ WARN, 'always' ],
-        'one-var': OFF,
-        'operator-assignment': [ WARN, 'never' ],
-        'operator-linebreak': [ WARN, 'after' ],
-        'padded-blocks': [ WARN, 'never' ],
-        'quote-props': [ WARN, 'consistent-as-needed' ],
-        'quotes': [ WARN, 'single' ],
-        'require-jsdoc': [ WARN, {
-            'require': {
-                'FunctionDeclaration': true,
-                'MethodDefinition': true,
-                'ClassDeclaration': false
-            }
-        }],
-        'semi-spacing': [ WARN, { 'before': false, 'after': true }],
-        'semi': [ ERROR, 'always' ],
-        'sort-vars': OFF,
-        'keyword-spacing': [ WARN ],
-        'space-before-blocks': [ WARN, 'always' ],
-        'space-before-function-paren': [ WARN, 'never' ],
-        'space-in-parens': [ WARN, 'never' ],
-        'space-infix-ops': [ WARN, { 'int32Hint': true } ],
-        'space-unary-ops': ERROR,
-        'spaced-comment': [ WARN, 'always' ],
-        'wrap-regex': WARN
-    }
+    // Stylistic
+    'array-bracket-spacing': [ 'warn', 'always' ],
+    'block-spacing': [ 'warn', 'always' ],
+    'brace-style': [ 'warn', '1tbs', { allowSingleLine: false } ],
+    'camelcase': 'warn',
+    'comma-spacing': [ 'warn', { before: false, after: true } ],
+    'comma-style': [ 'warn', 'last' ],
+    'computed-property-spacing': [ 'warn', 'never' ],
+    'consistent-this': [ 'warn', 'self' ],
+    'eol-last': 'warn',
+    'func-names': 'warn',
+    'func-style': [ 'warn', 'declaration' ],
+    'id-length': [ 'warn', { min: 2, max: 32 } ],
+    'indent': [ 'warn', 2 ],
+    'jsx-quotes': [ 'warn', 'prefer-double' ],
+    'linebreak-style': [ 'warn', 'unix' ],
+    'lines-around-comment': [ 'warn', { beforeBlockComment: true } ],
+    'max-depth': [ 'warn', 8 ],
+    'max-len': [ 'warn', 132 ],
+    'max-nested-callbacks': [ 'warn', 8 ],
+    'max-params': [ 'warn', 8 ],
+    'new-cap': 'warn',
+    'new-parens': 'warn',
+    'no-array-constructor': 'warn',
+    'no-lonely-if': 'warn',
+    'no-mixed-spaces-and-tabs': 'warn',
+    'no-multiple-empty-lines': 'warn',
+    'no-nested-ternary': 'warn',
+    'no-new-object': 'warn',
+    'no-spaced-func': 'warn',
+    'no-trailing-spaces': 'warn',
+    'no-underscore-dangle': 'warn',
+    'no-unneeded-ternary': 'warn',
+    'object-curly-spacing': [ 'warn', 'always' ],
+    'one-var': 'off',
+    'operator-assignment': [ 'warn', 'never' ],
+    'operator-linebreak': [ 'warn', 'after' ],
+    'padded-blocks': [ 'warn', 'never' ],
+    'quote-props': [ 'warn', 'consistent-as-needed' ],
+    'quotes': [ 'warn', 'single' ],
+    'require-jsdoc': [
+      'warn',
+      {
+        require: {
+          FunctionDeclaration: true,
+          MethodDefinition: true,
+          ClassDeclaration: false
+        }
+      }
+    ],
+    'semi-spacing': [ 'warn', { before: false, after: true } ],
+    'semi': [ 'error', 'always' ],
+    'sort-vars': 'off',
+    'keyword-spacing': [ 'warn' ],
+    'space-before-blocks': [ 'warn', 'always' ],
+    'space-before-function-paren': [ 'warn', 'never' ],
+    'space-in-parens': [ 'warn', 'never' ],
+    'space-infix-ops': [ 'warn', { int32Hint: true } ],
+    'space-unary-ops': 'error',
+    'spaced-comment': [ 'warn', 'always' ],
+    'wrap-regex': 'warn'
+  }
 };
