@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "watch": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -22,20 +21,18 @@
     "baseUrl": ".",
     "paths": {
       "@/components/*": ["components/*"],
-      "@/contexts/*": ["contexts/*"],
+      "@/constants/*": ["constants/*"],
       "@/pages/*": ["pages/*"],
-      "@/providers/*": ["providers/*"],
       "@/public/*": ["public/*"],
-      "@/redux/*": ["redux/*"],
-      "@/shared/*": ["shared/*"],
-      "@/widgets/*": ["widgets/*"]
+      "@/utils/*": ["utils/*"],
     }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "types.d.ts"
+    "types.d.ts",
+    ".eslintrc.js"
   ],
   "exclude": [
     "node_modules"

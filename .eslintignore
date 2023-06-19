@@ -1,6 +1,4 @@
 node_modules
 public
-next.config.js
-jest.config.js
-jest.setup.js
+.eslintrc.js
 *.json
