@@ -24,6 +24,9 @@
       "@/constants/*": ["constants/*"],
       "@/pages/*": ["pages/*"],
       "@/public/*": ["public/*"],
+      "@/reducers/*": ["reducers/*"],
+      "@/slices/*": ["slices/*"],
+      "@/tests/*": ["tests/*"],
       "@/utils/*": ["utils/*"],
     }
   },

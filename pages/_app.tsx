@@ -1,15 +1,39 @@
 import React from 'react';
+import { Provider, useSelector } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import theme from '@/public/theme/global.module.scss';
+import { lightTheme, darkTheme } from '@/public/theme/themes';
+import rootReducer from '@/reducers/rootReducer';
+import { RootReducerState } from '@/constants/types';
+
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+interface Props extends AppProps {
+  children: React.ReactNode;
+}
+
+function StatefulThemeProvider({ Component, pageProps }: Props) {
+  const isDarkMode = useSelector((state: RootReducerState) => state.isDarkMode);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+      <Component {...pageProps} />
+    </ThemeProvider>
+  );
+}
+
+export default function MyApp({ Component, pageProps, router }: AppProps) {
+  const store = configureStore({ reducer: rootReducer });
+
   return (
     <>
       <Head>
@@ -25,11 +49,13 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <meta property="og:description" content="Description for sharing" />
         <meta property="og:image" content="URL of the shared image" />
       </Head>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        <Component {...pageProps} />
-      </ThemeProvider>
+      <Provider store={store}>
+        <StatefulThemeProvider Component={Component} pageProps={pageProps} router={router}>
+          <CssBaseline />
+          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+          <Component {...pageProps} />
+        </StatefulThemeProvider>
+      </Provider>
     </>
   );
 }

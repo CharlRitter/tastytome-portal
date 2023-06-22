@@ -3,12 +3,14 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint && stylelint '**/*.scss'",
-    "lint:fix": "next lint --fix && yarn run stylelint '**/*.scss' --fix --allow-empty-input",
-    "pre-commit": "next lint --fix && yarn run stylelint '**/*.scss' --fix --allow-empty-input",
+    "lint:fix": "next lint --fix && npx stylelint '**/*.scss' --fix --allow-empty-input",
+    "pre-commit": "next lint --fix && npx stylelint '**/*.scss' --fix --allow-empty-input",
     "prepare": "husky install",
+    "sort-package": "npx sort-package-json",
     "start": "next start",
-    "test": "jest --watch",
-    "test:ci": "jest --ci"
+    "test": "npx playwright test",
+    "test:report": "npx playwright show-report",
+    "test:ui": "npx playwright test --ui"
   },
   "husky": {
     "hooks": {
@@ -29,17 +31,20 @@
     "@fontsource/roboto": "^5.0.3",
     "@mui/material": "^5.13.5",
     "@npmcli/fs": "^3.1.0",
+    "@reduxjs/toolkit": "^1.9.5",
     "framer-motion": "^10.12.16",
     "luxon": "^3.3.0",
     "next": "^13.4.4",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-icons": "^4.9.0",
+    "react-redux": "^8.1.1",
     "sass": "^1.63.3",
     "webpack-bundle-analyzer": "^4.5.0"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^12.1.6",
+    "@playwright/test": "^1.35.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.2.0",

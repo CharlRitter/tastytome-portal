@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { DateTime } from 'luxon';
 import {
@@ -15,16 +16,21 @@ import {
   Toolbar,
   Typography
 } from '@mui/material';
-import { FaBars, FaRegEnvelope, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
+import { FaBars, FaRegEnvelope, FaGithubSquare, FaLinkedin, FaSun, FaMoon } from 'react-icons/fa';
 import PAGES from '@/constants/pages';
+import { RootReducerState } from '@/constants/types';
+import { setIsDarkMode } from '@/slices/themeSlice';
 import styles from './SideMenu.module.scss';
 
 interface Props {
   drawerWidth: number;
 }
 
-function SideMenu(props: Props) {
+export default function SideMenu(props: Props) {
   const { drawerWidth } = props;
+  const isDarkMode = useSelector((state: RootReducerState) => state.isDarkMode);
+
+  const dispatch = useDispatch();
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
   const currentRoute = router.pathname;
@@ -39,24 +45,17 @@ function SideMenu(props: Props) {
       </Toolbar>
       <Divider />
       <List>
-        {PAGES.map((page) => {
-          return (
-            <div key={page.route}>
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={currentRoute === page.route}
-                  onClick={() => {
-                    return router.push(page.route);
-                  }}
-                >
-                  <ListItemIcon>{page.icon}</ListItemIcon>
-                  <ListItemText primary={page.title} />
-                </ListItemButton>
-              </ListItem>
-              {page?.divider && <Divider />}
-            </div>
-          );
-        })}
+        {PAGES.map((page) => (
+          <div key={page.route}>
+            <ListItem disablePadding>
+              <ListItemButton selected={currentRoute === page.route} onClick={() => router.push(page.route)}>
+                <ListItemIcon>{page.icon}</ListItemIcon>
+                <ListItemText primary={page.title} />
+              </ListItemButton>
+            </ListItem>
+            {page?.divider && <Divider />}
+          </div>
+        ))}
       </List>
       <Box className={styles['menu-bottom-wrapper']}>
         <Box className={styles['menu-bottom-item']}>
@@ -65,17 +64,13 @@ function SideMenu(props: Props) {
           <Box>
             <IconButton
               aria-label="github_profile"
-              onClick={() => {
-                return window.open('https://github.com/CharlRitter', '_blank');
-              }}
+              onClick={() => window.open('https://github.com/CharlRitter', '_blank')}
             >
               <FaGithubSquare />
             </IconButton>
             <IconButton
               aria-label="linkedin_profile"
-              onClick={() => {
-                return window.open('https://www.linkedin.com/in/charl-ritter-0a1a45130/', '_blank');
-              }}
+              onClick={() => window.open('https://www.linkedin.com/in/charl-ritter-0a1a45130/', '_blank')}
             >
               <FaLinkedin />
             </IconButton>
@@ -102,34 +97,29 @@ function SideMenu(props: Props) {
           width: { sm: `calc(100% - ${drawerWidth}px)` }
         }}
       >
-        <Toolbar>
+        <Toolbar className={styles['header-bar']}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
-            onClick={() => {
-              return setMobileOpen(!mobileOpen);
-            }}
+            onClick={() => setMobileOpen(!mobileOpen)}
             sx={{ mr: 2, display: { sm: 'none' } }}
           >
             <FaBars />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            {
-              PAGES.find((page) => {
-                return currentRoute === page.route;
-              }).title
-            }
+            {PAGES.find((page) => currentRoute === page.route).title}
           </Typography>
+          <IconButton aria-label="theme mode" color="white" onClick={() => dispatch(setIsDarkMode(!isDarkMode))}>
+            {isDarkMode ? <FaMoon /> : <FaSun />}
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="Menu">
         <Drawer
           variant="temporary"
           open={mobileOpen}
-          onClose={() => {
-            return setMobileOpen(!mobileOpen);
-          }}
+          onClose={() => setMobileOpen(!mobileOpen)}
           ModalProps={{
             keepMounted: true // Better open performance on mobile.
           }}
@@ -154,5 +144,3 @@ function SideMenu(props: Props) {
     </>
   );
 }
-
-export default SideMenu;

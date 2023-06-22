@@ -2,12 +2,15 @@ import React, { ReactNode } from 'react';
 import { Box, Container } from '@mui/material';
 import SideMenu from '@/components/SideMenu';
 import { DRAWER_WIDTH } from '@/constants/general';
+import { PageProps } from '@/constants/types';
 
-interface Props {
+interface Props extends PageProps {
   children?: ReactNode;
 }
 
-function Layout({ children }: Props) {
+function Layout(props: Props) {
+  const { children } = props;
+
   return (
     <Container>
       <SideMenu drawerWidth={DRAWER_WIDTH} />
