@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useRouter } from 'next/router';
+import { usePathname, useRouter } from 'next/navigation';
+import getConfig from 'next/config';
 import { DateTime } from 'luxon';
 import {
   AppBar,
@@ -19,21 +20,19 @@ import {
 import { FaBars, FaRegEnvelope, FaGithubSquare, FaLinkedin, FaSun, FaMoon } from 'react-icons/fa';
 import PAGES from '@/constants/pages';
 import { RootReducerState } from '@/constants/types';
-import { setIsDarkMode } from '@/slices/themeSlice';
-import styles from './SideMenu.module.scss';
+import { setIsDarkMode } from '@/slices/theme';
+import styles from './sidemenu.module.scss';
 
-interface Props {
-  drawerWidth: number;
-}
-
-export default function SideMenu(props: Props) {
+export default function SideMenu(props: { drawerWidth: number }) {
   const { drawerWidth } = props;
   const isDarkMode = useSelector((state: RootReducerState) => state.isDarkMode);
 
   const dispatch = useDispatch();
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
-  const currentRoute = router.pathname;
+  const currentRoute = usePathname();
+  const currentPage = PAGES.find((page) => currentRoute === page.route);
+  const { publicRuntimeConfig } = getConfig();
   const now = DateTime.local();
   const currentYear = now.year;
   const drawer = (
@@ -59,8 +58,7 @@ export default function SideMenu(props: Props) {
       </List>
       <Box className={styles['menu-bottom-wrapper']}>
         <Box className={styles['menu-bottom-item']}>
-          {/* TODO VERSION */}
-          <Typography variant="caption">version: 0.0.0</Typography>
+          <Typography variant="caption">version: {publicRuntimeConfig?.version}</Typography>
           <Box>
             <IconButton
               aria-label="github_profile"
@@ -108,7 +106,7 @@ export default function SideMenu(props: Props) {
             <FaBars />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            {PAGES.find((page) => currentRoute === page.route).title}
+            {currentPage ? currentPage.title : 'Page Not Found'}
           </Typography>
           <IconButton aria-label="theme mode" color="white" onClick={() => dispatch(setIsDarkMode(!isDarkMode))}>
             {isDarkMode ? <FaMoon /> : <FaSun />}

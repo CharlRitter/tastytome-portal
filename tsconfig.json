@@ -20,22 +20,45 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/components/*": ["components/*"],
-      "@/constants/*": ["constants/*"],
-      "@/pages/*": ["pages/*"],
-      "@/public/*": ["public/*"],
-      "@/reducers/*": ["reducers/*"],
-      "@/slices/*": ["slices/*"],
-      "@/tests/*": ["tests/*"],
-      "@/utils/*": ["utils/*"],
-    }
+      "@/components/*": [
+        "components/*"
+      ],
+      "@/constants/*": [
+        "constants/*"
+      ],
+      "@/pages/*": [
+        "app/*"
+      ],
+      "@/public/*": [
+        "public/*"
+      ],
+      "@/reducers/*": [
+        "reducers/*"
+      ],
+      "@/slices/*": [
+        "slices/*"
+      ],
+      "@/tests/*": [
+        "tests/*"
+      ],
+      "@/utils/*": [
+        "utils/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "types.d.ts",
-    ".eslintrc.js"
+    ".eslintrc.js",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

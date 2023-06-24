@@ -1,14 +1,9 @@
 import React, { ReactNode } from 'react';
 import { Box, Container } from '@mui/material';
-import SideMenu from '@/components/SideMenu';
+import SideMenu from '@/components/sidemenu';
 import { DRAWER_WIDTH } from '@/constants/general';
-import { PageProps } from '@/constants/types';
 
-interface Props extends PageProps {
-  children?: ReactNode;
-}
-
-function Layout(props: Props) {
+export default function Layout(props: { children?: ReactNode }) {
   const { children } = props;
 
   return (
@@ -29,5 +24,3 @@ function Layout(props: Props) {
     </Container>
   );
 }
-
-export default Layout;
