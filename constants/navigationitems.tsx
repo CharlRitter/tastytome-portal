@@ -9,11 +9,9 @@ import {
   FaShoppingBasket,
   FaBox,
   FaHome,
-  FaRegFile
+  FaRegFile,
+  FaCloud
 } from 'react-icons/fa';
-import About from '@/public/files/about.mdx';
-import Changelog from '@/public/files/changelog.mdx';
-import Terms from '@/public/files/terms.mdx';
 import { InfoModal, Page } from '@/constants/types';
 
 export const PAGES: Page[] = [
@@ -26,6 +24,11 @@ export const PAGES: Page[] = [
     title: 'Recipes',
     route: '/recipes',
     icon: <FaBook />
+  },
+  {
+    title: 'Library',
+    route: '/library',
+    icon: <FaCloud />
   },
   {
     title: 'Pantry',

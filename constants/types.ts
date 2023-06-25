@@ -15,3 +15,8 @@ export interface InfoModal {
   title: string;
   icon: ReactNode;
 }
+
+export interface AutocompleteOption {
+  label: string;
+  value: number;
+}

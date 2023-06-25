@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import getConfig from 'next/config';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
@@ -25,21 +24,18 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { FaBars, FaGithubSquare, FaLinkedin, FaSun, FaMoon } from 'react-icons/fa';
+import { FaBars, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
 import { PAGES, INFO_MODALS } from '@/constants/navigationitems';
-import { InfoModal, Page, RootReducerState } from '@/constants/types';
-import { setIsDarkMode } from '@/slices/theme';
+import { InfoModal, Page } from '@/constants/types';
 import styles from './sidemenu.module.scss';
 
 export default function SideMenu(props: { drawerWidth: number }) {
-  const dispatch = useDispatch();
   const router = useRouter();
   const [openModal, setOpenModal] = useState<number>(0);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const { drawerWidth } = props;
   const { publicRuntimeConfig } = getConfig();
   const currentRoute = usePathname();
-  const isDarkMode = useSelector((state: RootReducerState) => state.isDarkMode);
   const currentPage = PAGES.find((page: Page) => currentRoute === page.route);
   const now = DateTime.local();
   const currentYear = now.year;
@@ -131,7 +127,7 @@ export default function SideMenu(props: { drawerWidth: number }) {
           width: { sm: `calc(100% - ${drawerWidth}px)` }
         }}
       >
-        <Toolbar className={styles['header-bar']}>
+        <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -144,9 +140,6 @@ export default function SideMenu(props: { drawerWidth: number }) {
           <Typography variant="h6" noWrap component="div">
             {currentPage ? currentPage.title : 'Page Not Found'}
           </Typography>
-          <IconButton aria-label="theme mode" color="white" onClick={() => dispatch(setIsDarkMode(!isDarkMode))}>
-            {isDarkMode ? <FaMoon /> : <FaSun />}
-          </IconButton>
         </Toolbar>
       </AppBar>
       <Box component="nav" aria-label="Menu">
