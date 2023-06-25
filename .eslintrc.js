@@ -5,6 +5,7 @@ module.exports = {
     es6: true,
     jest: true
   },
+  ignorePatterns: ['next.config.js'],
   parser: '@typescript-eslint/parser',
   extends: [
     'next',

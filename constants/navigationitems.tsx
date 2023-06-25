@@ -8,10 +8,15 @@ import {
   FaBook,
   FaShoppingBasket,
   FaBox,
-  FaHome
+  FaHome,
+  FaRegFile
 } from 'react-icons/fa';
+import About from '@/public/files/about.mdx';
+import Changelog from '@/public/files/changelog.mdx';
+import Terms from '@/public/files/terms.mdx';
+import { InfoModal, Page } from '@/constants/types';
 
-export default [
+export const PAGES: Page[] = [
   {
     title: 'Dashboard',
     route: '/',
@@ -40,22 +45,29 @@ export default [
   {
     title: 'Settings',
     route: '/settings',
-    icon: <FaCog />,
-    divider: true
-  },
-  {
-    title: 'About',
-    route: '/about',
-    icon: <FaInfoCircle />
+    icon: <FaCog />
   },
   {
     title: 'Contact',
     route: '/contact',
     icon: <FaRegEnvelope />
+  }
+];
+
+export const INFO_MODALS: InfoModal[] = [
+  {
+    id: 1,
+    title: 'About',
+    icon: <FaInfoCircle />
   },
   {
+    id: 2,
+    title: 'Changelog',
+    icon: <FaRegFile />
+  },
+  {
+    id: 3,
     title: 'Terms',
-    route: '/terms',
     icon: <FaRegFileAlt />
   }
 ];

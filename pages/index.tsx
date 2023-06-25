@@ -1,6 +1,6 @@
 import React from 'react';
-import Layout from '@/components/layout';
+import PageContainer from '@/components/pagecontainer';
 
 export default function Home() {
-  return <Layout />;
+  return <PageContainer />;
 }
