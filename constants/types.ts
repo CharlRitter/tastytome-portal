@@ -1,9 +1,5 @@
 import { ReactNode } from 'react';
 
-export interface RootReducerState {
-  isDarkMode: boolean;
-}
-
 export interface Page {
   title: string;
   route: string;
@@ -16,7 +12,16 @@ export interface InfoModal {
   icon: ReactNode;
 }
 
+export interface InfoModals {
+  unsetModal: number;
+  modals: InfoModal[];
+}
+
 export interface AutocompleteOption {
   label: string;
   value: number;
+}
+
+export interface AutocompleteOptions {
+  options: AutocompleteOption[];
 }

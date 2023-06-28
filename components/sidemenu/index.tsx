@@ -27,11 +27,11 @@ import {
 import { FaBars, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
 import { PAGES, INFO_MODALS } from '@/constants/navigationitems';
 import { InfoModal, Page } from '@/constants/types';
-import styles from './sidemenu.module.scss';
+import { MenuBottomContent, MenuBottomWrapper } from './styled';
 
 export default function SideMenu(props: { drawerWidth: number }) {
   const router = useRouter();
-  const [openModal, setOpenModal] = useState<number>(0);
+  const [openModal, setOpenModal] = useState<number>(INFO_MODALS.unsetModal);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const { drawerWidth } = props;
   const { publicRuntimeConfig } = getConfig();
@@ -49,7 +49,7 @@ export default function SideMenu(props: { drawerWidth: number }) {
       </ListItemButton>
     </ListItem>
   ));
-  const infoModals = INFO_MODALS.map((modal: InfoModal) => {
+  const infoModals = INFO_MODALS.modals.map((modal: InfoModal) => {
     const Content = dynamic(() => import(`@/public/files/${modal.title.toLowerCase()}.mdx`), {
       loading: () => <div>Loading...</div>
     });
@@ -62,7 +62,7 @@ export default function SideMenu(props: { drawerWidth: number }) {
         </ListItemButton>
         <Dialog
           open={openModal === modal.id}
-          onClose={() => setOpenModal(0)}
+          onClose={() => setOpenModal(INFO_MODALS.unsetModal)}
           fullWidth
           maxWidth="md"
           fullScreen={isSM}
@@ -74,7 +74,7 @@ export default function SideMenu(props: { drawerWidth: number }) {
             <Content />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenModal(0)} autoFocus>
+            <Button onClick={() => setOpenModal(INFO_MODALS.unsetModal)} autoFocus>
               Close
             </Button>
           </DialogActions>
@@ -96,8 +96,8 @@ export default function SideMenu(props: { drawerWidth: number }) {
         <Divider />
         {infoModals}
       </List>
-      <Box className={styles['menu-bottom-wrapper']}>
-        <Box className={styles['menu-bottom-item']}>
+      <MenuBottomWrapper>
+        <MenuBottomContent>
           <Typography variant="caption">version: {publicRuntimeConfig?.version}</Typography>
           <Box>
             <IconButton
@@ -114,8 +114,8 @@ export default function SideMenu(props: { drawerWidth: number }) {
             </IconButton>
           </Box>
           <Typography variant="caption">© {currentYear} CookScribe.</Typography>
-        </Box>
-      </Box>
+        </MenuBottomContent>
+      </MenuBottomWrapper>
     </>
   );
 

@@ -15,7 +15,7 @@ export default function PageContainer(props: { children?: ReactNode }) {
         width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` }
       }}
     >
-      <Container>
+      <Container maxWidth="xl">
         <SideMenu drawerWidth={DRAWER_WIDTH} />
         <Box
           component="main"

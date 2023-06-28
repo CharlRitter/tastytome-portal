@@ -1,13 +1,12 @@
-import React, { ReactNode } from 'react';
-import { Provider, useSelector } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
+import React, { ReactNode, useEffect } from 'react';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/system';
 import CssBaseline from '@mui/material/CssBaseline';
 import { lightTheme, darkTheme } from '@/public/theme/themes';
-import rootReducer from '@/reducers/root';
-import { RootReducerState } from '@/constants/types';
+import { storeWrapper } from '@/reducers/store';
+import { RootState, setIsDarkTheme } from '@/slices/settings';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -15,14 +14,22 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 function StatefulThemeProvider({ children }: { children: ReactNode }) {
-  const isDarkMode = useSelector((state: RootReducerState) => state.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { isDarkTheme } = useSelector((state: RootState) => state.settings);
+  const dispatch = useDispatch();
+  const theme = isDarkTheme ? darkTheme : lightTheme;
+
+  useEffect(() => {
+    dispatch(
+      setIsDarkTheme(typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    );
+  }, [dispatch]);
 
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
 
-export default function CookScribe({ Component, pageProps }: AppProps) {
-  const store = configureStore({ reducer: rootReducer });
+export default function CookScribe({ Component, ...rest }: AppProps) {
+  const { store, props } = storeWrapper.useWrappedStore(rest);
+  const { pageProps } = props;
   const title = 'CookScribe';
   const description = 'Description of your website';
 

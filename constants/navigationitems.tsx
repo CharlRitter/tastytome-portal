@@ -12,7 +12,7 @@ import {
   FaRegFile,
   FaCloud
 } from 'react-icons/fa';
-import { InfoModal, Page } from '@/constants/types';
+import { InfoModals, Page } from '@/constants/types';
 
 export const PAGES: Page[] = [
   {
@@ -57,20 +57,23 @@ export const PAGES: Page[] = [
   }
 ];
 
-export const INFO_MODALS: InfoModal[] = [
-  {
-    id: 1,
-    title: 'About',
-    icon: <FaInfoCircle />
-  },
-  {
-    id: 2,
-    title: 'Changelog',
-    icon: <FaRegFile />
-  },
-  {
-    id: 3,
-    title: 'Terms',
-    icon: <FaRegFileAlt />
-  }
-];
+export const INFO_MODALS: InfoModals = {
+  unsetModal: 0,
+  modals: [
+    {
+      id: 1,
+      title: 'About',
+      icon: <FaInfoCircle />
+    },
+    {
+      id: 2,
+      title: 'Changelog',
+      icon: <FaRegFile />
+    },
+    {
+      id: 3,
+      title: 'Terms',
+      icon: <FaRegFileAlt />
+    }
+  ]
+};

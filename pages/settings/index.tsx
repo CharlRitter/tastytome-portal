@@ -1,19 +1,24 @@
-import React, { ChangeEvent, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { ChangeEvent } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Autocomplete, Grid, Paper, Switch, TextField, Typography } from '@mui/material';
 import PageContainer from '@/components/pagecontainer';
 import { THEMES, UNITS } from '@/constants/general';
 import { AutocompleteOption } from '@/constants/types';
-import { setIsDarkMode } from '@/slices/theme';
+import {
+  RootState,
+  setNegativePantryStock,
+  setNutritionalInformation,
+  setPantryStock,
+  setTheme,
+  setUnits
+} from '@/slices/settings';
 import globalStyles from '@/public/theme/global.module.scss';
 
 export default function Settings() {
   const dispatch = useDispatch();
-  const isSystemDarkMode =
-    typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const [pantryStock, setPantryStock] = useState<boolean>(true);
-  const [negativePantryStock, setNegativePantryStock] = useState<boolean>(true);
-  const [nutritionalInformation, setNutritionalInformation] = useState<boolean>(true);
+  const { theme, pantryStock, negativePantryStock, nutritionalInformation } = useSelector(
+    (state: RootState) => state.settings
+  );
 
   return (
     <PageContainer>
@@ -24,17 +29,25 @@ export default function Settings() {
           </Grid>
           <Grid item xs={6}>
             <Autocomplete
-              options={THEMES}
-              defaultValue={THEMES[0]}
+              options={THEMES.options}
+              value={THEMES.options[theme]}
               onChange={(event: ChangeEvent<object>, selectedOption: AutocompleteOption) =>
-                dispatch(
-                  setIsDarkMode(
-                    selectedOption.value === THEMES[0].value ?
-                      isSystemDarkMode :
-                      selectedOption.value === THEMES[1].value
-                  )
-                )
+                dispatch(setTheme(selectedOption.value))
               }
+              disableClearable
+              sx={{ width: '100%' }}
+              renderInput={(params) => <TextField {...params} />}
+            />
+          </Grid>
+        </Grid>
+        <Grid container spacing={2} alignItems="center" className={globalStyles['gap-bottom']}>
+          <Grid item xs={6}>
+            <Typography variant="body1">App Colour</Typography>
+          </Grid>
+          <Grid item xs={6}>
+            {/* TODO */}
+            <Autocomplete
+              options={[]}
               disableClearable
               sx={{ width: '100%' }}
               renderInput={(params) => <TextField {...params} />}
@@ -47,8 +60,11 @@ export default function Settings() {
           </Grid>
           <Grid item xs={6}>
             <Autocomplete
-              options={UNITS}
-              defaultValue={UNITS[0]}
+              options={UNITS.options}
+              defaultValue={UNITS.options[UNITS.mapping.metric]}
+              onChange={(event: ChangeEvent<object>, selectedOption: AutocompleteOption) =>
+                dispatch(setUnits(selectedOption.value))
+              }
               disableClearable
               sx={{ width: '100%' }}
               renderInput={(params) => <TextField {...params} />}
@@ -60,7 +76,11 @@ export default function Settings() {
             <Typography variant="body1">Pantry Stock</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Switch aria-label="pantry stock" checked={pantryStock} onChange={() => setPantryStock(!pantryStock)} />
+            <Switch
+              aria-label="pantry stock"
+              checked={pantryStock}
+              onChange={() => dispatch(setPantryStock(!pantryStock))}
+            />
           </Grid>
         </Grid>
         <Grid container spacing={2} alignItems="center" className={globalStyles['gap-bottom']}>
@@ -71,7 +91,7 @@ export default function Settings() {
             <Switch
               aria-label="negative pantry stock"
               checked={negativePantryStock}
-              onChange={() => setNegativePantryStock(!negativePantryStock)}
+              onChange={() => dispatch(setNegativePantryStock(!negativePantryStock))}
             />
           </Grid>
         </Grid>
@@ -83,7 +103,7 @@ export default function Settings() {
             <Switch
               aria-label="nutritional information"
               checked={nutritionalInformation}
-              onChange={() => setNutritionalInformation(!nutritionalInformation)}
+              onChange={() => dispatch(setNutritionalInformation(!nutritionalInformation))}
             />
           </Grid>
         </Grid>
