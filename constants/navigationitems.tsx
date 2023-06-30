@@ -10,9 +10,8 @@ import {
   FaBox,
   FaHome,
   FaRegFile,
-  FaCloud
 } from 'react-icons/fa';
-import { InfoModals, Page } from '@/constants/types';
+import { InfoModals, Page } from '@/types/constants';
 
 export const PAGES: Page[] = [
   {
@@ -24,11 +23,6 @@ export const PAGES: Page[] = [
     title: 'Recipes',
     route: '/recipes',
     icon: <FaBook />
-  },
-  {
-    title: 'Library',
-    route: '/library',
-    icon: <FaCloud />
   },
   {
     title: 'Pantry',

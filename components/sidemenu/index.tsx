@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import getConfig from 'next/config';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
@@ -6,6 +6,7 @@ import { DateTime } from 'luxon';
 import {
   AppBar,
   Box,
+  Breadcrumbs,
   Button,
   Dialog,
   DialogActions,
@@ -14,6 +15,7 @@ import {
   Divider,
   Drawer,
   IconButton,
+  Link,
   List,
   ListItem,
   ListItemButton,
@@ -26,7 +28,8 @@ import {
 } from '@mui/material';
 import { FaBars, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
 import { PAGES, INFO_MODALS } from '@/constants/navigationitems';
-import { InfoModal, Page } from '@/constants/types';
+import capitaliseFirstLetter from '@/utils/common';
+import { InfoModal, Page } from '@/types/constants';
 import { MenuBottomContent, MenuBottomWrapper } from './styled';
 
 export default function SideMenu(props: { drawerWidth: number }) {
@@ -36,11 +39,33 @@ export default function SideMenu(props: { drawerWidth: number }) {
   const { drawerWidth } = props;
   const { publicRuntimeConfig } = getConfig();
   const currentRoute = usePathname();
-  const currentPage = PAGES.find((page: Page) => currentRoute === page.route);
+  const routeSections = currentRoute.split('/').filter((element) => element.trim() !== '');
   const now = DateTime.local();
   const currentYear = now.year;
   const theme = useTheme();
   const isSM = useMediaQuery(theme.breakpoints.down('sm'));
+
+  let breadcrumbsHref = '';
+  const breadcrumbs = routeSections.map((routeSection: string, index: number) => {
+    breadcrumbsHref += `/${routeSection}`;
+    let content: string | ReactElement = capitaliseFirstLetter(routeSection, routeSection.includes('-') ? '-' : '');
+    const lastItem = index === routeSections.length - 1;
+
+    if (!lastItem) {
+      content = (
+        <Link underline="hover" key={routeSection} color="inherit" href={breadcrumbsHref}>
+          {content}
+        </Link>
+      );
+    }
+
+    return (
+      <Typography key={routeSection} variant="h6" noWrap color={lastItem ? 'text.primary' : 'inherit'}>
+        {content}
+      </Typography>
+    );
+  });
+
   const pages = PAGES.map((page: Page) => (
     <ListItem key={page.title} disablePadding>
       <ListItemButton selected={currentRoute === page.route} onClick={() => router.push(page.route)}>
@@ -49,6 +74,7 @@ export default function SideMenu(props: { drawerWidth: number }) {
       </ListItemButton>
     </ListItem>
   ));
+
   const infoModals = INFO_MODALS.modals.map((modal: InfoModal) => {
     const Content = dynamic(() => import(`@/public/files/${modal.title.toLowerCase()}.mdx`), {
       loading: () => <div>Loading...</div>
@@ -138,7 +164,7 @@ export default function SideMenu(props: { drawerWidth: number }) {
             <FaBars />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            {currentPage ? currentPage.title : 'Page Not Found'}
+            <Breadcrumbs aria-label="breadcrumb">{breadcrumbs}</Breadcrumbs>
           </Typography>
         </Toolbar>
       </AppBar>

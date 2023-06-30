@@ -33,7 +33,6 @@ module.exports = {
     'react/jsx-filename-extension': ['error', { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
 
     // Possible Errors (overrides from recommended set)
-    'no-extra-parens': 'error',
     'no-unexpected-multiline': 'error',
 
     // All JSDoc comments must be valid

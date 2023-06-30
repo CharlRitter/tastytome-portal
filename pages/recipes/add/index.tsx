@@ -1,6 +1,6 @@
 import React from 'react';
 import PageContainer from '@/components/pagecontainer';
 
-export default function Library() {
-  return <PageContainer />;
+export default function Recipes() {
+  return <PageContainer></PageContainer>;
 }

@@ -6,7 +6,8 @@ import { ThemeProvider } from '@mui/system';
 import CssBaseline from '@mui/material/CssBaseline';
 import { lightTheme, darkTheme } from '@/public/theme/themes';
 import { storeWrapper } from '@/reducers/store';
-import { RootState, setIsDarkTheme } from '@/slices/settings';
+import { setIsDarkTheme } from '@/slices/settings';
+import { SettingsRootState } from '@/types/settings';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -14,7 +15,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 function StatefulThemeProvider({ children }: { children: ReactNode }) {
-  const { isDarkTheme } = useSelector((state: RootState) => state.settings);
+  const { isDarkTheme } = useSelector((state: SettingsRootState) => state.settings);
   const dispatch = useDispatch();
   const theme = isDarkTheme ? darkTheme : lightTheme;
 

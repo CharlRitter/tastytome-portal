@@ -41,6 +41,9 @@
       "@/tests/*": [
         "tests/*"
       ],
+      "@/types/*": [
+        "types/*"
+      ],
       "@/utils/*": [
         "utils/*"
       ]

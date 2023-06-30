@@ -34,7 +34,7 @@ test.describe('Sidemenu Navigation', () => {
     });
   });
 
-  INFO_MODALS.forEach((modal) => {
+  INFO_MODALS.modals.forEach((modal) => {
     const modalTitle = modal.title;
 
     test(`open, read and close ${modalTitle} modal`, async ({ page, isMobile }, testInfo) => {

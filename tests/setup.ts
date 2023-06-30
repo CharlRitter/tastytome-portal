@@ -35,16 +35,15 @@ const defaultContextOptions = {
   // Set the viewport size
   viewport: {
     width: 1920,
-    height: 1080,
+    height: 1080
   },
   // Enable or disable JavaScript execution in the context
-  javaScriptEnabled: true,
+  javaScriptEnabled: true
 };
 
 // Jest/Jasmine setup
 beforeAll(async () => {
   // Launch the browsers specified in the Playwright configuration
-  // eslint-disable-next-line no-extra-parens
   (projects as ProjectConfig[]).forEach(async (project) => {
     const browserName = project.name.toLowerCase();
     const browserOptions = { ...defaultContextOptions, ...project.use };

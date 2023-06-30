@@ -1,10 +1,6 @@
-import { AutocompleteOptions } from '@/constants/types';
+import { ThemeAutocompleteOptions, UnitAutocompleteOptions } from '@/types/constants';
 
 export const DRAWER_WIDTH = 240;
-
-interface ThemeAutocompleteOptions extends AutocompleteOptions {
-  mapping: { auto: number; dark: number; light: number };
-}
 
 export const THEMES: ThemeAutocompleteOptions = {
   options: [
@@ -14,10 +10,6 @@ export const THEMES: ThemeAutocompleteOptions = {
   ],
   mapping: { auto: 0, dark: 1, light: 2 }
 };
-
-interface UnitAutocompleteOptions extends AutocompleteOptions {
-  mapping: { metric: number; us: number; imperial: number };
-}
 
 export const UNITS: UnitAutocompleteOptions = {
   options: [

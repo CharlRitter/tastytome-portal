@@ -3,9 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Autocomplete, Grid, Paper, Switch, TextField, Typography } from '@mui/material';
 import PageContainer from '@/components/pagecontainer';
 import { THEMES, UNITS } from '@/constants/general';
-import { AutocompleteOption } from '@/constants/types';
 import {
-  RootState,
   setNegativePantryStock,
   setNutritionalInformation,
   setPantryStock,
@@ -13,11 +11,13 @@ import {
   setUnits
 } from '@/slices/settings';
 import globalStyles from '@/public/theme/global.module.scss';
+import { AutocompleteOption } from '@/types/constants';
+import { SettingsRootState } from '@/types/settings';
 
 export default function Settings() {
   const dispatch = useDispatch();
   const { theme, pantryStock, negativePantryStock, nutritionalInformation } = useSelector(
-    (state: RootState) => state.settings
+    (state: SettingsRootState) => state.settings
   );
 
   return (
