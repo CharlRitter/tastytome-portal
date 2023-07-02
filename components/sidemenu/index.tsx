@@ -15,7 +15,6 @@ import {
   Divider,
   Drawer,
   IconButton,
-  Link,
   List,
   ListItem,
   ListItemButton,
@@ -30,6 +29,7 @@ import { FaBars, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
 import { PAGES, INFO_MODALS } from '@/constants/navigationitems';
 import capitaliseFirstLetter from '@/utils/common';
 import { InfoModal, Page } from '@/types/constants';
+import { NextLink } from '@/public/theme/globalStyled';
 import { MenuBottomContent, MenuBottomWrapper } from './styled';
 
 export default function SideMenu(props: { drawerWidth: number }) {
@@ -53,9 +53,9 @@ export default function SideMenu(props: { drawerWidth: number }) {
 
     if (!lastItem) {
       content = (
-        <Link underline="hover" key={routeSection} color="inherit" href={breadcrumbsHref}>
+        <NextLink key={routeSection} href={breadcrumbsHref}>
           {content}
-        </Link>
+        </NextLink>
       );
     }
 

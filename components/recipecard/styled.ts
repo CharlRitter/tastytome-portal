@@ -1,9 +1,9 @@
-import { Box, SpeedDial, SpeedDialAction, SpeedDialIcon, styled } from '@mui/material';
+import { CardActions, SpeedDial, SpeedDialAction, SpeedDialIcon, styled } from '@mui/material';
+import { StyledProps } from '@/types/common';
 
 export const RecipeSpeedDial = styled(SpeedDial)(() => ({
-  position: 'absolute',
-
   '.MuiSpeedDial-fab': {
+    boxShadow: 'unset',
     width: '40px',
     height: '40px'
   }
@@ -13,25 +13,30 @@ export const RecipeSpeedDialIcon = styled(SpeedDialIcon)(() => ({
   height: '20px',
 
   '.MuiSpeedDialIcon-icon': {
-    height: '20px'
+    height: '20px',
+    transition: 'transform 0.5s ease'
   },
 
-  '.MuiSpeedDialIcon-openIconOpen': {
-    height: '20px',
-    left: '10px',
-    transform: 'rotate(45deg)',
-    width: '20px'
+  '.MuiSpeedDialIcon-iconOpen': {
+    transform: 'rotate(180deg)',
+    transition: 'transform 0.5s ease'
   }
 }));
 
-export const RecipeSpeedDialAction = styled(SpeedDialAction)(({ theme }) => ({
+export const RecipeSpeedDialAction = styled(SpeedDialAction)<StyledProps>(({ theme }) => ({
   backgroundColor: theme.palette.secondary.main,
+
   '&:hover': {
     backgroundColor: theme.palette.secondary.dark
   }
 }));
 
-export const RecipeSpeedDialWrapper = styled(Box)(() => ({
-  height: '48px',
-  width: '48px'
+export const RecipeCardActions = styled(CardActions)(({ islistlayout }: { islistlayout: string }) => ({
+  alignItems: 'center',
+  display: 'flex',
+  height: islistlayout ? 'unset' : '50px',
+  justifyContent: islistlayout ? 'center' : 'unset',
+  paddingBottom: 0,
+  paddingTop: 0,
+  width: islistlayout ? '50px' : 'unset'
 }));

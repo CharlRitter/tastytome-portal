@@ -1,34 +1,6 @@
 import { ThemeOptions, createTheme } from '@mui/material/styles';
-import colours from '@/public/theme/colours';
+import { colours, sharedColours } from '@/public/theme/colours';
 import overrides from '@/public/theme/overrides';
-
-declare module '@mui/material' {
-  interface IconButtonPropsColorOverrides {
-    white: true;
-    veryLightGray: true;
-    lightGray: true;
-    lightBlack: true;
-    black: true;
-  }
-}
-
-const sharedColours = {
-  white: {
-    main: colours.white
-  },
-  veryLightGray: {
-    main: colours.veryLightGray
-  },
-  lightGray: {
-    main: colours.lightGray
-  },
-  lightBlack: {
-    main: colours.lightBlack
-  },
-  black: {
-    main: colours.black
-  }
-};
 
 const lightThemeOptions: ThemeOptions = {
   palette: {
@@ -40,9 +12,9 @@ const lightThemeOptions: ThemeOptions = {
       main: colours.lightSecondary
     },
     background: {
-      default: colours.veryLightGray
+      default: colours.lightBackground
     },
-    ...sharedColours
+    common: sharedColours
   },
   ...overrides
 };
@@ -58,7 +30,10 @@ const darkThemeOptions: ThemeOptions = {
     secondary: {
       main: colours.darkSecondary
     },
-    ...sharedColours
+    background: {
+      default: colours.darkBackground
+    },
+    common: sharedColours
   },
   ...overrides
 };

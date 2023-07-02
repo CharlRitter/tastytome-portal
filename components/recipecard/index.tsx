@@ -1,58 +1,79 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardMedia, Stack, Typography } from '@mui/material';
-import { FaCopy, FaEllipsisV, FaPlus, FaShareAlt, FaTrash } from 'react-icons/fa';
-import { RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon, RecipeSpeedDialWrapper } from './styled';
+import React, { useState } from 'react';
+import router from 'next/router';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardMedia,
+  Stack,
+  Typography,
+  CardActionArea,
+  useMediaQuery
+} from '@mui/material';
+import { FaChevronDown, FaChevronRight, FaCopy, FaShareAlt, FaTrash } from 'react-icons/fa';
+import { RecipeCardActions, RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon } from './styled';
 
-export default function RecipeCard(props: { isListLayout: boolean }) {
-  const { isListLayout } = props;
-  const speedDialActions = [
-    { icon: <FaShareAlt />, name: 'Share', ariaLabel: 'share' },
-    { icon: <FaCopy />, name: 'Duplicate', ariaLabel: 'duplicate' },
-    { icon: <FaTrash />, name: 'Delete', ariaLabel: 'delete' }
+export default function RecipeCard(props: {
+  isListLayout: boolean;
+  title: string;
+  dateCreated: string;
+  description: string;
+  imagePath: string;
+  recipeID: number;
+}) {
+  const { title, dateCreated, description, imagePath, recipeID } = props;
+  const [openSpeedDial, setOpenSpeedDial] = useState<boolean>(false);
+  const isListLayout = useMediaQuery('(max-width: 899px)') ? false : props.isListLayout;
+
+  const buttonActions = [
+    { icon: <FaShareAlt />, title: 'Share', ariaLabel: 'share' },
+    { icon: <FaCopy />, title: 'Duplicate', ariaLabel: 'duplicate' },
+    { icon: <FaTrash />, title: 'Delete', ariaLabel: 'delete' }
   ];
-  const [openSpeedDial, setOpenSpeedDial] = React.useState(false);
 
   return (
-    <Card classes={{ root: 'main' }} sx={{ display: 'flex', flexDirection: isListLayout ? 'grid' : 'column' }}>
-      {isListLayout ? (
-        <CardMedia component="img" image="/images/pancakes.jpg" alt="recipe" height="200" sx={{ width: '300px' }} />
-      ) : (
-        <CardMedia component="img" image="/images/pancakes.jpg" alt="recipe" height="200" />
-      )}
-      <Stack direction="column" width="100%">
-        <CardHeader
-          action={
-            <RecipeSpeedDialWrapper>
-              <RecipeSpeedDial
-                ariaLabel="recipe actions"
-                icon={<RecipeSpeedDialIcon icon={<FaEllipsisV />} openIcon={<FaPlus />} />}
-                open={openSpeedDial}
-                onClick={() => setOpenSpeedDial(!openSpeedDial)}
-                onOpen={() => setOpenSpeedDial(true)}
-                onClose={() => setOpenSpeedDial(false)}
-                direction="down"
-              >
-                {speedDialActions.map((action) => (
-                  <RecipeSpeedDialAction
-                    key={action.name}
-                    icon={action.icon}
-                    tooltipTitle={action.name}
-                    aria-label={action.ariaLabel}
-                    onClick={() => setOpenSpeedDial(false)}
-                  />
-                ))}
-              </RecipeSpeedDial>
-            </RecipeSpeedDialWrapper>
-          }
-          title="Shrimp and Chorizo Paella"
-          subheader="September 14, 2016"
-        />
-        <CardContent>
-          <Typography variant="body2" color="text.secondary">
-            This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup
-            of frozen peas along with the mussels, if you like.
-          </Typography>
-        </CardContent>
+    <Card>
+      <Stack direction={isListLayout ? 'row' : 'column'}>
+        <CardActionArea onClick={() => router.push(`/recipes/${recipeID}`)}>
+          <Stack direction={isListLayout ? 'row' : 'column'}>
+            <CardMedia
+              component="img"
+              image={imagePath}
+              alt="recipe"
+              height={isListLayout ? '250px' : '300px'}
+              sx={{ width: isListLayout ? '300px' : 'unset' }}
+            />
+            <Stack direction="column">
+              <CardHeader title={title} subheader={dateCreated} />
+              <CardContent>
+                <Typography variant="body2" color="text.secondary">
+                  {description}
+                </Typography>
+              </CardContent>
+            </Stack>
+          </Stack>
+        </CardActionArea>
+        <RecipeCardActions islistlayout={isListLayout ? 'true' : ''}>
+          <RecipeSpeedDial
+            ariaLabel="recipe actions"
+            icon={<RecipeSpeedDialIcon icon={isListLayout ? <FaChevronDown /> : <FaChevronRight />} />}
+            open={openSpeedDial}
+            onClick={() => setOpenSpeedDial(!openSpeedDial)}
+            onOpen={() => setOpenSpeedDial(true)}
+            onClose={() => setOpenSpeedDial(false)}
+            direction={isListLayout ? 'down' : 'right'}
+          >
+            {buttonActions.map((action) => (
+              <RecipeSpeedDialAction
+                key={action.title}
+                icon={action.icon}
+                tooltipTitle={action.title}
+                aria-label={action.ariaLabel}
+                onClick={() => setOpenSpeedDial(false)}
+              />
+            ))}
+          </RecipeSpeedDial>
+        </RecipeCardActions>
       </Stack>
     </Card>
   );

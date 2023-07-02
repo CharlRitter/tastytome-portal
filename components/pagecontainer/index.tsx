@@ -17,14 +17,7 @@ export default function PageContainer(props: { children?: ReactNode }) {
     >
       <Container maxWidth="xl">
         <SideMenu drawerWidth={DRAWER_WIDTH} />
-        <Box
-          component="main"
-          sx={{
-            p: 2
-          }}
-        >
-          {children}
-        </Box>
+        {children}
       </Container>
     </Box>
   );
