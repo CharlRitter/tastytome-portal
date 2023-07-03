@@ -211,7 +211,6 @@ module.exports = {
     'space-infix-ops': 'warn',
     'space-unary-ops': ['warn', { words: true, nonwords: false }],
     'spaced-comment': ['warn', 'always', { exceptions: ['-'] }],
-    'wrap-regex': 'warn',
     "comma-dangle": "off",
     "@typescript-eslint/comma-dangle": "off",
 

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "lib": [
+      "es6",
       "dom",
       "dom.iterable",
       "esnext"
@@ -53,7 +54,9 @@
         "name": "next"
       }
     ],
-    "strictNullChecks": true
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
   },
   "include": [
     "next-env.d.ts",
@@ -61,7 +64,8 @@
     "**/*.tsx",
     "types.d.ts",
     ".eslintrc.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "tsconfig.json"
   ],
   "exclude": [
     "node_modules"

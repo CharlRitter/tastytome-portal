@@ -9,7 +9,7 @@ import {
   FaShoppingBasket,
   FaBox,
   FaHome,
-  FaRegFile,
+  FaRegFile
 } from 'react-icons/fa';
 import { InfoModals, Page } from '@/types/constants';
 

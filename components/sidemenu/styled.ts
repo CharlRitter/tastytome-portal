@@ -6,8 +6,8 @@ export const MenuBottomWrapper = styled(Box)(() => ({
   height: '100%',
   padding: '5px 10px',
   textAlign: 'center'
-}));
+})) as typeof Box;
 
 export const MenuBottomContent = styled(Box)(() => ({
   width: '100%'
-}));
+})) as typeof Box;

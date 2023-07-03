@@ -13,7 +13,7 @@ export default function Recipes() {
   return (
     <PageContainer>
       <StickyHeader>
-        <Stack justifyContent="space-between" alignItems="center" direction="row" sx={{ margin: '10px 0' }}>
+        <Stack justifyContent="space-between" alignItems="center" direction="row" sx={{ margin: '10px' }}>
           <ToggleButtonGroup
             aria-label="layout button group"
             value={isListLayout}
@@ -37,7 +37,7 @@ export default function Recipes() {
         </Stack>
       </StickyHeader>
 
-      <Grid container spacing={2} className={globalStyles['gap-bottom']}>
+      <Grid container spacing={2} className={globalStyles['space-bottom']}>
         {[...Array(12)].map((_, index) => (
           <Grid key={index} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
             <RecipeCard
@@ -47,6 +47,8 @@ export default function Recipes() {
               dateCreated="September 14, 2016"
               description="This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like."
               imagePath="/images/pancakes.jpg"
+              rating={3}
+              loading={false}
             />
           </Grid>
         ))}

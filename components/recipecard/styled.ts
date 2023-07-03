@@ -7,7 +7,7 @@ export const RecipeSpeedDial = styled(SpeedDial)(() => ({
     width: '40px',
     height: '40px'
   }
-}));
+})) as typeof SpeedDial;
 
 export const RecipeSpeedDialIcon = styled(SpeedDialIcon)(() => ({
   height: '20px',
@@ -29,14 +29,11 @@ export const RecipeSpeedDialAction = styled(SpeedDialAction)<StyledProps>(({ the
   '&:hover': {
     backgroundColor: theme.palette.secondary.dark
   }
-}));
+})) as typeof SpeedDialAction;
 
-export const RecipeCardActions = styled(CardActions)(({ islistlayout }: { islistlayout: string }) => ({
+export const RecipeCardActions = styled(CardActions)(() => ({
   alignItems: 'center',
   display: 'flex',
-  height: islistlayout ? 'unset' : '50px',
-  justifyContent: islistlayout ? 'center' : 'unset',
   paddingBottom: 0,
-  paddingTop: 0,
-  width: islistlayout ? '50px' : 'unset'
-}));
+  paddingTop: 0
+})) as typeof CardActions;

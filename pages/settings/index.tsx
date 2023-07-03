@@ -23,7 +23,7 @@ export default function Settings() {
   return (
     <PageContainer>
       <Paper classes={{ root: 'main' }}>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['gap-bottom']}>
+        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
           <Grid item xs={6}>
             <Typography variant="body1">Theme</Typography>
           </Grid>
@@ -40,7 +40,7 @@ export default function Settings() {
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['gap-bottom']}>
+        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
           <Grid item xs={6}>
             <Typography variant="body1">App Colour</Typography>
           </Grid>
@@ -54,7 +54,7 @@ export default function Settings() {
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['gap-bottom']}>
+        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
           <Grid item xs={6}>
             <Typography variant="body1">Default Units</Typography>
           </Grid>
@@ -71,7 +71,7 @@ export default function Settings() {
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['gap-bottom']}>
+        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
           <Grid item xs={6}>
             <Typography variant="body1">Pantry Stock</Typography>
           </Grid>
@@ -83,7 +83,7 @@ export default function Settings() {
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['gap-bottom']}>
+        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
           <Grid item xs={6}>
             <Typography variant="body1">Negative Pantry Stock</Typography>
           </Grid>
@@ -95,7 +95,7 @@ export default function Settings() {
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['gap-bottom']}>
+        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
           <Grid item xs={6}>
             <Typography variant="body1">Nutritional Information</Typography>
           </Grid>

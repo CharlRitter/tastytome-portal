@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import router from 'next/router';
 import {
+  Avatar,
   Card,
   CardContent,
   CardHeader,
   CardMedia,
+  Rating,
+  Skeleton,
   Stack,
   Typography,
   CardActionArea,
   useMediaQuery
 } from '@mui/material';
 import { FaChevronDown, FaChevronRight, FaCopy, FaShareAlt, FaTrash } from 'react-icons/fa';
+import { AbbreviateTitle, StringToColor } from '@/utils/common';
 import { RecipeCardActions, RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon } from './styled';
 
 export default function RecipeCard(props: {
@@ -18,10 +22,12 @@ export default function RecipeCard(props: {
   title: string;
   dateCreated: string;
   description: string;
-  imagePath: string;
   recipeID: number;
+  imagePath?: string;
+  rating?: number;
+  loading?: boolean;
 }) {
-  const { title, dateCreated, description, imagePath, recipeID } = props;
+  const { title, dateCreated, description, imagePath, recipeID, loading, rating } = props;
   const [openSpeedDial, setOpenSpeedDial] = useState<boolean>(false);
   const isListLayout = useMediaQuery('(max-width: 899px)') ? false : props.isListLayout;
 
@@ -31,20 +37,59 @@ export default function RecipeCard(props: {
     { icon: <FaTrash />, title: 'Delete', ariaLabel: 'delete' }
   ];
 
-  return (
+  return loading ? (
     <Card>
-      <Stack direction={isListLayout ? 'row' : 'column'}>
+      <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
+        <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
+          <Skeleton variant="rounded" width={isListLayout ? 300 : 'unset'} height={isListLayout ? 250 : 300} />
+          <Stack direction="column" width="100%">
+            <CardContent>
+              <Skeleton variant="text" height={50} width="50%" />
+              <br></br>
+              <Skeleton variant="text" />
+              <Skeleton variant="text" width="50%" />
+              <Skeleton variant="text" width="75%" />
+            </CardContent>
+          </Stack>
+        </Stack>
+      </Stack>
+    </Card>
+  ) : (
+    <Card>
+      <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
         <CardActionArea onClick={() => router.push(`/recipes/${recipeID}`)}>
-          <Stack direction={isListLayout ? 'row' : 'column'}>
-            <CardMedia
-              component="img"
-              image={imagePath}
-              alt="recipe"
-              height={isListLayout ? '250px' : '300px'}
-              sx={{ width: isListLayout ? '300px' : 'unset' }}
-            />
-            <Stack direction="column">
-              <CardHeader title={title} subheader={dateCreated} />
+          <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
+            {imagePath ? (
+              <CardMedia
+                component="img"
+                image={imagePath}
+                alt="recipe"
+                height={isListLayout ? '250px' : '300px'}
+                sx={{ width: isListLayout ? '300px' : 'unset' }}
+              />
+            ) : (
+              <Avatar
+                sx={{
+                  bgcolor: StringToColor(title),
+                  width: isListLayout ? '300px' : 'unset',
+                  height: isListLayout ? '250px' : '300px'
+                }}
+                variant="square"
+              >
+                <Typography variant="h2">{AbbreviateTitle(title)}</Typography>
+              </Avatar>
+            )}
+            <Stack direction="column" width="100%">
+              <CardHeader
+                title={title}
+                subheader={
+                  <>
+                    {dateCreated}
+                    <br></br>
+                    <Rating name="read-only" value={rating} readOnly />
+                  </>
+                }
+              />
               <CardContent>
                 <Typography variant="body2" color="text.secondary">
                   {description}
@@ -53,7 +98,13 @@ export default function RecipeCard(props: {
             </Stack>
           </Stack>
         </CardActionArea>
-        <RecipeCardActions islistlayout={isListLayout ? 'true' : ''}>
+        <RecipeCardActions
+          sx={{
+            height: isListLayout ? 'unset' : '50px',
+            justifyContent: isListLayout ? 'center' : 'unset',
+            width: isListLayout ? '50px' : 'unset'
+          }}
+        >
           <RecipeSpeedDial
             ariaLabel="recipe actions"
             icon={<RecipeSpeedDialIcon icon={isListLayout ? <FaChevronDown /> : <FaChevronRight />} />}

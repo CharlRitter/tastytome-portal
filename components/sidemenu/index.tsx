@@ -27,7 +27,7 @@ import {
 } from '@mui/material';
 import { FaBars, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
 import { PAGES, INFO_MODALS } from '@/constants/navigationitems';
-import capitaliseFirstLetter from '@/utils/common';
+import { CapitaliseFirstLetter } from '@/utils/common';
 import { InfoModal, Page } from '@/types/constants';
 import { NextLink } from '@/public/theme/globalStyled';
 import { MenuBottomContent, MenuBottomWrapper } from './styled';
@@ -39,7 +39,7 @@ export default function SideMenu(props: { drawerWidth: number }) {
   const { drawerWidth } = props;
   const { publicRuntimeConfig } = getConfig();
   const currentRoute = usePathname();
-  const routeSections = currentRoute.split('/').filter((element) => element.trim() !== '');
+  const routeSections = currentRoute ? currentRoute.split('/').filter((element) => element.trim() !== '') : [];
   const now = DateTime.local();
   const currentYear = now.year;
   const theme = useTheme();
@@ -48,7 +48,7 @@ export default function SideMenu(props: { drawerWidth: number }) {
   let breadcrumbsHref = '';
   const breadcrumbs = routeSections.map((routeSection: string, index: number) => {
     breadcrumbsHref += `/${routeSection}`;
-    let content: string | ReactElement = capitaliseFirstLetter(routeSection, routeSection.includes('-') ? '-' : '');
+    let content: string | ReactElement = CapitaliseFirstLetter(routeSection, routeSection.includes('-') ? '-' : '');
     const lastItem = index === routeSections.length - 1;
 
     if (!lastItem) {
