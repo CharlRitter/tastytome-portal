@@ -1,9 +1,9 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, ReactElement, useState } from 'react';
 import { Button, Grid, Paper, TextField } from '@mui/material';
 import ReCAPTCHA from 'react-google-recaptcha';
 import PageContainer from '@/components/pagecontainer';
 
-export default function Contact() {
+export default function Contact(): ReactElement {
   const [isCaptchaVerified, setIsCaptchaVerified] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
@@ -21,55 +21,47 @@ export default function Contact() {
 
   return (
     <PageContainer>
-      <Paper classes={{ root: 'main' }}>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Name"
-                variant="outlined"
-                required
-                fullWidth
-                onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setName(event.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Email"
-                variant="outlined"
-                type="email"
-                required
-                fullWidth
-                onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setEmail(event.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Message"
-                variant="outlined"
-                multiline
-                rows={4}
-                required
-                fullWidth
-                onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-                  setMessage(event.target.value)
-                }
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <ReCAPTCHA
-                sitekey="YOUR_RECAPTCHA_SITE_KEY"
-                size="invisible"
-                onChange={() => setIsCaptchaVerified(true)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button type="submit" variant="contained" color="primary" disabled={!name || !email || !message}>
-                Submit
-              </Button>
-            </Grid>
+      <Paper classes={{ root: 'main' }} component="form" onSubmit={handleSubmit}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Name"
+              variant="outlined"
+              required
+              fullWidth
+              onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setName(event.target.value)}
+            />
           </Grid>
-        </form>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Email"
+              variant="outlined"
+              type="email"
+              required
+              fullWidth
+              onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setEmail(event.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Message"
+              variant="outlined"
+              multiline
+              rows={4}
+              required
+              fullWidth
+              onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setMessage(event.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <ReCAPTCHA sitekey="YOUR_RECAPTCHA_SITE_KEY" size="invisible" onChange={() => setIsCaptchaVerified(true)} />
+          </Grid>
+          <Grid item xs={12}>
+            <Button type="button" variant="contained" color="primary" disabled={!name || !email || !message}>
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
       </Paper>
     </PageContainer>
   );

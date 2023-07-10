@@ -19,8 +19,6 @@ const lightThemeOptions: ThemeOptions = {
   ...overrides
 };
 
-export const lightTheme = createTheme(lightThemeOptions);
-
 const darkThemeOptions: ThemeOptions = {
   palette: {
     mode: 'dark',
@@ -38,4 +36,5 @@ const darkThemeOptions: ThemeOptions = {
   ...overrides
 };
 
+export const lightTheme = createTheme(lightThemeOptions);
 export const darkTheme = createTheme(darkThemeOptions);

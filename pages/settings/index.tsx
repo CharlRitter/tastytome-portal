@@ -1,24 +1,26 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Autocomplete, Grid, Paper, Switch, TextField, Typography } from '@mui/material';
 import PageContainer from '@/components/pagecontainer';
-import { THEMES, UNITS } from '@/constants/general';
 import {
   setNegativePantryStock,
   setNutritionalInformation,
   setPantryStock,
-  setTheme,
-  setUnits
+  setThemeSetting,
+  setMeasurementSystem
 } from '@/slices/settings';
 import globalStyles from '@/public/theme/global.module.scss';
-import { AutocompleteOption } from '@/types/constants';
 import { SettingsRootState } from '@/types/settings';
+import { MeasurementSystems } from '@/constants/measurements';
+import { ThemeSettingOptions } from '@/constants/general';
 
-export default function Settings() {
+export default function Settings() : ReactElement {
   const dispatch = useDispatch();
   const { theme, pantryStock, negativePantryStock, nutritionalInformation } = useSelector(
     (state: SettingsRootState) => state.settings
   );
+  const measurementSystemOptions = Object.values(MeasurementSystems);
+  const themeSettingOptions = Object.values(ThemeSettingOptions);
 
   return (
     <PageContainer>
@@ -29,10 +31,10 @@ export default function Settings() {
           </Grid>
           <Grid item xs={6}>
             <Autocomplete
-              options={THEMES.options}
-              value={THEMES.options[theme]}
-              onChange={(event: ChangeEvent<object>, selectedOption: AutocompleteOption) =>
-                dispatch(setTheme(selectedOption.value))
+              options={themeSettingOptions}
+              value={theme}
+              onChange={(event: ChangeEvent<object>, selectedOption: string) =>
+                dispatch(setThemeSetting(selectedOption))
               }
               disableClearable
               sx={{ width: '100%' }}
@@ -60,10 +62,10 @@ export default function Settings() {
           </Grid>
           <Grid item xs={6}>
             <Autocomplete
-              options={UNITS.options}
-              defaultValue={UNITS.options[UNITS.mapping.metric]}
-              onChange={(event: ChangeEvent<object>, selectedOption: AutocompleteOption) =>
-                dispatch(setUnits(selectedOption.value))
+              options={measurementSystemOptions}
+              defaultValue={MeasurementSystems.Metric}
+              onChange={(event: ChangeEvent<object>, selectedOption: string) =>
+                dispatch(setMeasurementSystem(selectedOption))
               }
               disableClearable
               sx={{ width: '100%' }}

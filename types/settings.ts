@@ -1,7 +1,7 @@
 export interface SettingsState {
   isDarkTheme: boolean;
-  theme: number;
-  units: number;
+  theme: string;
+  units: string;
   pantryStock: boolean;
   negativePantryStock: boolean;
   nutritionalInformation: boolean;

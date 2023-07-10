@@ -1,21 +1,31 @@
-import { ThemeAutocompleteOptions, UnitAutocompleteOptions } from '@/types/constants';
-
 export const DRAWER_WIDTH = 240;
 
-export const THEMES: ThemeAutocompleteOptions = {
-  options: [
-    { label: 'Auto', value: 0 },
-    { label: 'Dark', value: 1 },
-    { label: 'Light', value: 2 }
-  ],
-  mapping: { auto: 0, dark: 1, light: 2 }
-};
+export enum ThemeSettingOptions {
+  Auto = 'Auto',
+  Dark = 'Dark',
+  Light = 'Light'
+}
 
-export const UNITS: UnitAutocompleteOptions = {
-  options: [
-    { label: 'Metric', value: 0 },
-    { label: 'US', value: 1 },
-    { label: 'Imperial', value: 2 }
-  ],
-  mapping: { metric: 0, us: 1, imperial: 2 }
-};
+export enum CategoryOptions {
+  Appetizer = 'Appetizer',
+  Baking = 'Baking',
+  Breakfast = 'Breakfast',
+  Brunch = 'Brunch',
+  Dessert = 'Dessert',
+  Dinner = 'Dinner',
+  DrinksAndCocktails = 'Drinks & Cocktails',
+  Lunch = 'Lunch',
+  Salad = 'Salad',
+  Sides = 'Sides',
+  SmoothiesAndShakes = 'Smoothies & Shakes',
+  Soups = 'Soups',
+  Snacks = 'Snacks',
+  Vegetarian = 'Vegetarian',
+  Vegan = 'Vegan'
+}
+
+export enum ListTypes {
+  Instructions = 'Instructions',
+  Ingredients = 'ingredients',
+  Timers = 'Timers'
+}

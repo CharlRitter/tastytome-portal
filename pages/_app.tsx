@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactElement, ReactNode, useEffect } from 'react';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -14,7 +14,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-function StatefulThemeProvider({ children }: { children: ReactNode }) {
+function StatefulThemeProvider({ children }: { children: ReactNode }): ReactElement {
   const { isDarkTheme } = useSelector((state: SettingsRootState) => state.settings);
   const dispatch = useDispatch();
   const theme = isDarkTheme ? darkTheme : lightTheme;

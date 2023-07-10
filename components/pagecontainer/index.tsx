@@ -1,9 +1,9 @@
-import React, { ReactNode } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { Box, Container } from '@mui/material';
 import SideMenu from '@/components/sidemenu';
 import { DRAWER_WIDTH } from '@/constants/general';
 
-export default function PageContainer(props: { children?: ReactNode }) {
+export default function PageContainer(props: { children?: ReactNode }): ReactElement {
   const { children } = props;
 
   return (

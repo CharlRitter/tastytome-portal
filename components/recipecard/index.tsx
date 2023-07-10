@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import router from 'next/router';
 import {
   Avatar,
@@ -11,7 +11,8 @@ import {
   Stack,
   Typography,
   CardActionArea,
-  useMediaQuery
+  useMediaQuery,
+  Chip
 } from '@mui/material';
 import { FaChevronDown, FaChevronRight, FaCopy, FaShareAlt, FaTrash } from 'react-icons/fa';
 import { AbbreviateTitle, StringToColor } from '@/utils/common';
@@ -22,12 +23,13 @@ export default function RecipeCard(props: {
   title: string;
   dateCreated: string;
   description: string;
+  categories: string[];
   recipeID: number;
   imagePath?: string;
   rating?: number;
   loading?: boolean;
-}) {
-  const { title, dateCreated, description, imagePath, recipeID, loading, rating } = props;
+}): ReactElement {
+  const { title, dateCreated, description, categories, imagePath, recipeID, loading, rating } = props;
   const [openSpeedDial, setOpenSpeedDial] = useState<boolean>(false);
   const isListLayout = useMediaQuery('(max-width: 899px)') ? false : props.isListLayout;
 
@@ -87,6 +89,10 @@ export default function RecipeCard(props: {
                     {dateCreated}
                     <br></br>
                     <Rating name="read-only" value={rating} readOnly />
+                    <br></br>
+                    {categories.map((category) => (
+                      <Chip key={category} label={category} variant="outlined" />
+                    ))}
                   </>
                 }
               />

@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import PageContainer from '@/components/pagecontainer';
 
-export default function Pantry() {
+export default function RecipeAction() : ReactElement {
   const router = useRouter();
   const { action, id } = router.query;
   const isIDInt = typeof id === 'string' && /^\d+$/.test(id);

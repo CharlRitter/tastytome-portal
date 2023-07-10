@@ -32,7 +32,7 @@ import { InfoModal, Page } from '@/types/constants';
 import { NextLink } from '@/public/theme/globalStyled';
 import { MenuBottomContent, MenuBottomWrapper } from './styled';
 
-export default function SideMenu(props: { drawerWidth: number }) {
+export default function SideMenu(props: { drawerWidth: number }): ReactElement {
   const router = useRouter();
   const [openModal, setOpenModal] = useState<number>(INFO_MODALS.unsetModal);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
@@ -60,7 +60,12 @@ export default function SideMenu(props: { drawerWidth: number }) {
     }
 
     return (
-      <Typography key={routeSection} variant="h6" noWrap color={lastItem ? 'text.primary' : 'inherit'}>
+      <Typography
+        key={routeSection}
+        variant="h6"
+        noWrap
+        sx={{ color: lastItem ? theme.palette.common.white : theme.palette.grey.A400 }}
+      >
         {content}
       </Typography>
     );
@@ -163,9 +168,9 @@ export default function SideMenu(props: { drawerWidth: number }) {
           >
             <FaBars />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            <Breadcrumbs aria-label="breadcrumb">{breadcrumbs}</Breadcrumbs>
-          </Typography>
+          <Breadcrumbs aria-label="breadcrumb" sx={{ color: 'inherit' }}>
+            {breadcrumbs}
+          </Breadcrumbs>
         </Toolbar>
       </AppBar>
       <Box component="nav" aria-label="Menu">
