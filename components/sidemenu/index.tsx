@@ -30,7 +30,6 @@ import { PAGES, INFO_MODALS } from '@/constants/navigationitems';
 import { CapitaliseFirstLetter } from '@/utils/common';
 import { InfoModal, Page } from '@/types/constants';
 import { NextLink } from '@/public/theme/globalStyled';
-import { MenuBottomContent, MenuBottomWrapper } from './styled';
 
 export default function SideMenu(props: { drawerWidth: number }): ReactElement {
   const router = useRouter();
@@ -127,26 +126,26 @@ export default function SideMenu(props: { drawerWidth: number }): ReactElement {
         <Divider />
         {infoModals}
       </List>
-      <MenuBottomWrapper>
-        <MenuBottomContent>
+      <Box className="flex items-end	text-center	h-full pb-1">
+        <Box className="w-full">
           <Typography variant="caption">version: {publicRuntimeConfig?.version}</Typography>
           <Box>
             <IconButton
-              aria-label="github_profile"
+              aria-label="github profile"
               onClick={() => window.open('https://github.com/CharlRitter', '_blank')}
             >
               <FaGithubSquare />
             </IconButton>
             <IconButton
-              aria-label="linkedin_profile"
+              aria-label="linkedin profile"
               onClick={() => window.open('https://www.linkedin.com/in/charl-ritter-0a1a45130/', '_blank')}
             >
               <FaLinkedin />
             </IconButton>
           </Box>
           <Typography variant="caption">© {currentYear} CookScribe.</Typography>
-        </MenuBottomContent>
-      </MenuBottomWrapper>
+        </Box>
+      </Box>
     </>
   );
 
@@ -168,7 +167,7 @@ export default function SideMenu(props: { drawerWidth: number }): ReactElement {
           >
             <FaBars />
           </IconButton>
-          <Breadcrumbs aria-label="breadcrumb" sx={{ color: 'inherit' }}>
+          <Breadcrumbs aria-label="breadcrumbs" sx={{ color: 'inherit' }}>
             {breadcrumbs}
           </Breadcrumbs>
         </Toolbar>

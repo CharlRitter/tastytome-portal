@@ -87,7 +87,7 @@ export default function RecipeAction(): ReactElement {
             <TextField
               label="Title"
               name="title"
-              sx={{ width: isMediumScreen ? 'unset' : '75%' }}
+              sx={{ width: isMediumScreen ? 'unset' : '80%' }}
               value={recipe.title}
               onChange={(event: ChangeEvent<HTMLInputElement>) => handleSetRecipe({ title: event.target.value })}
               required

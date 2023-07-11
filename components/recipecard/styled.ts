@@ -1,4 +1,4 @@
-import { CardActions, SpeedDial, SpeedDialAction, SpeedDialIcon, styled } from '@mui/material';
+import { SpeedDial, SpeedDialAction, SpeedDialIcon, styled } from '@mui/material';
 import { StyledProps } from '@/types/common';
 
 export const RecipeSpeedDial = styled(SpeedDial)(() => ({
@@ -30,10 +30,3 @@ export const RecipeSpeedDialAction = styled(SpeedDialAction)<StyledProps>(({ the
     backgroundColor: theme.palette.secondary.dark
   }
 })) as typeof SpeedDialAction;
-
-export const RecipeCardActions = styled(CardActions)(() => ({
-  alignItems: 'center',
-  display: 'flex',
-  paddingBottom: 0,
-  paddingTop: 0
-})) as typeof CardActions;

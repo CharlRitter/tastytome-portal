@@ -1,9 +1,5 @@
-import { Accordion, Box, Paper, ToggleButton, styled } from '@mui/material';
+import { Accordion, Box, styled } from '@mui/material';
 import { StyledProps } from '@/types/common';
-
-export const LayoutToggleButton = styled(ToggleButton)(() => ({
-  padding: '10px'
-})) as typeof ToggleButton;
 
 export const StickyWrapper = styled(Box)<StyledProps>(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -14,10 +10,6 @@ export const StickyWrapper = styled(Box)<StyledProps>(({ theme }) => ({
   top: '60px',
   zIndex: 1051
 })) as typeof Box;
-
-export const ActionsHeader = styled(Paper)(() => ({
-  padding: '5px'
-})) as typeof Paper;
 
 export const ActionsAccordion = styled(Accordion)(() => ({
   '&::before': {

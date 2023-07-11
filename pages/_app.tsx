@@ -2,17 +2,14 @@ import React, { ReactElement, ReactNode, useEffect } from 'react';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import { ThemeProvider } from '@mui/system';
+import { StyledEngineProvider, ThemeProvider } from '@mui/system';
 import CssBaseline from '@mui/material/CssBaseline';
 import { lightTheme, darkTheme } from '@/public/theme/themes';
 import { storeWrapper } from '@/reducers/store';
 import { setIsDarkTheme } from '@/slices/settings';
 import { SettingsRootState } from '@/types/settings';
-
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
+import '@/public/theme/global.scss';
+import '@/public/theme/tailwind.css';
 
 function StatefulThemeProvider({ children }: { children: ReactNode }): ReactElement {
   const { isDarkTheme } = useSelector((state: SettingsRootState) => state.settings);
@@ -25,7 +22,11 @@ function StatefulThemeProvider({ children }: { children: ReactNode }): ReactElem
     );
   }, [dispatch]);
 
-  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+  return (
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+    </StyledEngineProvider>
+  );
 }
 
 export default function CookScribe({ Component, ...rest }: AppProps) {

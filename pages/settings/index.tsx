@@ -9,12 +9,11 @@ import {
   setThemeSetting,
   setMeasurementSystem
 } from '@/slices/settings';
-import globalStyles from '@/public/theme/global.module.scss';
 import { SettingsRootState } from '@/types/settings';
 import { MeasurementSystems } from '@/constants/measurements';
 import { ThemeSettingOptions } from '@/constants/general';
 
-export default function Settings() : ReactElement {
+export default function Settings(): ReactElement {
   const dispatch = useDispatch();
   const { theme, pantryStock, negativePantryStock, nutritionalInformation } = useSelector(
     (state: SettingsRootState) => state.settings
@@ -25,7 +24,7 @@ export default function Settings() : ReactElement {
   return (
     <PageContainer>
       <Paper classes={{ root: 'main' }}>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
+        <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
             <Typography variant="body1">Theme</Typography>
           </Grid>
@@ -42,7 +41,7 @@ export default function Settings() : ReactElement {
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
+        <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
             <Typography variant="body1">App Colour</Typography>
           </Grid>
@@ -56,7 +55,7 @@ export default function Settings() : ReactElement {
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
+        <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
             <Typography variant="body1">Default Units</Typography>
           </Grid>
@@ -73,7 +72,7 @@ export default function Settings() : ReactElement {
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
+        <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
             <Typography variant="body1">Pantry Stock</Typography>
           </Grid>
@@ -85,7 +84,7 @@ export default function Settings() : ReactElement {
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
+        <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
             <Typography variant="body1">Negative Pantry Stock</Typography>
           </Grid>
@@ -97,7 +96,7 @@ export default function Settings() : ReactElement {
             />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" className={globalStyles['space-bottom']}>
+        <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
             <Typography variant="body1">Nutritional Information</Typography>
           </Grid>

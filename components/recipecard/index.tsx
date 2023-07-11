@@ -12,11 +12,12 @@ import {
   Typography,
   CardActionArea,
   useMediaQuery,
-  Chip
+  Chip,
+  CardActions
 } from '@mui/material';
 import { FaChevronDown, FaChevronRight, FaCopy, FaShareAlt, FaTrash } from 'react-icons/fa';
 import { AbbreviateTitle, StringToColor } from '@/utils/common';
-import { RecipeCardActions, RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon } from './styled';
+import { RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon } from './styled';
 
 export default function RecipeCard(props: {
   isListLayout: boolean;
@@ -104,12 +105,13 @@ export default function RecipeCard(props: {
             </Stack>
           </Stack>
         </CardActionArea>
-        <RecipeCardActions
+        <CardActions
           sx={{
             height: isListLayout ? 'unset' : '50px',
             justifyContent: isListLayout ? 'center' : 'unset',
             width: isListLayout ? '50px' : 'unset'
           }}
+          className="pb-0 pt-0 flex items-center"
         >
           <RecipeSpeedDial
             ariaLabel="recipe actions"
@@ -130,7 +132,7 @@ export default function RecipeCard(props: {
               />
             ))}
           </RecipeSpeedDial>
-        </RecipeCardActions>
+        </CardActions>
       </Stack>
     </Card>
   );
