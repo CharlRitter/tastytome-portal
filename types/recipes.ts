@@ -13,6 +13,7 @@ export interface Recipe {
   description: string;
   categories: string[];
   rating: number;
+  difficulty: number;
   measurementSystem: string;
   ingredients: Step[];
   instructions: Step[];

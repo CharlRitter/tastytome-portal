@@ -1,6 +1,7 @@
 import React, { ChangeEvent, FormEvent, ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { isEmpty } from 'lodash';
+import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 import PageContainer from '@/components/pagecontainer';
 import {
   AccordionDetails,
@@ -8,7 +9,6 @@ import {
   Autocomplete,
   Button,
   Paper,
-  Rating,
   Stack,
   Switch,
   TextField,
@@ -20,6 +20,7 @@ import RecipeItemsList from '@/components/recipeitemslist';
 import { CategoryOptions, ListTypes } from '@/constants/general';
 import { Recipe } from '@/types/recipes';
 import { MeasurementSystems } from '@/constants/measurements';
+import { DifficultyRating, StyledRating } from '@/public/theme/globalStyled';
 import { ActionsAccordion } from '../styled';
 
 export default function RecipeAction(): ReactElement {
@@ -33,6 +34,7 @@ export default function RecipeAction(): ReactElement {
     description: '',
     categories: [],
     rating: 0,
+    difficulty: 0,
     measurementSystem: MeasurementSystems.Metric,
     ingredients: [],
     instructions: [],
@@ -93,11 +95,28 @@ export default function RecipeAction(): ReactElement {
               required
             />
             <Stack direction="row" spacing={1} alignItems="center">
-              <Typography>Rating:</Typography>
-              <Rating
+              <Typography component="legend" color={theme.palette.text.secondary}>
+                Rating
+              </Typography>
+              <StyledRating
                 value={recipe.rating}
                 onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => handleSetRecipe({ rating: value })}
                 size="large"
+              />
+            </Stack>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Typography component="legend" color={theme.palette.text.secondary}>
+                Difficulty
+              </Typography>
+              <DifficultyRating
+                value={recipe.difficulty}
+                onChange={(event: ChangeEvent<HTMLInputElement>, value: number) =>
+                  handleSetRecipe({ difficulty: value })
+                }
+                size="large"
+                icon={<TbRectangleFilled />}
+                emptyIcon={<TbRectangle />}
+                max={3}
               />
             </Stack>
           </Stack>
@@ -137,7 +156,9 @@ export default function RecipeAction(): ReactElement {
             disableGutters
           >
             <AccordionSummary aria-label="add timers">
-              <Typography>Add Timers</Typography>
+              <Typography component="legend" color={theme.palette.text.secondary}>
+                Add Timers
+              </Typography>
               <Switch checked={hasTimers} />
             </AccordionSummary>
             <AccordionDetails>

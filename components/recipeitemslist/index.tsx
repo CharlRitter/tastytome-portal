@@ -1,5 +1,5 @@
 import React, { ChangeEvent, KeyboardEvent, ReactElement, useState } from 'react';
-import { TiDelete } from 'react-icons/ti';
+import { VscClose } from 'react-icons/vsc';
 import { BiSend } from 'react-icons/bi';
 import {
   Box,
@@ -257,8 +257,9 @@ export default function RecipeItemsList(props: {
                             onClick={() => handleSetItems(items.filter((_, i) => i !== index))}
                             edge="end"
                             aria-label={`remove ${ariaLableItem}`}
+                            color="primary"
                           >
-                            <TiDelete />
+                            <VscClose />
                           </IconButton>
                         }
                       >

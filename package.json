@@ -1,6 +1,6 @@
 {
   "name": "cookscribe",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "TODO",
   "keywords": [],
   "license": "EULA",
@@ -10,6 +10,7 @@
     "test": "tests"
   },
   "scripts": {
+    "compile-tailwind": "yarn tailwindcss build -c tailwind.config.ts -o public/theme/tailwind.css",
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint && stylelint '**/*.scss'",

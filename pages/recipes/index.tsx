@@ -1,11 +1,31 @@
-import React, { MouseEvent, ReactElement, useState } from 'react';
+import React, { ChangeEvent, MouseEvent, ReactElement, useState } from 'react';
 import router from 'next/router';
-import { Fab, Grid, Pagination, Stack, ToggleButtonGroup, Tooltip } from '@mui/material';
-import { BsFillGridFill, BsList, BsPlus } from 'react-icons/bs';
+import {
+  AccordionDetails,
+  AccordionSummary,
+  Autocomplete,
+  Fab,
+  Grid,
+  IconButton,
+  Pagination,
+  Paper,
+  Stack,
+  Switch,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
+import { BsFillGridFill, BsFilter, BsList, BsPlus } from 'react-icons/bs';
+import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
+import { VscClose } from 'react-icons/vsc';
 import PageContainer from '@/components/pagecontainer';
 import RecipeCard from '@/components/recipecard';
-import globalStyles from '@/public/theme/global.module.scss';
-import { ActionsHeader, LayoutToggleButton, StickyWrapper } from './styled';
+import { CategoryOptions } from '@/constants/general';
+import { DifficultyRating, StyledRating } from '@/public/theme/globalStyled';
+import { ActionsAccordion, StickyWrapper } from './styled';
 
 export default function Recipes(): ReactElement {
   // TODO Test data
@@ -18,7 +38,8 @@ export default function Recipes(): ReactElement {
         'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
       categories: ['Breakfast', 'Dinner'],
       imagePath: '/images/pancakes.jpg',
-      rating: 1
+      rating: 1,
+      difficulty: 1
     },
     {
       id: 2,
@@ -27,8 +48,8 @@ export default function Recipes(): ReactElement {
       description:
         'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
       categories: ['Breakfast', 'Dinner'],
-      imagePath: '/images/pancakes.jpg',
-      rating: 2
+      rating: 2,
+      difficulty: 2
     },
     {
       id: 3,
@@ -38,7 +59,8 @@ export default function Recipes(): ReactElement {
         'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
       categories: ['Breakfast', 'Dinner'],
       imagePath: '/images/pancakes.jpg',
-      rating: 3
+      rating: 3,
+      difficulty: 3
     },
     {
       id: 4,
@@ -47,7 +69,6 @@ export default function Recipes(): ReactElement {
       description:
         'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
       categories: ['Breakfast', 'Dinner'],
-      imagePath: '/images/pancakes.jpg',
       rating: 4
     },
     {
@@ -101,38 +122,162 @@ export default function Recipes(): ReactElement {
       rating: 3
     }
   ];
+  const theme = useTheme();
   const [isListLayout, setIsListLayout] = useState<boolean>(false);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [ratingFilter, setRatingFilter] = useState<number>(0);
+  const [difficultyFilter, setDifficultyFilter] = useState<number>(0);
+  const [isDateAscending, setIsDateAscending] = useState<boolean>(true);
+  const categoryOptions = Object.values(CategoryOptions);
+
+  function handleFilter(filters: { categories: string[]; rating: number; difficulty: number; dateAscending: boolean }) {
+    // TODO
+    console.log(filters);
+  }
+
+  function handleCategoryChange(value: string[]) {
+    setSelectedCategories(value);
+    handleFilter({
+      categories: value,
+      rating: ratingFilter,
+      difficulty: difficultyFilter,
+      dateAscending: isDateAscending
+    });
+  }
+
+  function handleRatingChange(value: number) {
+    setRatingFilter(value);
+    handleFilter({
+      categories: selectedCategories,
+      rating: value,
+      difficulty: difficultyFilter,
+      dateAscending: isDateAscending
+    });
+  }
+
+  function handleDifficultyChange(value: number) {
+    setDifficultyFilter(value);
+    handleFilter({
+      categories: selectedCategories,
+      rating: ratingFilter,
+      difficulty: value,
+      dateAscending: isDateAscending
+    });
+  }
+
+  function handleDateOrderChange(checked: boolean) {
+    setIsDateAscending(checked);
+    handleFilter({
+      categories: selectedCategories,
+      rating: ratingFilter,
+      difficulty: difficultyFilter,
+      dateAscending: checked
+    });
+  }
+
+  function handleClearFilters() {
+    setSelectedCategories([]);
+    setRatingFilter(0);
+    setDifficultyFilter(0);
+    setIsDateAscending(true);
+  }
 
   return (
     <PageContainer>
       <StickyWrapper>
-        <ActionsHeader>
-          <Stack justifyContent="space-between" alignItems="center" direction="row" sx={{ margin: '10px' }}>
-            <ToggleButtonGroup
-              aria-label="layout button group"
-              value={isListLayout}
-              onChange={(event: MouseEvent<HTMLElement>, value: boolean) => value !== null && setIsListLayout(value)}
-              sx={{ visibility: { xs: 'hidden', md: 'visible' } }}
-              color="primary"
-              exclusive
-            >
-              <LayoutToggleButton aria-label="grid layout" value={false}>
-                <BsFillGridFill className={globalStyles['large-icon']} />
-              </LayoutToggleButton>
-              <LayoutToggleButton aria-label="list layout" value={true}>
-                <BsList className={globalStyles['large-icon']} />
-              </LayoutToggleButton>
-            </ToggleButtonGroup>
+        <Paper className="p-3">
+          <Stack justifyContent="space-between" alignItems="center" direction="row">
+            <Stack direction="row" spacing={2}>
+              <ToggleButtonGroup
+                aria-label="layout button group"
+                value={isListLayout}
+                onChange={(event: MouseEvent<HTMLElement>, value: boolean) => value !== null && setIsListLayout(value)}
+                sx={{ visibility: { xs: 'hidden', md: 'visible' } }}
+                color="primary"
+                exclusive
+              >
+                <ToggleButton className="p-3" aria-label="grid layout" value={false}>
+                  <BsFillGridFill className="large-icon" />
+                </ToggleButton>
+                <ToggleButton className="p-3" aria-label="list layout" value={true}>
+                  <BsList className="large-icon" />
+                </ToggleButton>
+              </ToggleButtonGroup>
+              <ToggleButtonGroup
+                value={showFilters}
+                exclusive
+                color="primary"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <ToggleButton value={true} aria-label="show filters">
+                  <BsFilter className="large-icon" />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Stack>
             <Tooltip title="Add Recipe">
               <Fab color="primary" size="medium" aria-label="add recipe" onClick={() => router.push('/recipes/add')}>
-                <BsPlus className={globalStyles['large-icon']} />
+                <BsPlus className={'large-icon'} />
               </Fab>
             </Tooltip>
           </Stack>
-        </ActionsHeader>
+        </Paper>
+        <ActionsAccordion expanded={showFilters} disableGutters className="p-0">
+          <AccordionSummary className="hidden" />
+          <AccordionDetails>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" className="px-3 pb-3 pt-0 gap-5">
+              <Autocomplete
+                multiple
+                limitTags={3}
+                options={categoryOptions}
+                value={selectedCategories}
+                renderInput={(params) => <TextField {...params} label="Categories" />}
+                onChange={(event: ChangeEvent<HTMLInputElement>, value: string[]) => handleCategoryChange(value)}
+                className="w-3/12"
+              />
+              <Stack direction="row" spacing={1}>
+                <Typography component="legend" color={theme.palette.text.secondary}>
+                  Rating
+                </Typography>
+                <StyledRating
+                  value={ratingFilter}
+                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => handleRatingChange(value)}
+                  size="large"
+                />
+              </Stack>
+              <Stack direction="row" spacing={1}>
+                <Typography component="legend" color={theme.palette.text.secondary}>
+                  Difficulty
+                </Typography>
+                <DifficultyRating
+                  value={difficultyFilter}
+                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => handleDifficultyChange(value)}
+                  size="large"
+                  icon={<TbRectangleFilled />}
+                  emptyIcon={<TbRectangle />}
+                  max={3}
+                />
+              </Stack>
+              <Stack direction="row" alignItems="center">
+                <Typography component="legend" color={theme.palette.text.secondary}>
+                  {isDateAscending ? 'Ascending' : 'Descending'}
+                </Typography>
+                <Switch
+                  checked={isDateAscending}
+                  onChange={(event: ChangeEvent<HTMLInputElement>, checked: boolean) => handleDateOrderChange(checked)}
+                />
+              </Stack>
+              <Tooltip title="Clear Filters">
+                <IconButton color="primary" aria-label="clear filters" onClick={() => handleClearFilters()}>
+                  <VscClose className={'large-icon'} />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          </AccordionDetails>
+        </ActionsAccordion>
       </StickyWrapper>
 
-      <Grid container spacing={2} className={globalStyles['space-bottom']}>
+      <Grid container spacing={2} className="mb-3">
         {recipes.map((recipe) => (
           <Grid key={recipe.id} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
             <RecipeCard
@@ -144,6 +289,7 @@ export default function Recipes(): ReactElement {
               categories={recipe.categories}
               imagePath={recipe.imagePath}
               rating={recipe.rating}
+              difficulty={recipe.difficulty}
               loading={false}
             />
           </Grid>

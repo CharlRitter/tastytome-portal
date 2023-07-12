@@ -6,17 +6,19 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
-  Rating,
   Skeleton,
   Stack,
   Typography,
   CardActionArea,
   useMediaQuery,
   Chip,
-  CardActions
+  CardActions,
+  useTheme
 } from '@mui/material';
 import { FaChevronDown, FaChevronRight, FaCopy, FaShareAlt, FaTrash } from 'react-icons/fa';
+import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 import { AbbreviateTitle, StringToColor } from '@/utils/common';
+import { DifficultyRating, StyledRating } from '@/public/theme/globalStyled';
 import { RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon } from './styled';
 
 export default function RecipeCard(props: {
@@ -28,9 +30,11 @@ export default function RecipeCard(props: {
   recipeID: number;
   imagePath?: string;
   rating?: number;
+  difficulty?: number;
   loading?: boolean;
 }): ReactElement {
-  const { title, dateCreated, description, categories, imagePath, recipeID, loading, rating } = props;
+  const { title, dateCreated, description, categories, imagePath, recipeID, loading, rating, difficulty } = props;
+  const theme = useTheme();
   const [openSpeedDial, setOpenSpeedDial] = useState<boolean>(false);
   const isListLayout = useMediaQuery('(max-width: 899px)') ? false : props.isListLayout;
 
@@ -84,12 +88,26 @@ export default function RecipeCard(props: {
             )}
             <Stack direction="column" width="100%">
               <CardHeader
-                title={title}
                 subheader={
                   <>
-                    {dateCreated}
-                    <br></br>
-                    <Rating name="read-only" value={rating} readOnly />
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="h5" color={theme.palette.common.white}>
+                        {title}
+                      </Typography>
+                      <Typography>{dateCreated}</Typography>
+                    </Stack>
+                    <Stack direction="row" justifyContent="space-between">
+                      <StyledRating name="read-only" value={rating} readOnly size="large" />
+                      <DifficultyRating
+                        name="read-only"
+                        value={difficulty}
+                        readOnly
+                        size="large"
+                        icon={<TbRectangleFilled />}
+                        emptyIcon={<TbRectangle />}
+                        max={3}
+                      />
+                    </Stack>
                     <br></br>
                     {categories.map((category) => (
                       <Chip key={category} label={category} variant="outlined" />
