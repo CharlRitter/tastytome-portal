@@ -1,7 +1,7 @@
 import React, { ChangeEvent, ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Autocomplete, Grid, Paper, Switch, TextField, Typography } from '@mui/material';
-import PageContainer from '@/components/pagecontainer';
+import PageContainer from '@/components/page-container';
 import {
   setNegativePantryStock,
   setNutritionalInformation,
@@ -43,21 +43,7 @@ export default function Settings(): ReactElement {
         </Grid>
         <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
-            <Typography variant="body1">App Colour</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            {/* TODO */}
-            <Autocomplete
-              options={[]}
-              disableClearable
-              sx={{ width: '100%' }}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          </Grid>
-        </Grid>
-        <Grid container spacing={2} alignItems="center" className="mb-3">
-          <Grid item xs={6}>
-            <Typography variant="body1">Default Units</Typography>
+            <Typography variant="body1">Measurement System</Typography>
           </Grid>
           <Grid item xs={6}>
             <Autocomplete
@@ -74,7 +60,7 @@ export default function Settings(): ReactElement {
         </Grid>
         <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
-            <Typography variant="body1">Pantry Stock</Typography>
+            <Typography variant="body1">Use Pantry Stock</Typography>
           </Grid>
           <Grid item xs={6}>
             <Switch
@@ -86,7 +72,7 @@ export default function Settings(): ReactElement {
         </Grid>
         <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
-            <Typography variant="body1">Negative Pantry Stock</Typography>
+            <Typography variant="body1">Allow Negative Pantry Stock</Typography>
           </Grid>
           <Grid item xs={6}>
             <Switch
@@ -98,7 +84,7 @@ export default function Settings(): ReactElement {
         </Grid>
         <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
-            <Typography variant="body1">Nutritional Information</Typography>
+            <Typography variant="body1">Display Nutritional Information</Typography>
           </Grid>
           <Grid item xs={6}>
             <Switch

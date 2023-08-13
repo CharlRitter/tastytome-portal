@@ -1,7 +1,7 @@
 import React, { ChangeEvent, ReactElement, useState } from 'react';
 import { Button, Grid, Paper, TextField } from '@mui/material';
 import ReCAPTCHA from 'react-google-recaptcha';
-import PageContainer from '@/components/pagecontainer';
+import PageContainer from '@/components/page-container';
 
 export default function Contact(): ReactElement {
   const [isCaptchaVerified, setIsCaptchaVerified] = useState<boolean>(false);

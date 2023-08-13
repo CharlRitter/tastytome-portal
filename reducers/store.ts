@@ -1,6 +1,6 @@
 import { configureStore, ThunkAction, Action, AnyAction } from '@reduxjs/toolkit';
 import { createWrapper, HYDRATE } from 'next-redux-wrapper';
-import rootReducer from '@/reducers/root';
+import rootReducer from '@/reducers/rootReducer';
 
 function makeStore() {
   const store = configureStore({
@@ -8,7 +8,6 @@ function makeStore() {
     devTools: process.env.NODE_ENV !== 'production'
   });
 
-  // Enable Next.js "Hydrate" action for server-side rendering
   if (typeof window === 'undefined') {
     store.dispatch({ type: HYDRATE, payload: {} });
   }

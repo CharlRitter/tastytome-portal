@@ -1,14 +1,18 @@
-import React, { ChangeEvent, MouseEvent, ReactElement, useState } from 'react';
+import React, { ChangeEvent, MouseEvent, ReactElement, useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import router from 'next/router';
 import {
   AccordionDetails,
   AccordionSummary,
+  Alert,
   Autocomplete,
+  Button,
   Fab,
   Grid,
   IconButton,
   Pagination,
   Paper,
+  Snackbar,
   Stack,
   Switch,
   TextField,
@@ -21,179 +25,98 @@ import {
 import { BsFillGridFill, BsFilter, BsList, BsPlus } from 'react-icons/bs';
 import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 import { VscClose } from 'react-icons/vsc';
-import PageContainer from '@/components/pagecontainer';
-import RecipeCard from '@/components/recipecard';
-import { CategoryOptions } from '@/constants/general';
+import PageContainer from '@/components/page-container';
+import RecipeCard from '@/components/recipe-card';
+import { getRecipes } from '@/slices/recipeSlice';
+import { Category, EnumState } from '@/types/enum';
+import { RecipeState } from '@/types/recipe';
 import { DifficultyRating, StyledRating } from '@/public/theme/globalStyled';
 import { ActionsAccordion, StickyWrapper } from './styled';
 
 export default function Recipes(): ReactElement {
-  // TODO Test data
-  const recipes = [
-    {
-      id: 1,
-      title: 'Recipe 1',
-      dateCreated: 'September 14, 2016',
-      description:
-        'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
-      categories: ['Breakfast', 'Dinner'],
-      imagePath: '/images/pancakes.jpg',
-      rating: 1,
-      difficulty: 1
-    },
-    {
-      id: 2,
-      title: 'Recipe 2',
-      dateCreated: 'September 14, 2016',
-      description:
-        'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
-      categories: ['Breakfast', 'Dinner'],
-      rating: 2,
-      difficulty: 2
-    },
-    {
-      id: 3,
-      title: 'Recipe 3',
-      dateCreated: 'September 14, 2016',
-      description:
-        'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
-      categories: ['Breakfast', 'Dinner'],
-      imagePath: '/images/pancakes.jpg',
-      rating: 3,
-      difficulty: 3
-    },
-    {
-      id: 4,
-      title: 'Recipe 4',
-      dateCreated: 'September 14, 2016',
-      description:
-        'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
-      categories: ['Breakfast', 'Dinner'],
-      rating: 4
-    },
-    {
-      id: 5,
-      title: 'Recipe 5',
-      dateCreated: 'September 14, 2016',
-      description:
-        'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
-      categories: ['Breakfast', 'Dinner'],
-      imagePath: '/images/pancakes.jpg',
-      rating: 5
-    },
-    {
-      id: 6,
-      title: 'Recipe 6',
-      dateCreated: 'September 14, 2016',
-      description:
-        'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
-      categories: ['Breakfast', 'Dinner'],
-      imagePath: '/images/pancakes.jpg',
-      rating: 3
-    },
-    {
-      id: 7,
-      title: 'Recipe 7',
-      dateCreated: 'September 14, 2016',
-      description:
-        'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
-      categories: ['Breakfast', 'Dinner'],
-      imagePath: '/images/pancakes.jpg',
-      rating: 3
-    },
-    {
-      id: 8,
-      title: 'Recipe 8',
-      dateCreated: 'September 14, 2016',
-      description:
-        'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
-      categories: ['Breakfast', 'Dinner'],
-      imagePath: '/images/pancakes.jpg',
-      rating: 3
-    },
-    {
-      id: 9,
-      title: 'Recipe 9',
-      dateCreated: 'September 14, 2016',
-      description:
-        'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.',
-      categories: ['Breakfast', 'Dinner'],
-      imagePath: '/images/pancakes.jpg',
-      rating: 3
-    }
-  ];
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const { categories } = useSelector((state: { enum: EnumState }) => state.enum);
+  const {
+    recipes,
+    loading: recipeLoading,
+    error: recipeError
+  } = useSelector((state: { recipe: RecipeState }) => state.recipe);
+
   const [isListLayout, setIsListLayout] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   const [ratingFilter, setRatingFilter] = useState<number>(0);
-  const [difficultyFilter, setDifficultyFilter] = useState<number>(0);
-  const [isDateAscending, setIsDateAscending] = useState<boolean>(true);
-  const categoryOptions = Object.values(CategoryOptions);
+  const [effortFilter, setEffortFilter] = useState<number>(0);
+  const [isDateAscending, setIsDateAscending] = useState<boolean>(false);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [recipesPerPage] = useState<number>(10);
 
-  function handleFilter(filters: { categories: string[]; rating: number; difficulty: number; dateAscending: boolean }) {
-    // TODO
-    console.log(filters);
-  }
+  const totalRecipes = recipes.length;
+  const totalPages = Math.ceil(totalRecipes / recipesPerPage) || 1;
 
-  function handleCategoryChange(value: string[]) {
-    setSelectedCategories(value);
-    handleFilter({
-      categories: value,
-      rating: ratingFilter,
-      difficulty: difficultyFilter,
-      dateAscending: isDateAscending
-    });
-  }
+  useEffect(() => {
+    dispatch(
+      getRecipes({
+        categories: selectedCategories && selectedCategories.map((category) => category.id).join(','),
+        orderBy: isDateAscending ? 'asc' : 'desc',
+        effort: effortFilter?.toString(),
+        rating: ratingFilter?.toString(),
+        page: currentPage,
+        pageSize: recipesPerPage
+      })
+    );
+  }, [dispatch, selectedCategories, isDateAscending, effortFilter, ratingFilter, currentPage, recipesPerPage]);
 
-  function handleRatingChange(value: number) {
-    setRatingFilter(value);
-    handleFilter({
-      categories: selectedCategories,
-      rating: value,
-      difficulty: difficultyFilter,
-      dateAscending: isDateAscending
-    });
-  }
-
-  function handleDifficultyChange(value: number) {
-    setDifficultyFilter(value);
-    handleFilter({
-      categories: selectedCategories,
-      rating: ratingFilter,
-      difficulty: value,
-      dateAscending: isDateAscending
-    });
-  }
-
-  function handleDateOrderChange(checked: boolean) {
-    setIsDateAscending(checked);
-    handleFilter({
-      categories: selectedCategories,
-      rating: ratingFilter,
-      difficulty: difficultyFilter,
-      dateAscending: checked
-    });
-  }
+  useEffect(() => {
+    setOpenSnackbar(recipeError !== null);
+  }, [recipeError]);
 
   function handleClearFilters() {
     setSelectedCategories([]);
     setRatingFilter(0);
-    setDifficultyFilter(0);
-    setIsDateAscending(true);
+    setEffortFilter(0);
+    setIsDateAscending(false);
   }
 
   return (
     <PageContainer>
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+        <Alert onClose={() => setOpenSnackbar(false)} severity="error">
+          <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+            <Typography>Could not load recipes — {recipeError}</Typography>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() =>
+                dispatch(
+                  getRecipes({
+                    categories: selectedCategories && selectedCategories.map((category) => category.id).join(','),
+                    orderBy: isDateAscending ? 'asc' : 'desc',
+                    effort: effortFilter?.toString(),
+                    rating: ratingFilter?.toString(),
+                    page: currentPage,
+                    pageSize: recipesPerPage
+                  })
+                )
+              }
+            >
+              Reload
+            </Button>
+          </Stack>
+        </Alert>
+      </Snackbar>
       <StickyWrapper>
         <Paper className="p-3">
           <Stack justifyContent="space-between" alignItems="center" direction="row">
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row">
               <ToggleButtonGroup
                 aria-label="layout button group"
+                className="mr-3"
                 value={isListLayout}
                 onChange={(event: MouseEvent<HTMLElement>, value: boolean) => value !== null && setIsListLayout(value)}
-                sx={{ visibility: { xs: 'hidden', md: 'visible' } }}
+                sx={{ display: { xs: 'none', md: 'block' } }}
                 color="primary"
                 exclusive
               >
@@ -229,10 +152,11 @@ export default function Recipes(): ReactElement {
               <Autocomplete
                 multiple
                 limitTags={3}
-                options={categoryOptions}
-                value={selectedCategories}
+                options={categories as Category[]}
+                getOptionLabel={(option) => option.value}
+                value={selectedCategories || []}
                 renderInput={(params) => <TextField {...params} label="Categories" />}
-                onChange={(event: ChangeEvent<HTMLInputElement>, value: string[]) => handleCategoryChange(value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>, value: Category[]) => setSelectedCategories(value)}
                 className="w-3/12"
               />
               <Stack direction="row" spacing={1}>
@@ -241,7 +165,7 @@ export default function Recipes(): ReactElement {
                 </Typography>
                 <StyledRating
                   value={ratingFilter}
-                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => handleRatingChange(value)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setRatingFilter(value)}
                   size="large"
                 />
               </Stack>
@@ -250,8 +174,8 @@ export default function Recipes(): ReactElement {
                   Difficulty
                 </Typography>
                 <DifficultyRating
-                  value={difficultyFilter}
-                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => handleDifficultyChange(value)}
+                  value={effortFilter}
+                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setEffortFilter(value)}
                   size="large"
                   icon={<TbRectangleFilled />}
                   emptyIcon={<TbRectangle />}
@@ -264,7 +188,7 @@ export default function Recipes(): ReactElement {
                 </Typography>
                 <Switch
                   checked={isDateAscending}
-                  onChange={(event: ChangeEvent<HTMLInputElement>, checked: boolean) => handleDateOrderChange(checked)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>, checked: boolean) => setIsDateAscending(checked)}
                 />
               </Stack>
               <Tooltip title="Clear Filters">
@@ -278,25 +202,36 @@ export default function Recipes(): ReactElement {
       </StickyWrapper>
 
       <Grid container spacing={2} className="mb-3">
-        {recipes.map((recipe) => (
-          <Grid key={recipe.id} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
-            <RecipeCard
-              recipeID={recipe.id}
-              isListLayout={isListLayout}
-              title={recipe.title}
-              dateCreated={recipe.dateCreated}
-              description={recipe.description}
-              categories={recipe.categories}
-              imagePath={recipe.imagePath}
-              rating={recipe.rating}
-              difficulty={recipe.difficulty}
-              loading={false}
-            />
-          </Grid>
-        ))}
+        {recipes.length > 0 ? (
+          recipes.map((recipe) => (
+            <Grid key={recipe.id} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
+              <RecipeCard
+                recipeID={recipe.id as number}
+                isListLayout={isListLayout}
+                title={recipe.title}
+                dateCreated={recipe.createdat as string}
+                description={recipe.description}
+                recipeCategories={recipe.recipecategory}
+                imagePath={recipe.image as string | null}
+                rating={recipe.rating}
+                effort={recipe.effort}
+                loading={recipeLoading}
+              />
+            </Grid>
+          ))
+        ) : (
+          <Stack className="w-full mt-6 mb-3" justifyContent="center" direction="row">
+            <Typography>No results</Typography>
+          </Stack>
+        )}
       </Grid>
       <Stack justifyContent="center" direction="row">
-        <Pagination count={10} color="secondary" size="large" />
+        <Pagination
+          count={totalPages}
+          color="secondary"
+          size="large"
+          onChange={(event: ChangeEvent<HTMLInputElement>, page: number) => setCurrentPage(page)}
+        />
       </Stack>
     </PageContainer>
   );

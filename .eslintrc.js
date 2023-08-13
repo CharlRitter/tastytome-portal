@@ -7,19 +7,8 @@ module.exports = {
   },
   ignorePatterns: ['next.config.js'],
   parser: '@typescript-eslint/parser',
-  extends: [
-    'next',
-    'airbnb',
-    'prettier',
-    'plugin:@typescript-eslint/recommended',
-    'airbnb-typescript'
-  ],
-  plugins: [
-    '@typescript-eslint',
-    'react',
-    'react-hooks',
-    'prettier'
-  ],
+  extends: ['next', 'airbnb', 'prettier', 'plugin:@typescript-eslint/recommended', 'airbnb-typescript'],
+  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'prettier'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true
@@ -52,11 +41,11 @@ module.exports = {
     'accessor-pairs': ['error', { getWithoutSet: false, setWithoutGet: true }],
     'block-scoped-var': 'warn',
     'consistent-return': 'error',
-    'curly': 'error',
+    curly: 'error',
     'default-case': 'warn',
     'dot-location': ['warn', 'property'],
     'dot-notation': 'warn',
-    'eqeqeq': ['error', 'smart'],
+    eqeqeq: ['error', 'smart'],
     'guard-for-in': 'warn',
     'no-alert': 'error',
     'no-caller': 'error',
@@ -104,13 +93,13 @@ module.exports = {
       }
     ],
     'no-with': 'warn',
-    'radix': 'warn',
+    radix: 'warn',
     'vars-on-top': 'error',
     'wrap-iife': ['error', 'outside'],
-    'yoda': 'error',
+    yoda: 'error',
 
     // Strict Mode - for ES6, never use strict.
-    'strict': ['error', 'never'],
+    strict: ['error', 'never'],
 
     // Variables
     'init-declarations': ['error', 'always'],
@@ -157,7 +146,6 @@ module.exports = {
     'array-bracket-spacing': ['warn', 'never'],
     'block-spacing': ['warn', 'always'],
     'brace-style': ['warn', '1tbs', { allowSingleLine: false }],
-    'camelcase': 'warn',
     'comma-spacing': ['warn', { before: false, after: true }],
     'comma-style': ['warn', 'last'],
     'computed-property-spacing': ['warn', 'never'],
@@ -166,13 +154,13 @@ module.exports = {
     'func-names': 'warn',
     'func-style': ['warn', 'declaration'],
     'id-length': ['warn', { min: 2, max: 32 }],
-    "indent": "off",
+    indent: 'off',
     '@typescript-eslint/indent': ['warn', 2],
     'jsx-quotes': ['warn', 'prefer-double'],
     'linebreak-style': ['warn', 'unix'],
     'lines-around-comment': ['warn', { beforeBlockComment: true }],
     'max-depth': ['warn', 8],
-    'max-len': ['warn', 132],
+    'max-len': ['warn', 120],
     'max-nested-callbacks': ['warn', 8],
     'max-params': ['warn', 8],
     'max-statements-per-line': ['warn', { max: 2 }],
@@ -203,17 +191,17 @@ module.exports = {
     'operator-assignment': ['warn', 'always'],
     'padded-blocks': ['warn', 'never'],
     'quote-props': ['warn', 'as-needed'],
-    'quotes': ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
+    quotes: ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
     'semi-spacing': ['warn', { before: false, after: true }],
-    'semi': ['warn', 'always'],
+    semi: ['warn', 'always'],
     'space-before-blocks': 'warn',
     'space-before-function-paren': ['warn', 'never'],
     'space-in-parens': ['warn', 'never'],
     'space-infix-ops': 'warn',
     'space-unary-ops': ['warn', { words: true, nonwords: false }],
     'spaced-comment': ['warn', 'always', { exceptions: ['-'] }],
-    "comma-dangle": "off",
-    "@typescript-eslint/comma-dangle": "off",
+    'comma-dangle': 'off',
+    '@typescript-eslint/comma-dangle': 'off',
 
     // Plugin: React
     'react/boolean-prop-naming': 'off',
@@ -307,6 +295,6 @@ module.exports = {
 
     // Plugin: React Hooks
     'react-hooks/exhaustive-deps': 'warn',
-    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/rules-of-hooks': 'error'
   }
 };

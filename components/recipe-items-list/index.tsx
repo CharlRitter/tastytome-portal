@@ -1,4 +1,5 @@
 import React, { ChangeEvent, KeyboardEvent, ReactElement, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { VscClose } from 'react-icons/vsc';
 import { BiSend } from 'react-icons/bi';
 import {
@@ -16,23 +17,24 @@ import {
 } from '@mui/material';
 import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided } from 'react-beautiful-dnd';
 import { cloneDeep } from 'lodash';
-import { MeasurementSystems, MeasurementTypes } from '@/constants/measurements';
 import { ListTypes } from '@/constants/general';
-import { getMeasurementUnits } from '@/utils/measurements';
-import { Step } from '@/types/recipes';
+import { RecipeIngredient, RecipeInstruction, RecipeTimer } from '@/types/recipe';
+import { EnumState, MeasurementType, MeasurementUnit } from '@/types/enum';
 import { ListContainer, SendButton, AdditionalInputAutocomplete, AdditionalInputTextField } from './styled';
 
 export default function RecipeItemsList(props: {
   title: string;
-  items: Step[];
+  items: Partial<RecipeIngredient>[] | Partial<RecipeInstruction>[] | Partial<RecipeTimer>[];
   label: string;
   type?: string;
-  handleSetItems: (value: Step[]) => void;
+  handleSetItems: (value: Partial<RecipeIngredient>[] | Partial<RecipeInstruction>[] | Partial<RecipeTimer>[]) => void;
 }): ReactElement {
+  const theme = useTheme();
+  const { measurementtypes, measurementunits } = useSelector((state: { enum: EnumState }) => state.enum);
   const { title, items, label, type, handleSetItems } = props;
   const [fieldText, setFieldText] = useState('');
+
   const ariaLableItem = label.charAt(0).toLowerCase() + label.slice(1);
-  const theme = useTheme();
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   function HandleItemAdd(event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) {
@@ -43,17 +45,25 @@ export default function RecipeItemsList(props: {
       ) {
         const updatedItems = cloneDeep(items);
         const itemTitle = fieldText.charAt(0).toUpperCase() + fieldText.slice(1);
-        const newItem: Step = {
-          title: itemTitle
-        };
+        let newItem: Partial<RecipeIngredient> | Partial<RecipeInstruction> | Partial<RecipeTimer> = {};
 
         if (type === ListTypes.Ingredients) {
-          newItem.measurementType = null;
-          newItem.measurementUnit = null;
-          newItem.amount = null;
+          newItem = {
+            title: itemTitle,
+            measurementtype: null,
+            measurementunit: null,
+            measurementamount: null
+          };
         } else if (type === ListTypes.Timers) {
-          newItem.hours = null;
-          newItem.minutes = null;
+          newItem = {
+            title: itemTitle,
+            hours: null,
+            minutes: null
+          };
+        } else {
+          newItem = {
+            title: itemTitle
+          };
         }
 
         updatedItems.push(newItem);
@@ -76,14 +86,14 @@ export default function RecipeItemsList(props: {
     handleSetItems(updatedItems);
   }
 
-  function setMeasurementType(newValue: string, index: number) {
+  function setMeasurementType(newValue: MeasurementType, index: number) {
     const updatedItems = items.map((item, itemIndex) => {
       if (index === itemIndex) {
         return {
           ...item,
-          measurementType: newValue,
-          measurementUnit: null,
-          amount: null
+          measurementtype: newValue,
+          measurementunit: null,
+          measurementamount: null
         };
       }
 
@@ -93,13 +103,13 @@ export default function RecipeItemsList(props: {
     handleSetItems(updatedItems);
   }
 
-  function setMeasurementUnit(newValue: string, index: number) {
+  function setMeasurementUnit(newValue: MeasurementUnit, index: number) {
     const updatedItems = items.map((item, itemIndex) => {
       if (index === itemIndex) {
         return {
           ...item,
-          measurementUnit: newValue,
-          amount: null
+          measurementunit: newValue,
+          measurementamount: null
         };
       }
 
@@ -114,7 +124,7 @@ export default function RecipeItemsList(props: {
       if (index === itemIndex) {
         return {
           ...item,
-          amount: parseFloat(newValue)
+          measurementamount: parseFloat(newValue)
         };
       }
 
@@ -154,13 +164,23 @@ export default function RecipeItemsList(props: {
     handleSetItems(updatedItems);
   }
 
-  function additionalInputs(item: Step, index: number): ReactElement | null {
-    if (type === ListTypes.Ingredients) {
-      const measurementTypeOptions = Object.values(MeasurementTypes).filter(
-        (value) => value !== MeasurementTypes.Time && value !== MeasurementTypes.Tempreture
-      );
-      const measurementUnitOptions = getMeasurementUnits(MeasurementSystems.Metric, item.measurementType || '');
+  function isRecipeIngredient(
+    item: Partial<RecipeIngredient> | Partial<RecipeInstruction> | Partial<RecipeTimer>
+  ): item is RecipeIngredient {
+    return 'measurementtype' in item && 'measurementunit' in item && 'measurementamount' in item;
+  }
 
+  function isRecipeTimer(
+    item: Partial<RecipeIngredient> | Partial<RecipeInstruction> | Partial<RecipeTimer>
+  ): item is RecipeTimer {
+    return 'hours' in item && 'minutes' in item;
+  }
+
+  function additionalInputs(
+    item: Partial<RecipeIngredient> | Partial<RecipeInstruction> | Partial<RecipeTimer>,
+    index: number
+  ): ReactElement | null {
+    if (type === ListTypes.Ingredients && isRecipeIngredient(item)) {
       return (
         <Stack
           direction={isMediumScreen ? 'column' : 'row'}
@@ -168,23 +188,35 @@ export default function RecipeItemsList(props: {
           alignItems={isMediumScreen ? 'stretch' : 'center'}
         >
           <AdditionalInputAutocomplete
-            options={measurementTypeOptions}
-            value={item.measurementType}
-            onChange={(event: ChangeEvent<HTMLInputElement>, newValue: string) => setMeasurementType(newValue, index)}
+            options={measurementtypes.filter((measurementtype) => measurementtype.id !== 2 && measurementtype.id !== 3)}
+            getOptionLabel={(option) => option.value}
+            value={item.measurementtype}
+            onChange={(event: ChangeEvent<HTMLInputElement>, newValue: MeasurementType) =>
+              setMeasurementType(newValue, index)
+            }
             renderInput={(params) => <TextField {...params} label="Type" />}
           />
           <AdditionalInputAutocomplete
-            options={measurementUnitOptions}
-            value={item.measurementUnit}
-            onChange={(event: ChangeEvent<HTMLInputElement>, newValue: string) => setMeasurementUnit(newValue, index)}
+            // TODO Replace measurementsystem once hooked up
+            options={measurementunits.filter(
+              (measurementunit) =>
+                (measurementunit.measurementsystemid === 1 || measurementunit.measurementsystemid === null) &&
+                item.measurementtype &&
+                measurementunit.measurementtypeid === item.measurementtype.id
+            )}
+            getOptionLabel={(option) => option.value}
+            value={item.measurementunit}
+            onChange={(event: ChangeEvent<HTMLInputElement>, newValue: MeasurementUnit) =>
+              setMeasurementUnit(newValue, index)
+            }
             renderInput={(params) => <TextField {...params} label="Unit" />}
-            disabled={!item.measurementType}
+            disabled={!item.measurementtype}
           />
           <AdditionalInputTextField
             label="Amount"
             type="number"
             InputProps={{ inputProps: { min: 0, step: 0.01 } }}
-            value={item.amount || ''}
+            value={item.measurementamount || ''}
             onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
               if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+') {
                 event.preventDefault();
@@ -198,14 +230,13 @@ export default function RecipeItemsList(props: {
                 setAmount(inputValue, index);
               }
             }}
-            disabled={!item.measurementUnit}
-            InputLabelProps={{ shrink: Boolean(item.amount) }}
+            disabled={!item.measurementunit}
+            InputLabelProps={{ shrink: Boolean(item.measurementamount) }}
           />
         </Stack>
       );
     }
-
-    if (type === ListTypes.Timers) {
+    if (type === ListTypes.Timers && isRecipeTimer(item)) {
       const timeOptions = Array.from({ length: 60 }, (_, i) => `${i + 1}`);
 
       timeOptions.unshift('');
@@ -289,6 +320,7 @@ export default function RecipeItemsList(props: {
             value={fieldText}
             onClick={(event: React.MouseEvent<HTMLButtonElement>) => HandleItemAdd(event)}
             aria-label={`add ${ariaLableItem}`}
+            color="primary"
           >
             <BiSend />
           </SendButton>

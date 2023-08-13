@@ -1,6 +1,6 @@
 import React, { ReactElement, ReactNode } from 'react';
 import { Box, Container } from '@mui/material';
-import SideMenu from '@/components/sidemenu';
+import SideMenu from '@/components/side-menu';
 import { DRAWER_WIDTH } from '@/constants/general';
 
 export default function PageContainer(props: { children?: ReactNode }): ReactElement {

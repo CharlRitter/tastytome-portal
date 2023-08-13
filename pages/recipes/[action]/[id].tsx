@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import PageContainer from '@/components/pagecontainer';
+import PageContainer from '@/components/page-container';
 
 export default function RecipeAction() : ReactElement {
   const router = useRouter();

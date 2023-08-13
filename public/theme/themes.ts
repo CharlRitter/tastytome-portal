@@ -14,7 +14,7 @@ const lightThemeOptions: ThemeOptions = {
     background: {
       default: colours.lightBackground
     },
-    common: sharedColours
+    common: sharedColours,
   },
   ...overrides
 };

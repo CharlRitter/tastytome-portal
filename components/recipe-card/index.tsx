@@ -1,4 +1,5 @@
 import React, { ReactElement, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import router from 'next/router';
 import {
   Avatar,
@@ -13,11 +14,19 @@ import {
   useMediaQuery,
   Chip,
   CardActions,
-  useTheme
+  useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button
 } from '@mui/material';
 import { FaChevronDown, FaChevronRight, FaCopy, FaShareAlt, FaTrash } from 'react-icons/fa';
 import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
-import { AbbreviateTitle, StringToColor } from '@/utils/common';
+import { AbbreviateTitle, FormatDate, StringToColor } from '@/utils/common';
+import { deleteRecipe } from '@/slices/recipeSlice';
+import { RecipeCategory } from '@/types/recipe';
 import { DifficultyRating, StyledRating } from '@/public/theme/globalStyled';
 import { RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon } from './styled';
 
@@ -26,22 +35,30 @@ export default function RecipeCard(props: {
   title: string;
   dateCreated: string;
   description: string;
-  categories: string[];
+  recipeCategories: RecipeCategory[];
   recipeID: number;
-  imagePath?: string;
+  imagePath?: string | null;
   rating?: number;
-  difficulty?: number;
+  effort?: number;
   loading?: boolean;
 }): ReactElement {
-  const { title, dateCreated, description, categories, imagePath, recipeID, loading, rating, difficulty } = props;
+  const { title, dateCreated, description, recipeCategories, imagePath, recipeID, loading, rating, effort } = props;
+
   const theme = useTheme();
+  const dispatch = useDispatch();
   const [openSpeedDial, setOpenSpeedDial] = useState<boolean>(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
   const isListLayout = useMediaQuery('(max-width: 899px)') ? false : props.isListLayout;
 
   const buttonActions = [
-    { icon: <FaShareAlt />, title: 'Share', ariaLabel: 'share' },
-    { icon: <FaCopy />, title: 'Duplicate', ariaLabel: 'duplicate' },
-    { icon: <FaTrash />, title: 'Delete', ariaLabel: 'delete' }
+    { icon: <FaShareAlt />, title: 'Share', ariaLabel: 'share', command: () => {} },
+    {
+      icon: <FaCopy />,
+      title: 'Duplicate',
+      ariaLabel: 'duplicate',
+      command: () => router.push(`/recipes/add/${recipeID}`)
+    },
+    { icon: <FaTrash />, title: 'Delete', ariaLabel: 'delete', command: () => setDeleteConfirmation(true) }
   ];
 
   return loading ? (
@@ -51,8 +68,7 @@ export default function RecipeCard(props: {
           <Skeleton variant="rounded" width={isListLayout ? 300 : 'unset'} height={isListLayout ? 250 : 300} />
           <Stack direction="column" width="100%">
             <CardContent>
-              <Skeleton variant="text" height={50} width="50%" />
-              <br></br>
+              <Skeleton variant="text" height={50} width="50%" className="mb-4" />
               <Skeleton variant="text" />
               <Skeleton variant="text" width="50%" />
               <Skeleton variant="text" width="75%" />
@@ -63,6 +79,25 @@ export default function RecipeCard(props: {
     </Card>
   ) : (
     <Card>
+      <Dialog
+        open={deleteConfirmation}
+        onClose={() => setDeleteConfirmation(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Confirm delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Delete this recipe? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmation(false)}>Cancel</Button>
+          <Button onClick={() => dispatch(deleteRecipe(recipeID))} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
         <CardActionArea onClick={() => router.push(`/recipes/${recipeID}`)}>
           <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
@@ -94,13 +129,13 @@ export default function RecipeCard(props: {
                       <Typography variant="h5" color={theme.palette.common.white}>
                         {title}
                       </Typography>
-                      <Typography>{dateCreated}</Typography>
+                      <Typography>{FormatDate(dateCreated)}</Typography>
                     </Stack>
-                    <Stack direction="row" justifyContent="space-between">
+                    <Stack direction="row" justifyContent="space-between" className="mb-4">
                       <StyledRating name="read-only" value={rating} readOnly size="large" />
                       <DifficultyRating
                         name="read-only"
-                        value={difficulty}
+                        value={effort}
                         readOnly
                         size="large"
                         icon={<TbRectangleFilled />}
@@ -108,9 +143,13 @@ export default function RecipeCard(props: {
                         max={3}
                       />
                     </Stack>
-                    <br></br>
-                    {categories.map((category) => (
-                      <Chip key={category} label={category} variant="outlined" />
+                    {recipeCategories.map((recipeCategory) => (
+                      <Chip
+                        className="mr-1"
+                        key={recipeCategory.id}
+                        label={recipeCategory.category.value}
+                        variant="outlined"
+                      />
                     ))}
                   </>
                 }
@@ -146,7 +185,10 @@ export default function RecipeCard(props: {
                 icon={action.icon}
                 tooltipTitle={action.title}
                 aria-label={action.ariaLabel}
-                onClick={() => setOpenSpeedDial(false)}
+                onClick={() => {
+                  setOpenSpeedDial(false);
+                  action.command();
+                }}
               />
             ))}
           </RecipeSpeedDial>

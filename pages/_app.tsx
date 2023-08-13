@@ -6,20 +6,38 @@ import { StyledEngineProvider, ThemeProvider } from '@mui/system';
 import CssBaseline from '@mui/material/CssBaseline';
 import { lightTheme, darkTheme } from '@/public/theme/themes';
 import { storeWrapper } from '@/reducers/store';
-import { setIsDarkTheme } from '@/slices/settings';
+// TODO fix settings
+// import { setIsDarkTheme } from '@/slices/settingsSlice';
+import {
+  getCategories,
+  getMeasurementSystems,
+  getMeasurementTypes,
+  getMeasurementUnits,
+  getThemes
+} from '@/slices/enumSlice';
 import { SettingsRootState } from '@/types/settings';
 import '@/public/theme/global.scss';
 import '@/public/theme/tailwind.css';
 
-function StatefulThemeProvider({ children }: { children: ReactNode }): ReactElement {
-  const { isDarkTheme } = useSelector((state: SettingsRootState) => state.settings);
+interface StatefulThemeProviderProps {
+  children: ReactNode;
+}
+
+function StatefulThemeProvider({ children }: StatefulThemeProviderProps): ReactElement {
+  // const { isDarkTheme } = useSelector((state: SettingsRootState) => state.settings);
   const dispatch = useDispatch();
-  const theme = isDarkTheme ? darkTheme : lightTheme;
+  // const theme = isDarkTheme ? darkTheme : lightTheme;
+  const theme = darkTheme;
 
   useEffect(() => {
-    dispatch(
-      setIsDarkTheme(typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    );
+    dispatch(getCategories());
+    dispatch(getMeasurementSystems());
+    dispatch(getMeasurementTypes());
+    dispatch(getMeasurementUnits());
+    dispatch(getThemes());
+    //   dispatch(
+    //     setIsDarkTheme(typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    //   );
   }, [dispatch]);
 
   return (

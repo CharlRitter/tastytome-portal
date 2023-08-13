@@ -1,4 +1,4 @@
-import { Accordion, Box, styled } from '@mui/material';
+import { Accordion, Box, Stack, styled } from '@mui/material';
 import { StyledProps } from '@/types/common';
 
 export const StickyWrapper = styled(Box)<StyledProps>(({ theme }) => ({
@@ -24,3 +24,27 @@ export const ActionsAccordion = styled(Accordion)(() => ({
     padding: 0
   }
 })) as typeof Accordion;
+
+export const RatingStack = styled(Stack)<StyledProps>(({ theme }) => ({
+  border: `1px solid ${theme.palette.action.disabled}`,
+  color: theme.palette.text.secondary,
+  borderRadius: '5px',
+  padding: '9px'
+}));
+
+export const DropzoneBox = styled('div')<StyledProps>(({ theme, isMediumScreen }) => ({
+  border: `1px solid ${theme.palette.action.disabled}`,
+  color: theme.palette.text.secondary,
+  borderRadius: '5px',
+  padding: '15px',
+  minWidth: isMediumScreen ? 'unset' : '403px'
+}));
+
+export const DropBox = styled('div')<StyledProps>(({ theme, disabled, isDragActive }) => ({
+  border: `1px solid ${isDragActive ? theme.palette.action.active : 'transparent'}`,
+  color: theme.palette.text.secondary,
+  borderRadius: '5px',
+  padding: '9px',
+  opacity: disabled ? 0.7 : 1,
+  backgroundColor: isDragActive ? theme.palette.action.hover : 'inherit'
+}));

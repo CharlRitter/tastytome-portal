@@ -2,15 +2,15 @@
 import { Draft, PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { HYDRATE } from 'next-redux-wrapper';
 import { SettingsState } from '@/types/settings';
-import { MeasurementSystems } from '@/constants/measurements';
+// import { MeasurementSystems } from '@/constants/measurements';
 import { ThemeSettingOptions } from '@/constants/general';
 
 const systemTheme = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
 const initialState: SettingsState = {
   isDarkTheme: false,
-  theme: ThemeSettingOptions.Auto,
-  units: MeasurementSystems.Metric,
+  // theme: ThemeSettingOptions.Auto,
+  // units: MeasurementSystems.Metric,
   pantryStock: true,
   negativePantryStock: true,
   nutritionalInformation: true

@@ -8,17 +8,11 @@ import {
   FaBook,
   FaShoppingBasket,
   FaBox,
-  FaHome,
   FaRegFile
 } from 'react-icons/fa';
 import { InfoModals, Page } from '@/types/constants';
 
 export const PAGES: Page[] = [
-  {
-    title: 'Dashboard',
-    route: '/',
-    icon: <FaHome />
-  },
   {
     title: 'Recipes',
     route: '/recipes',

@@ -21,38 +21,10 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/components/*": [
-        "components/*"
-      ],
-      "@/constants/*": [
-        "constants/*"
-      ],
-      "@/pages/*": [
-        "app/*"
-      ],
-      "@/public/*": [
-        "public/*"
-      ],
-      "@/reducers/*": [
-        "reducers/*"
-      ],
-      "@/slices/*": [
-        "slices/*"
-      ],
-      "@/tests/*": [
-        "tests/*"
-      ],
-      "@/types/*": [
-        "types/*"
-      ],
-      "@/utils/*": [
-        "utils/*"
-      ]
+      "@/*": ["*"]
     },
     "plugins": [
-      {
-        "name": "next"
-      }
+      { "name": "next" }
     ],
     "noImplicitAny": true,
     "noImplicitThis": true,

@@ -1,5 +1,5 @@
 {
-  "name": "cookscribe",
+  "name": "cookscribe-portal",
   "version": "0.8.0",
   "description": "TODO",
   "keywords": [],
@@ -10,18 +10,19 @@
     "test": "tests"
   },
   "scripts": {
-    "compile-tailwind": "yarn tailwindcss build -c tailwind.config.ts -o public/theme/tailwind.css",
     "build": "next build",
+    "compile-tailwind": "yarn tailwindcss build -c tailwind.config.ts -o public/theme/tailwind.css",
     "dev": "next dev",
     "lint": "next lint && stylelint '**/*.scss'",
     "lint:fix": "next lint --fix && yarn stylelint '**/*.scss' --fix --allow-empty-input",
-    "pre-commit": "next lint --fix && yarn stylelint '**/*.scss' --fix --allow-empty-input",
+    "pre-commit": "lint-staged",
     "prepare": "husky install",
     "sort-package": "yarn sort-package-json",
     "start": "next start",
     "test": "yarn playwright test",
     "test:report": "yarn playwright show-report",
-    "test:ui": "yarn playwright test --ui"
+    "test:ui": "yarn playwright test --ui",
+    "tree": "git ls-tree -r --name-only HEAD | tree --fromfile"
   },
   "husky": {
     "hooks": {
@@ -42,13 +43,14 @@
     "@fontsource/roboto": "^5.0.3",
     "@mdx-js/loader": "^2.3.0",
     "@mdx-js/react": "^2.3.0",
+    "@mui/lab": "^5.0.0-alpha.139",
     "@mui/material": "^5.13.6",
     "@mui/system": "^5.13.6",
     "@next/mdx": "^13.4.7",
     "@npmcli/fs": "^3.1.0",
-    "@playwright/test": "^1.35.1",
     "@reduxjs/toolkit": "^1.9.5",
-    "@types/mdx": "^2.0.5",
+    "axios": "^1.4.0",
+    "convert-units": "^2.3.4",
     "framer-motion": "^10.12.16",
     "lodash": "^4.17.21",
     "luxon": "^3.3.0",
@@ -57,6 +59,7 @@
     "react": "latest",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "latest",
+    "react-dropzone": "^14.2.3",
     "react-google-recaptcha": "^3.1.0",
     "react-icons": "^4.9.0",
     "react-redux": "^8.1.1",
@@ -65,11 +68,13 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^12.1.6",
+    "@playwright/test": "^1.35.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.2.0",
     "@types/lodash": "^4.14.195",
     "@types/luxon": "^3.3.0",
+    "@types/mdx": "^2.0.5",
     "@types/node": "^20.3.1",
     "@types/react": "^18.2.12",
     "@types/react-beautiful-dnd": "^13.1.4",
@@ -109,5 +114,5 @@
     "url-loader": "^4.1.1",
     "yarn": "^2.4.3"
   },
-  "packageManager": "yarn@3.6.0"
+  "packageManager": "yarn@3.6.1"
 }

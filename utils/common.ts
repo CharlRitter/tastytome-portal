@@ -1,3 +1,5 @@
+import { QueryParams } from '@/types/utils';
+
 export function CapitaliseFirstLetter(word: string, seperator?: string): string {
   let words: string[] = [word];
 
@@ -36,4 +38,32 @@ export function StringToColor(string: string) {
   }
 
   return color;
+}
+
+export function FormatDate(date: string) {
+  const options: Intl.DateTimeFormatOptions = {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  };
+
+  return new Date(date).toLocaleDateString('en-GB', options);
+}
+
+function IsValidQueryParam(value: string | null): boolean {
+  if (value === null || value === '' || value === 'desc' || value === '0') {
+    return false;
+  }
+
+  return true;
+}
+
+export function ConstructApiQuery(params: QueryParams): string {
+  const validParams = Object.fromEntries(Object.entries(params).filter(([key, value]) => IsValidQueryParam(value)));
+
+  const queryParameters = Object.keys(validParams)
+    .map((key) => `${key}=${validParams[key]}`)
+    .join('&');
+
+  return queryParameters ? `?${queryParameters}` : '';
 }
