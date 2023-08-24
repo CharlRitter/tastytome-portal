@@ -1,27 +1,46 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as api from '@/api/recipeApi';
-import { Recipe, RecipeIngredient, RecipeState, RecipeTimer } from '@/types/recipe';
+import { GetRecipeResponse, Recipe, RecipeIngredient, RecipeState, RecipeTimer } from '@/types/recipe';
 import handleAsyncThunk from '@/utils/api';
 
 const initialState: RecipeState = {
   error: null,
   loading: false,
+  loadingNext: false,
+  totalCount: 0,
   recipes: []
 };
 
 export const getRecipes = createAsyncThunk(
   'recipe/getRecipes',
   async (
-    query: { categories?: string; dateAscending?: string; effort?: string; rating?: string },
+    query: {
+      categories?: string;
+      dateAscending?: string;
+      effort?: string;
+      rating?: string;
+      page?: string;
+      pageSize?: string;
+    },
     thunkAPI
-  ): Promise<Recipe[]> => handleAsyncThunk(thunkAPI, () => api.getRecipes(query))
+  ): Promise<GetRecipeResponse> => handleAsyncThunk(thunkAPI, () => api.getRecipes(query))
 );
 
-// export const getRecipeById = createAsyncThunk(
-//   'recipe/getRecipeById',
-//   async (id: number, thunkAPI): Promise<Recipe> => handleAsyncThunk(thunkAPI, () => api.getRecipeById(id))
-// );
+export const getNextRecipes = createAsyncThunk(
+  'recipe/getNextRecipes',
+  async (
+    query: {
+      categories?: string;
+      dateAscending?: string;
+      effort?: string;
+      rating?: string;
+      page?: string;
+      pageSize?: string;
+    },
+    thunkAPI
+  ): Promise<GetRecipeResponse> => handleAsyncThunk(thunkAPI, () => api.getRecipes(query))
+);
 
 export const createRecipe = createAsyncThunk(
   'recipe/createRecipe',
@@ -63,24 +82,30 @@ const recipeSlice = createSlice({
         state.loading = true;
       })
       .addCase(getRecipes.fulfilled, (state, action) => {
-        state.recipes = action.payload;
+        const { recipes, totalCount } = action.payload;
+
+        state.recipes = recipes;
+        state.totalCount = totalCount;
         state.loading = false;
       })
       .addCase(getRecipes.rejected, (state, action) => {
         state.error = action.payload as string | null;
         state.loading = false;
       })
-      // .addCase(getRecipeById.pending, (state) => {
-      //   state.loading = true;
-      // })
-      // .addCase(getRecipeById.fulfilled, (state, action) => {
-      //   state.recipe = action.payload;
-      //   state.loading = false;
-      // })
-      // .addCase(getRecipeById.rejected, (state, action) => {
-      //   state.error = action.payload as string | null;
-      //   state.loading = false;
-      // })
+      .addCase(getNextRecipes.pending, (state) => {
+        state.loadingNext = true;
+      })
+      .addCase(getNextRecipes.fulfilled, (state, action) => {
+        const { recipes, totalCount } = action.payload;
+
+        state.recipes.push(...recipes);
+        state.totalCount = totalCount;
+        state.loadingNext = false;
+      })
+      .addCase(getNextRecipes.rejected, (state, action) => {
+        state.error = action.payload as string | null;
+        state.loadingNext = false;
+      })
       .addCase(createRecipe.pending, (state) => {
         state.loading = true;
       })

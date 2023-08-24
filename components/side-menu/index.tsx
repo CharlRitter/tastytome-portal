@@ -26,8 +26,8 @@ import {
   useTheme
 } from '@mui/material';
 import { FaBars, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
-import { PAGES, INFO_MODALS } from '@/constants/navigationitems';
-import { CapitaliseFirstLetter } from '@/utils/common';
+import { PAGES, INFO_MODALS } from '@/constants/navigationItems';
+import { capitaliseFirstLetter } from '@/utils/common';
 import { InfoModal, Page } from '@/types/constants';
 import { NextLink } from '@/public/theme/globalStyled';
 
@@ -47,7 +47,7 @@ export default function SideMenu(props: { drawerWidth: number }): ReactElement {
   let breadcrumbsHref = '';
   const breadcrumbs = routeSections.map((routeSection: string, index: number) => {
     breadcrumbsHref += `/${routeSection}`;
-    let content: string | ReactElement = CapitaliseFirstLetter(routeSection, routeSection.includes('-') ? '-' : '');
+    let content: string | ReactElement = capitaliseFirstLetter(routeSection, routeSection.includes('-') ? '-' : '');
     const lastItem = index === routeSections.length - 1;
 
     if (!lastItem) {

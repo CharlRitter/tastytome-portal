@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import axiosInstance from '@/api/axios';
 import { Recipe } from '@/types/recipe';
-import { ConstructApiQuery } from '@/utils/common';
+import { constructApiQuery } from '@/utils/common';
 
 const path = '/v1/recipe';
 
@@ -10,13 +10,11 @@ export async function getRecipes(query: {
   dateAscending?: string;
   effort?: string;
   rating?: string;
+  page?: string;
+  pageSize?: string;
 }): Promise<AxiosResponse> {
-  return axiosInstance.get(`${path}${ConstructApiQuery(query)}`);
+  return axiosInstance.get(`${path}${constructApiQuery(query)}`);
 }
-
-// export async function getRecipeById(id: number): Promise<AxiosResponse> {
-//   return axiosInstance.get(`${path}/${id}`);
-// }
 
 export async function createRecipe(id: number, data: Partial<Recipe>): Promise<AxiosResponse> {
   return axiosInstance.post(`${path}/${id}`, data);

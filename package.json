@@ -30,10 +30,10 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
+    "**/*.{js,jsx,ts,tsx}": [
       "next lint --fix"
     ],
-    "*.{scss,sass,css}": [
+    "**/*.{scss,css}": [
       "stylelint --fix --allow-empty-input"
     ]
   },

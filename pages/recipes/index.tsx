@@ -7,10 +7,10 @@ import {
   Alert,
   Autocomplete,
   Button,
+  CircularProgress,
   Fab,
   Grid,
   IconButton,
-  Pagination,
   Paper,
   Snackbar,
   Stack,
@@ -20,14 +20,15 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@mui/material';
 import { BsFillGridFill, BsFilter, BsList, BsPlus } from 'react-icons/bs';
 import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 import { VscClose } from 'react-icons/vsc';
 import PageContainer from '@/components/page-container';
-import RecipeCard from '@/components/recipe-card';
-import { getRecipes } from '@/slices/recipeSlice';
+import RecipeCards from '@/components/recipe-cards';
+import { getRecipes, getNextRecipes } from '@/slices/recipeSlice';
 import { Category, EnumState } from '@/types/enum';
 import { RecipeState } from '@/types/recipe';
 import { DifficultyRating, StyledRating } from '@/public/theme/globalStyled';
@@ -39,8 +40,10 @@ export default function Recipes(): ReactElement {
   const { categories } = useSelector((state: { enum: EnumState }) => state.enum);
   const {
     recipes,
-    loading: recipeLoading,
-    error: recipeError
+    loading: loadingRecipes,
+    loadingNext: loadingNextRecipe,
+    totalCount: recipeTotalCount,
+    error: errorRecipe
   } = useSelector((state: { recipe: RecipeState }) => state.recipe);
 
   const [isListLayout, setIsListLayout] = useState<boolean>(false);
@@ -51,27 +54,9 @@ export default function Recipes(): ReactElement {
   const [isDateAscending, setIsDateAscending] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [recipesPerPage] = useState<number>(10);
+  const [isMoreRecipes, setIsMoreRecipes] = useState<boolean>(false);
 
-  const totalRecipes = recipes.length;
-  const totalPages = Math.ceil(totalRecipes / recipesPerPage) || 1;
-
-  useEffect(() => {
-    dispatch(
-      getRecipes({
-        categories: selectedCategories && selectedCategories.map((category) => category.id).join(','),
-        orderBy: isDateAscending ? 'asc' : 'desc',
-        effort: effortFilter?.toString(),
-        rating: ratingFilter?.toString(),
-        page: currentPage,
-        pageSize: recipesPerPage
-      })
-    );
-  }, [dispatch, selectedCategories, isDateAscending, effortFilter, ratingFilter, currentPage, recipesPerPage]);
-
-  useEffect(() => {
-    setOpenSnackbar(recipeError !== null);
-  }, [recipeError]);
+  const pageSize = useMediaQuery(theme.breakpoints.down('xl')) || isListLayout ? 10 : 12;
 
   function handleClearFilters() {
     setSelectedCategories([]);
@@ -80,12 +65,71 @@ export default function Recipes(): ReactElement {
     setIsDateAscending(false);
   }
 
+  useEffect(() => {
+    async function handleScroll() {
+      const { scrollHeight, scrollTop, clientHeight } = document.documentElement;
+
+      if (scrollHeight - (scrollTop + clientHeight) < 100 && !loadingRecipes && isMoreRecipes) {
+        const nextPage = currentPage + 1;
+
+        dispatch(
+          getNextRecipes({
+            categories: selectedCategories.map((category) => category.id).join(','),
+            orderBy: isDateAscending ? 'asc' : 'desc',
+            effort: effortFilter?.toString(),
+            rating: ratingFilter?.toString(),
+            page: nextPage,
+            pageSize
+          })
+        );
+
+        setCurrentPage(nextPage);
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [
+    dispatch,
+    currentPage,
+    isMoreRecipes,
+    loadingRecipes,
+    selectedCategories,
+    isDateAscending,
+    effortFilter,
+    ratingFilter
+  ]);
+
+  useEffect(() => {
+    dispatch(
+      getRecipes({
+        categories: selectedCategories && selectedCategories.map((category) => category.id).join(','),
+        orderBy: isDateAscending ? 'asc' : 'desc',
+        effort: effortFilter?.toString(),
+        rating: ratingFilter?.toString(),
+        pageSize
+      })
+    );
+    setCurrentPage(1);
+  }, [dispatch, selectedCategories, isDateAscending, effortFilter, ratingFilter]);
+
+  useEffect(() => {
+    setOpenSnackbar(errorRecipe !== null);
+  }, [errorRecipe]);
+
+  useEffect(() => {
+    setIsMoreRecipes(recipeTotalCount > currentPage * 10);
+  }, [recipeTotalCount, currentPage]);
+
   return (
     <PageContainer>
       <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
         <Alert onClose={() => setOpenSnackbar(false)} severity="error">
           <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-            <Typography>Could not load recipes — {recipeError}</Typography>
+            <Typography>Could not load recipes — {errorRecipe}</Typography>
             <Button
               variant="contained"
               color="error"
@@ -97,7 +141,7 @@ export default function Recipes(): ReactElement {
                     effort: effortFilter?.toString(),
                     rating: ratingFilter?.toString(),
                     page: currentPage,
-                    pageSize: recipesPerPage
+                    pageSize
                   })
                 )
               }
@@ -200,39 +244,19 @@ export default function Recipes(): ReactElement {
           </AccordionDetails>
         </ActionsAccordion>
       </StickyWrapper>
-
-      <Grid container spacing={2} className="mb-3">
-        {recipes.length > 0 ? (
-          recipes.map((recipe) => (
-            <Grid key={recipe.id} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
-              <RecipeCard
-                recipeID={recipe.id as number}
-                isListLayout={isListLayout}
-                title={recipe.title}
-                dateCreated={recipe.createdat as string}
-                description={recipe.description}
-                recipeCategories={recipe.recipecategory}
-                imagePath={recipe.image as string | null}
-                rating={recipe.rating}
-                effort={recipe.effort}
-                loading={recipeLoading}
-              />
-            </Grid>
-          ))
-        ) : (
-          <Stack className="w-full mt-6 mb-3" justifyContent="center" direction="row">
-            <Typography>No results</Typography>
-          </Stack>
-        )}
+      <Grid container spacing={2} className="mb-5">
+        <RecipeCards recipes={recipes} isListLayout={isListLayout} loading={loadingRecipes} />
       </Grid>
-      <Stack justifyContent="center" direction="row">
-        <Pagination
-          count={totalPages}
-          color="secondary"
-          size="large"
-          onChange={(event: ChangeEvent<HTMLInputElement>, page: number) => setCurrentPage(page)}
-        />
-      </Stack>
+      {loadingNextRecipe && (
+        <Stack className="w-full mt-6 mb-5" justifyContent="center" direction="row">
+          <CircularProgress />
+        </Stack>
+      )}
+      {!isMoreRecipes && (
+        <Stack className="w-full mt-6 mb-5" justifyContent="center" direction="row">
+          <Typography>No more recipes</Typography>
+        </Stack>
+      )}
     </PageContainer>
   );
 }

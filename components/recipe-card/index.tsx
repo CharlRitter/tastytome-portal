@@ -7,7 +7,6 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
-  Skeleton,
   Stack,
   Typography,
   CardActionArea,
@@ -22,9 +21,9 @@ import {
   DialogActions,
   Button
 } from '@mui/material';
-import { FaChevronDown, FaChevronRight, FaCopy, FaShareAlt, FaTrash } from 'react-icons/fa';
+import { FaChevronDown, FaChevronRight, FaCopy, FaEdit, FaTrash } from 'react-icons/fa';
 import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
-import { AbbreviateTitle, FormatDate, StringToColor } from '@/utils/common';
+import { abbreviateTitle, formatDate, stringToColor } from '@/utils/common';
 import { deleteRecipe } from '@/slices/recipeSlice';
 import { RecipeCategory } from '@/types/recipe';
 import { DifficultyRating, StyledRating } from '@/public/theme/globalStyled';
@@ -40,9 +39,8 @@ export default function RecipeCard(props: {
   imagePath?: string | null;
   rating?: number;
   effort?: number;
-  loading?: boolean;
 }): ReactElement {
-  const { title, dateCreated, description, recipeCategories, imagePath, recipeID, loading, rating, effort } = props;
+  const { title, dateCreated, description, recipeCategories, imagePath, recipeID, rating, effort } = props;
 
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -51,7 +49,12 @@ export default function RecipeCard(props: {
   const isListLayout = useMediaQuery('(max-width: 899px)') ? false : props.isListLayout;
 
   const buttonActions = [
-    { icon: <FaShareAlt />, title: 'Share', ariaLabel: 'share', command: () => {} },
+    {
+      icon: <FaEdit />,
+      title: 'Edit',
+      ariaLabel: 'edit',
+      command: () => router.push(`/recipes/edit/${recipeID}`)
+    },
     {
       icon: <FaCopy />,
       title: 'Duplicate',
@@ -61,23 +64,7 @@ export default function RecipeCard(props: {
     { icon: <FaTrash />, title: 'Delete', ariaLabel: 'delete', command: () => setDeleteConfirmation(true) }
   ];
 
-  return loading ? (
-    <Card>
-      <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
-        <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
-          <Skeleton variant="rounded" width={isListLayout ? 300 : 'unset'} height={isListLayout ? 250 : 300} />
-          <Stack direction="column" width="100%">
-            <CardContent>
-              <Skeleton variant="text" height={50} width="50%" className="mb-4" />
-              <Skeleton variant="text" />
-              <Skeleton variant="text" width="50%" />
-              <Skeleton variant="text" width="75%" />
-            </CardContent>
-          </Stack>
-        </Stack>
-      </Stack>
-    </Card>
-  ) : (
+  return (
     <Card>
       <Dialog
         open={deleteConfirmation}
@@ -112,13 +99,13 @@ export default function RecipeCard(props: {
             ) : (
               <Avatar
                 sx={{
-                  bgcolor: StringToColor(title),
+                  bgcolor: stringToColor(title),
                   width: isListLayout ? '300px' : 'unset',
                   height: isListLayout ? '250px' : '300px'
                 }}
                 variant="square"
               >
-                <Typography variant="h2">{AbbreviateTitle(title)}</Typography>
+                <Typography variant="h2">{abbreviateTitle(title)}</Typography>
               </Avatar>
             )}
             <Stack direction="column" width="100%">
@@ -129,7 +116,7 @@ export default function RecipeCard(props: {
                       <Typography variant="h5" color={theme.palette.common.white}>
                         {title}
                       </Typography>
-                      <Typography>{FormatDate(dateCreated)}</Typography>
+                      <Typography>{formatDate(dateCreated)}</Typography>
                     </Stack>
                     <Stack direction="row" justifyContent="space-between" className="mb-4">
                       <StyledRating name="read-only" value={rating} readOnly size="large" />

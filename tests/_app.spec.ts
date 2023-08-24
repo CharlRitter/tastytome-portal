@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { PAGES, INFO_MODALS } from '@/constants/navigationitems';
+import { PAGES, INFO_MODALS } from '@/constants/navigationItems';
 
 const devSite = 'http://localhost:3000';
 

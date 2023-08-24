@@ -1,6 +1,6 @@
 import { QueryParams } from '@/types/utils';
 
-export function CapitaliseFirstLetter(word: string, seperator?: string): string {
+export function capitaliseFirstLetter(word: string, seperator?: string): string {
   let words: string[] = [word];
 
   if (seperator) {
@@ -10,7 +10,7 @@ export function CapitaliseFirstLetter(word: string, seperator?: string): string 
   return words.map((string: string) => string.charAt(0).toUpperCase() + string.slice(1)).join(' ');
 }
 
-export function AbbreviateTitle(title: string): string {
+export function abbreviateTitle(title: string): string {
   let words = title.split(' ');
 
   words = words.map((word) => {
@@ -22,7 +22,7 @@ export function AbbreviateTitle(title: string): string {
   return words.join('');
 }
 
-export function StringToColor(string: string) {
+export function stringToColor(string: string) {
   let index = 0;
   let hash = 0;
   let color = '#';
@@ -40,7 +40,7 @@ export function StringToColor(string: string) {
   return color;
 }
 
-export function FormatDate(date: string) {
+export function formatDate(date: string) {
   const options: Intl.DateTimeFormatOptions = {
     day: 'numeric',
     month: 'long',
@@ -50,7 +50,7 @@ export function FormatDate(date: string) {
   return new Date(date).toLocaleDateString('en-GB', options);
 }
 
-function IsValidQueryParam(value: string | null): boolean {
+function isValidQueryParam(value: string | null): boolean {
   if (value === null || value === '' || value === 'desc' || value === '0') {
     return false;
   }
@@ -58,8 +58,8 @@ function IsValidQueryParam(value: string | null): boolean {
   return true;
 }
 
-export function ConstructApiQuery(params: QueryParams): string {
-  const validParams = Object.fromEntries(Object.entries(params).filter(([key, value]) => IsValidQueryParam(value)));
+export function constructApiQuery(params: QueryParams): string {
+  const validParams = Object.fromEntries(Object.entries(params).filter(([key, value]) => isValidQueryParam(value)));
 
   const queryParameters = Object.keys(validParams)
     .map((key) => `${key}=${validParams[key]}`)
