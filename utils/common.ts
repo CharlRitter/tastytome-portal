@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { QueryParams } from '@/types/utils';
 
 export function capitaliseFirstLetter(word: string, seperator?: string): string {
@@ -50,8 +51,8 @@ export function formatDate(date: string) {
   return new Date(date).toLocaleDateString('en-GB', options);
 }
 
-function isValidQueryParam(value: string | null): boolean {
-  if (value === null || value === '' || value === 'desc' || value === '0') {
+function isValidQueryParam(value: string | number | null): boolean {
+  if (value === null || value === '' || value === 'desc' || value === 0) {
     return false;
   }
 
@@ -66,4 +67,14 @@ export function constructApiQuery(params: QueryParams): string {
     .join('&');
 
   return queryParameters ? `?${queryParameters}` : '';
+}
+
+export function usePrevious<T>(value: T): T | undefined {
+  const ref = useRef<T>();
+
+  useEffect(() => {
+    ref.current = value;
+  });
+
+  return ref.current;
 }

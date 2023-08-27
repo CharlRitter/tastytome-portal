@@ -2,6 +2,8 @@ import React, { ChangeEvent, ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Autocomplete, Grid, Paper, Switch, TextField, Typography } from '@mui/material';
 import PageContainer from '@/components/page-container';
+import { SettingsRootState } from '@/types/settings';
+// import { ThemeSettingOptions } from '@/constants/general';
 import {
   setNegativePantryStock,
   setNutritionalInformation,
@@ -9,9 +11,7 @@ import {
   setThemeSetting,
   setMeasurementSystem
 } from '@/slices/settings';
-import { SettingsRootState } from '@/types/settings';
 import { MeasurementSystems } from '@/constants/measurements';
-import { ThemeSettingOptions } from '@/constants/general';
 
 export default function Settings(): ReactElement {
   const dispatch = useDispatch();

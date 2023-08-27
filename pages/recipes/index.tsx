@@ -20,7 +20,6 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
-  useMediaQuery,
   useTheme
 } from '@mui/material';
 import { BsFillGridFill, BsFilter, BsList, BsPlus } from 'react-icons/bs';
@@ -28,40 +27,45 @@ import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 import { VscClose } from 'react-icons/vsc';
 import PageContainer from '@/components/page-container';
 import RecipeCards from '@/components/recipe-cards';
-import { getRecipes, getNextRecipes } from '@/slices/recipeSlice';
+import { getRecipes } from '@/slices/recipeSlice';
 import { Category, EnumState } from '@/types/enum';
-import { RecipeState } from '@/types/recipe';
+import { Recipe, RecipeState } from '@/types/recipe';
 import { DifficultyRating, StyledRating } from '@/public/theme/globalStyled';
+import { usePrevious } from '@/utils/common';
 import { ActionsAccordion, StickyWrapper } from './styled';
 
 export default function Recipes(): ReactElement {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { categories } = useSelector((state: { enum: EnumState }) => state.enum);
+  const { categories: recipeCategories } = useSelector((state: { enum: EnumState }) => state.enum);
   const {
-    recipes,
+    recipes: storeRecipes,
     loading: loadingRecipes,
-    loadingNext: loadingNextRecipe,
     totalCount: recipeTotalCount,
     error: errorRecipe
   } = useSelector((state: { recipe: RecipeState }) => state.recipe);
 
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isListLayout, setIsListLayout] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
-  const [ratingFilter, setRatingFilter] = useState<number>(0);
-  const [effortFilter, setEffortFilter] = useState<number>(0);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [rating, setRating] = useState<number>(0);
+  const [effort, setEffort] = useState<number>(0);
   const [isDateAscending, setIsDateAscending] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [isMoreRecipes, setIsMoreRecipes] = useState<boolean>(false);
+  const prevCategories = usePrevious<Category[]>(categories);
+  const prevEffort = usePrevious<number>(effort);
+  const prevRating = usePrevious<number>(rating);
+  const prevIsDateAscending = usePrevious<boolean>(isDateAscending);
 
-  const pageSize = useMediaQuery(theme.breakpoints.down('xl')) || isListLayout ? 10 : 12;
+  const pageSize = 12;
+  const isMoreRecipes = recipeTotalCount > currentPage * pageSize || false;
 
   function handleClearFilters() {
-    setSelectedCategories([]);
-    setRatingFilter(0);
-    setEffortFilter(0);
+    setCategories([]);
+    setRating(0);
+    setEffort(0);
     setIsDateAscending(false);
   }
 
@@ -70,20 +74,7 @@ export default function Recipes(): ReactElement {
       const { scrollHeight, scrollTop, clientHeight } = document.documentElement;
 
       if (scrollHeight - (scrollTop + clientHeight) < 100 && !loadingRecipes && isMoreRecipes) {
-        const nextPage = currentPage + 1;
-
-        dispatch(
-          getNextRecipes({
-            categories: selectedCategories.map((category) => category.id).join(','),
-            orderBy: isDateAscending ? 'asc' : 'desc',
-            effort: effortFilter?.toString(),
-            rating: ratingFilter?.toString(),
-            page: nextPage,
-            pageSize
-          })
-        );
-
-        setCurrentPage(nextPage);
+        setCurrentPage((prevPage) => prevPage + 1);
       }
     }
 
@@ -92,37 +83,49 @@ export default function Recipes(): ReactElement {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
+  }, [loadingRecipes, isMoreRecipes]);
+
+  useEffect(() => {
+    if (
+      categories.length === prevCategories?.length &&
+      isDateAscending === prevIsDateAscending &&
+      effort === prevEffort &&
+      rating === prevRating
+    ) {
+      dispatch(
+        getRecipes({
+          categories: categories.map((category) => category.id).join(','),
+          orderBy: isDateAscending ? 'asc' : 'desc',
+          effort,
+          rating,
+          page: currentPage,
+          pageSize
+        })
+      );
+    } else {
+      setCurrentPage(1);
+      setRecipes([]);
+    }
   }, [
-    dispatch,
+    categories,
     currentPage,
-    isMoreRecipes,
-    loadingRecipes,
-    selectedCategories,
+    dispatch,
+    effort,
     isDateAscending,
-    effortFilter,
-    ratingFilter
+    prevCategories?.length,
+    prevEffort,
+    prevIsDateAscending,
+    prevRating,
+    rating
   ]);
 
   useEffect(() => {
-    dispatch(
-      getRecipes({
-        categories: selectedCategories && selectedCategories.map((category) => category.id).join(','),
-        orderBy: isDateAscending ? 'asc' : 'desc',
-        effort: effortFilter?.toString(),
-        rating: ratingFilter?.toString(),
-        pageSize
-      })
-    );
-    setCurrentPage(1);
-  }, [dispatch, selectedCategories, isDateAscending, effortFilter, ratingFilter]);
+    setRecipes((prevRecipes) => [...prevRecipes, ...storeRecipes]);
+  }, [storeRecipes]);
 
   useEffect(() => {
     setOpenSnackbar(errorRecipe !== null);
   }, [errorRecipe]);
-
-  useEffect(() => {
-    setIsMoreRecipes(recipeTotalCount > currentPage * 10);
-  }, [recipeTotalCount, currentPage]);
 
   return (
     <PageContainer>
@@ -136,10 +139,10 @@ export default function Recipes(): ReactElement {
               onClick={() =>
                 dispatch(
                   getRecipes({
-                    categories: selectedCategories && selectedCategories.map((category) => category.id).join(','),
+                    categories: categories.map((category) => category.id).join(','),
                     orderBy: isDateAscending ? 'asc' : 'desc',
-                    effort: effortFilter?.toString(),
-                    rating: ratingFilter?.toString(),
+                    effort,
+                    rating,
                     page: currentPage,
                     pageSize
                   })
@@ -196,11 +199,11 @@ export default function Recipes(): ReactElement {
               <Autocomplete
                 multiple
                 limitTags={3}
-                options={categories as Category[]}
+                options={recipeCategories as Category[]}
                 getOptionLabel={(option) => option.value}
-                value={selectedCategories || []}
+                value={categories}
                 renderInput={(params) => <TextField {...params} label="Categories" />}
-                onChange={(event: ChangeEvent<HTMLInputElement>, value: Category[]) => setSelectedCategories(value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>, value: Category[]) => setCategories(value)}
                 className="w-3/12"
               />
               <Stack direction="row" spacing={1}>
@@ -208,8 +211,8 @@ export default function Recipes(): ReactElement {
                   Rating
                 </Typography>
                 <StyledRating
-                  value={ratingFilter}
-                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setRatingFilter(value)}
+                  value={rating}
+                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setRating(value)}
                   size="large"
                 />
               </Stack>
@@ -218,8 +221,8 @@ export default function Recipes(): ReactElement {
                   Difficulty
                 </Typography>
                 <DifficultyRating
-                  value={effortFilter}
-                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setEffortFilter(value)}
+                  value={effort}
+                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setEffort(value)}
                   size="large"
                   icon={<TbRectangleFilled />}
                   emptyIcon={<TbRectangle />}
@@ -245,14 +248,14 @@ export default function Recipes(): ReactElement {
         </ActionsAccordion>
       </StickyWrapper>
       <Grid container spacing={2} className="mb-5">
-        <RecipeCards recipes={recipes} isListLayout={isListLayout} loading={loadingRecipes} />
+        <RecipeCards recipes={recipes} isListLayout={isListLayout} loading={loadingRecipes && recipes.length === 0} />
       </Grid>
-      {loadingNextRecipe && (
+      {loadingRecipes && recipes.length > 0 && (
         <Stack className="w-full mt-6 mb-5" justifyContent="center" direction="row">
           <CircularProgress />
         </Stack>
       )}
-      {!isMoreRecipes && (
+      {!loadingRecipes && recipes.length === 0 && !isMoreRecipes && (
         <Stack className="w-full mt-6 mb-5" justifyContent="center" direction="row">
           <Typography>No more recipes</Typography>
         </Stack>

@@ -1,3 +1,3 @@
 export type QueryParams = {
-  [key: string]: string | null;
+  [key: string]: string | number | null;
 };

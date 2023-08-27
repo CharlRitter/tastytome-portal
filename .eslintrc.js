@@ -8,7 +8,7 @@ module.exports = {
   ignorePatterns: ['next.config.js'],
   parser: '@typescript-eslint/parser',
   extends: ['next', 'airbnb', 'prettier', 'plugin:@typescript-eslint/recommended', 'airbnb-typescript'],
-  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'prettier'],
+  plugins: ['@typescript-eslint', 'react', 'prettier'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true

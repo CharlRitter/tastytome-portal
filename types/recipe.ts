@@ -57,7 +57,6 @@ export interface Recipe {
 export interface RecipeState {
   error: string | null;
   loading: boolean;
-  loadingNext: boolean;
   totalCount: number;
   recipes: Recipe[];
 }

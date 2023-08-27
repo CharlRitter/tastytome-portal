@@ -6,8 +6,7 @@ import handleAsyncThunk from '@/utils/api';
 
 const initialState: RecipeState = {
   error: null,
-  loading: false,
-  loadingNext: false,
+  loading: true,
   totalCount: 0,
   recipes: []
 };
@@ -18,25 +17,10 @@ export const getRecipes = createAsyncThunk(
     query: {
       categories?: string;
       dateAscending?: string;
-      effort?: string;
-      rating?: string;
-      page?: string;
-      pageSize?: string;
-    },
-    thunkAPI
-  ): Promise<GetRecipeResponse> => handleAsyncThunk(thunkAPI, () => api.getRecipes(query))
-);
-
-export const getNextRecipes = createAsyncThunk(
-  'recipe/getNextRecipes',
-  async (
-    query: {
-      categories?: string;
-      dateAscending?: string;
-      effort?: string;
-      rating?: string;
-      page?: string;
-      pageSize?: string;
+      effort?: number;
+      rating?: number;
+      page?: number;
+      pageSize?: number;
     },
     thunkAPI
   ): Promise<GetRecipeResponse> => handleAsyncThunk(thunkAPI, () => api.getRecipes(query))
@@ -69,7 +53,7 @@ export const updateRecipe = createAsyncThunk(
 
 export const deleteRecipe = createAsyncThunk('recipe/deleteRecipe', async (id: number, thunkAPI): Promise<void> => {
   handleAsyncThunk(thunkAPI, () => api.deleteRecipe(id));
-  thunkAPI.dispatch(getRecipes());
+  thunkAPI.dispatch(getRecipes({}));
 });
 
 const recipeSlice = createSlice({
@@ -91,20 +75,6 @@ const recipeSlice = createSlice({
       .addCase(getRecipes.rejected, (state, action) => {
         state.error = action.payload as string | null;
         state.loading = false;
-      })
-      .addCase(getNextRecipes.pending, (state) => {
-        state.loadingNext = true;
-      })
-      .addCase(getNextRecipes.fulfilled, (state, action) => {
-        const { recipes, totalCount } = action.payload;
-
-        state.recipes.push(...recipes);
-        state.totalCount = totalCount;
-        state.loadingNext = false;
-      })
-      .addCase(getNextRecipes.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loadingNext = false;
       })
       .addCase(createRecipe.pending, (state) => {
         state.loading = true;

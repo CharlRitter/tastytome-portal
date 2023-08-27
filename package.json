@@ -13,10 +13,11 @@
     "build": "next build",
     "compile-tailwind": "yarn tailwindcss build -c tailwind.config.ts -o public/theme/tailwind.css",
     "dev": "next dev",
+    "postinstall": "husky install",
     "lint": "next lint && stylelint '**/*.scss'",
     "lint:fix": "next lint --fix && yarn stylelint '**/*.scss' --fix --allow-empty-input",
-    "pre-commit": "lint-staged",
-    "prepare": "husky install",
+    "prepack": "pinst --disable",
+    "postpack": "pinst --enable",
     "sort-package": "yarn sort-package-json",
     "start": "next start",
     "test": "yarn playwright test",
@@ -24,18 +25,9 @@
     "test:ui": "yarn playwright test --ui",
     "tree": "git ls-tree -r --name-only HEAD | tree --fromfile"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": [
-      "next lint --fix"
-    ],
-    "**/*.{scss,css}": [
-      "stylelint --fix --allow-empty-input"
-    ]
+    "*.{js,jsx,ts,tsx}": "next lint --fix",
+    "*.{scss,css}": "stylelint --fix --allow-empty-input"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -84,6 +76,7 @@
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
     "autoprefixer": "^10.4.14",
+    "commitizen": "^4.3.0",
     "css-loader": "^6.7.1",
     "eslint": "^8.43.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -93,12 +86,12 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.30.0",
-    "eslint-plugin-react-hooks": "^4.5.0",
     "file-loader": "^6.2.0",
-    "husky": "^8.0.1",
+    "husky": "^8.0.3",
     "jest": "^28.1.1",
     "jest-environment-jsdom": "^28.1.1",
-    "lint-staged": "^13.0.1",
+    "lint-staged": "^14.0.1",
+    "pinst": "^3.0.0",
     "postcss": "^8.4.25",
     "prettier": "^2.6.2",
     "sass-loader": "^13.0.0",

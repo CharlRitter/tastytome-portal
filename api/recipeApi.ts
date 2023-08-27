@@ -8,10 +8,10 @@ const path = '/v1/recipe';
 export async function getRecipes(query: {
   categories?: string;
   dateAscending?: string;
-  effort?: string;
-  rating?: string;
-  page?: string;
-  pageSize?: string;
+  effort?: number;
+  rating?: number;
+  page?: number;
+  pageSize?: number;
 }): Promise<AxiosResponse> {
   return axiosInstance.get(`${path}${constructApiQuery(query)}`);
 }
