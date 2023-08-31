@@ -4,26 +4,26 @@ import { Autocomplete, Grid, Paper, Switch, TextField, Typography } from '@mui/m
 import PageContainer from '@/components/page-container';
 import { SettingsRootState } from '@/types/settings';
 // import { ThemeSettingOptions } from '@/constants/general';
-import {
-  setNegativePantryStock,
-  setNutritionalInformation,
-  setPantryStock,
-  setThemeSetting,
-  setMeasurementSystem
-} from '@/slices/settings';
-import { MeasurementSystems } from '@/constants/measurements';
+// import {
+//   setNegativePantryStock,
+//   setNutritionalInformation,
+//   setPantryStock,
+//   setThemeSetting,
+//   setMeasurementSystem
+// } from '@/slices/settings';
+// import { MeasurementSystems } from '@/constants/measurements';
 
 export default function Settings(): ReactElement {
-  const dispatch = useDispatch();
-  const { theme, pantryStock, negativePantryStock, nutritionalInformation } = useSelector(
-    (state: SettingsRootState) => state.settings
-  );
-  const measurementSystemOptions = Object.values(MeasurementSystems);
-  const themeSettingOptions = Object.values(ThemeSettingOptions);
+  // const dispatch = useDispatch();
+  // const { theme, pantryStock, negativePantryStock, nutritionalInformation } = useSelector(
+  //   (state: SettingsRootState) => state.settings
+  // );
+  // const measurementSystemOptions = Object.values(MeasurementSystems);
+  // const themeSettingOptions = Object.values(ThemeSettingOptions);
 
   return (
     <PageContainer>
-      <Paper classes={{ root: 'main' }}>
+      {/* <Paper classes={{ root: 'main' }}>
         <Grid container spacing={2} alignItems="center" className="mb-3">
           <Grid item xs={6}>
             <Typography variant="body1">Theme</Typography>
@@ -94,7 +94,7 @@ export default function Settings(): ReactElement {
             />
           </Grid>
         </Grid>
-      </Paper>
+      </Paper> */}
     </PageContainer>
   );
 }
