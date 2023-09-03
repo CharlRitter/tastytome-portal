@@ -1,38 +1,36 @@
-import React, { ReactElement } from 'react';
-import { Card, CardContent, Grid, Skeleton, Stack, Typography } from '@mui/material';
+import React, { Dispatch, ReactElement, SetStateAction } from 'react';
+import { Grid, Stack, Typography } from '@mui/material';
 import RecipeCard from '@/components/recipe-card';
 import { Recipe } from '@/types/recipe';
 
-export default function RecipeCards(props: {
+interface RecipeCardsProps {
   recipes: Recipe[];
   isListLayout: boolean;
   loading?: boolean;
-}): ReactElement {
-  const { recipes, isListLayout, loading } = props;
+  setRecipes: Dispatch<SetStateAction<Recipe[]>>;
+}
+
+export default function RecipeCards(props: RecipeCardsProps): ReactElement {
+  const { recipes, isListLayout, loading, setRecipes } = props;
 
   let content = (
     <>
-      {Array(3)
-        .fill(null)
-        .map((_, index) => (
-          <Grid key={index} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
-            <Card>
-              <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
-                <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
-                  <Skeleton variant="rounded" width={isListLayout ? 300 : 'unset'} height={isListLayout ? 250 : 300} />
-                  <Stack direction="column" width="100%">
-                    <CardContent>
-                      <Skeleton variant="text" height={50} width="50%" className="mb-4" />
-                      <Skeleton variant="text" />
-                      <Skeleton variant="text" width="50%" />
-                      <Skeleton variant="text" width="75%" />
-                    </CardContent>
-                  </Stack>
-                </Stack>
-              </Stack>
-            </Card>
-          </Grid>
-        ))}
+      {recipes.map((recipe) => (
+        <Grid key={recipe.id} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
+          <RecipeCard
+            recipeID={recipe.id as number}
+            isListLayout={isListLayout}
+            title={recipe.title}
+            dateCreated={recipe.createdat as string}
+            description={recipe.description}
+            recipeCategories={recipe.recipecategory}
+            imagePath={recipe.image as string | null}
+            rating={recipe.rating}
+            effort={recipe.effort}
+            setRecipes={setRecipes}
+          />
+        </Grid>
+      ))}
     </>
   );
 
@@ -42,27 +40,28 @@ export default function RecipeCards(props: {
         <Typography>No results</Typography>
       </Stack>
     );
-  } else if (!loading && recipes.length > 0) {
-    content = (
-      <>
-        {recipes.map((recipe) => (
-          <Grid key={recipe.id} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
-            <RecipeCard
-              recipeID={recipe.id as number}
-              isListLayout={isListLayout}
-              title={recipe.title}
-              dateCreated={recipe.createdat as string}
-              description={recipe.description}
-              recipeCategories={recipe.recipecategory}
-              imagePath={recipe.image as string | null}
-              rating={recipe.rating}
-              effort={recipe.effort}
-            />
-          </Grid>
-        ))}
-      </>
-    );
   }
 
-  return content;
+  return (
+    <>
+      {content}
+      {loading &&
+        Array(3)
+          .fill(null)
+          .map((_, index) => (
+            <Grid key={index} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
+              <RecipeCard
+                isListLayout={isListLayout}
+                loading={true}
+                title={''}
+                dateCreated={''}
+                description={''}
+                recipeCategories={[]}
+                recipeID={0}
+                setRecipes={setRecipes}
+              />
+            </Grid>
+          ))}
+    </>
+  );
 }

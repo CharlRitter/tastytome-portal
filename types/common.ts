@@ -6,3 +6,11 @@ export interface StyledProps {
   disabled?: boolean;
   isMediumScreen?: boolean;
 }
+
+export interface SliceItem<T> {
+  value: T;
+  status: string;
+  operation: string | null;
+  error: string | null;
+  totalCount?: number;
+}

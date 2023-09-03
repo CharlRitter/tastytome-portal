@@ -1,3 +1,5 @@
+import { SliceItem } from "@/types/common";
+
 export interface Category {
   id: number;
   value: string;
@@ -29,11 +31,9 @@ export interface Theme {
 }
 
 export interface EnumState {
-  error: string | null;
-  loading: boolean;
-  categories: Category[];
-  measurementsystems: MeasurementSystem[];
-  measurementtypes: MeasurementType[];
-  measurementunits: MeasurementUnit[];
-  themes: Theme[];
+  categories: SliceItem<Category[]>;
+  measurementsystems: SliceItem<MeasurementSystem[]>;
+  measurementtypes: SliceItem<MeasurementType[]>;
+  measurementunits: SliceItem<MeasurementUnit[]>;
+  themes: SliceItem<Theme[]>;
 }

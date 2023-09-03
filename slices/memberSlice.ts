@@ -2,12 +2,16 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as api from '@/api/memberApi';
 import { Member, MemberSettings, MemberState } from '@/types/member';
+import { OperationTypes, StatusTypes } from '@/constants/general';
 import handleAsyncThunk from '@/utils/api';
 
 const initialState: MemberState = {
-  error: null,
-  loading: false,
-  member: null
+  member: {
+    error: null,
+    status: StatusTypes.Fulfilled,
+    operation: null,
+    value: null
+  }
 };
 
 export const getMemberById = createAsyncThunk(
@@ -81,106 +85,126 @@ const memberSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getMemberById.pending, (state) => {
-        state.loading = true;
+        state.member.error = null;
+        state.member.status = StatusTypes.Pending;
+        state.member.operation = OperationTypes.Get;
       })
       .addCase(getMemberById.fulfilled, (state, action) => {
-        state.member = action.payload;
-        state.loading = false;
+        state.member.value = action.payload;
+        state.member.status = StatusTypes.Fulfilled;
       })
       .addCase(getMemberById.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.member.error = action.payload as string | null;
+        state.member.status = StatusTypes.Rejected;
       })
       .addCase(createMember.pending, (state) => {
-        state.loading = true;
+        state.member.error = null;
+        state.member.status = StatusTypes.Pending;
+        state.member.operation = OperationTypes.Create;
       })
       .addCase(createMember.fulfilled, (state) => {
-        state.loading = false;
+        state.member.status = StatusTypes.Fulfilled;
       })
       .addCase(createMember.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.member.error = action.payload as string | null;
+        state.member.status = StatusTypes.Rejected;
       })
       .addCase(updateMember.pending, (state) => {
-        state.loading = true;
+        state.member.error = null;
+        state.member.status = StatusTypes.Pending;
+        state.member.operation = OperationTypes.Get;
       })
       .addCase(updateMember.fulfilled, (state) => {
-        state.loading = false;
+        state.member.status = StatusTypes.Fulfilled;
       })
       .addCase(updateMember.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.member.error = action.payload as string | null;
+        state.member.status = StatusTypes.Rejected;
       })
       .addCase(deleteMember.pending, (state) => {
-        state.loading = true;
+        state.member.error = null;
+        state.member.status = StatusTypes.Pending;
+        state.member.operation = OperationTypes.Delete;
       })
       .addCase(deleteMember.fulfilled, (state) => {
-        state.loading = false;
+        state.member.status = StatusTypes.Fulfilled;
       })
       .addCase(deleteMember.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.member.error = action.payload as string | null;
+        state.member.status = StatusTypes.Rejected;
       })
       .addCase(updateMemberPassword.pending, (state) => {
-        state.loading = true;
+        state.member.error = null;
+        state.member.status = StatusTypes.Pending;
+        state.member.operation = OperationTypes.Update;
       })
       .addCase(updateMemberPassword.fulfilled, (state) => {
-        state.loading = false;
+        state.member.status = StatusTypes.Fulfilled;
       })
       .addCase(updateMemberPassword.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.member.error = action.payload as string | null;
+        state.member.status = StatusTypes.Rejected;
       })
       .addCase(resetMemberPassword.pending, (state) => {
-        state.loading = true;
+        state.member.error = null;
+        state.member.status = StatusTypes.Pending;
+        state.member.operation = OperationTypes.Update;
       })
       .addCase(resetMemberPassword.fulfilled, (state) => {
-        state.loading = false;
+        state.member.status = StatusTypes.Fulfilled;
       })
       .addCase(resetMemberPassword.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.member.error = action.payload as string | null;
+        state.member.status = StatusTypes.Rejected;
       })
       .addCase(confirmResetMemberPassword.pending, (state) => {
-        state.loading = true;
+        state.member.error = null;
+        state.member.status = StatusTypes.Pending;
+        state.member.operation = OperationTypes.Update;
       })
       .addCase(confirmResetMemberPassword.fulfilled, (state) => {
-        state.loading = false;
+        state.member.status = StatusTypes.Fulfilled;
       })
       .addCase(confirmResetMemberPassword.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.member.error = action.payload as string | null;
+        state.member.status = StatusTypes.Rejected;
       })
       .addCase(loginMember.pending, (state) => {
-        state.loading = true;
+        state.member.error = null;
+        state.member.status = StatusTypes.Pending;
+        state.member.operation = OperationTypes.Get;
       })
       .addCase(loginMember.fulfilled, (state, action) => {
-        state.member = action.payload;
-        state.loading = false;
+        state.member.value = action.payload;
+        state.member.status = StatusTypes.Rejected;
       })
       .addCase(loginMember.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.member.error = action.payload as string | null;
+        state.member.status = StatusTypes.Rejected;
       })
       .addCase(logoutMember.pending, (state) => {
-        state.loading = true;
+        state.member.error = null;
+        state.member.status = StatusTypes.Pending;
+        state.member.operation = OperationTypes.Update;
       })
       .addCase(logoutMember.fulfilled, (state) => {
-        state.loading = false;
+        state.member.status = StatusTypes.Fulfilled;
       })
       .addCase(logoutMember.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.member.error = action.payload as string | null;
+        state.member.status = StatusTypes.Rejected;
       })
       .addCase(updateMemberSettings.pending, (state) => {
-        state.loading = true;
+        state.member.error = null;
+        state.member.status = StatusTypes.Pending;
+        state.member.operation = OperationTypes.Update;
       })
       .addCase(updateMemberSettings.fulfilled, (state) => {
-        state.loading = false;
+        state.member.status = StatusTypes.Fulfilled;
       })
       .addCase(updateMemberSettings.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.member.error = action.payload as string | null;
+        state.member.status = StatusTypes.Rejected;
       });
   }
 });

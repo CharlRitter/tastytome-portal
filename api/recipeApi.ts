@@ -16,6 +16,10 @@ export async function getRecipes(query: {
   return axiosInstance.get(`${path}${constructApiQuery(query)}`);
 }
 
+export async function getRecipe(id: number): Promise<AxiosResponse> {
+  return axiosInstance.get(`${path}/${id}`);
+}
+
 export async function createRecipe(id: number, data: Partial<Recipe>): Promise<AxiosResponse> {
   return axiosInstance.post(`${path}/${id}`, data);
 }

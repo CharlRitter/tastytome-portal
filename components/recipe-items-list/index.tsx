@@ -188,7 +188,9 @@ export default function RecipeItemsList(props: {
           alignItems={isMediumScreen ? 'stretch' : 'center'}
         >
           <AdditionalInputAutocomplete
-            options={measurementtypes.filter((measurementtype) => measurementtype.id !== 2 && measurementtype.id !== 3)}
+            options={measurementtypes.value.filter(
+              (measurementtype) => measurementtype.id !== 2 && measurementtype.id !== 3
+            )}
             getOptionLabel={(option) => option.value}
             value={item.measurementtype}
             onChange={(event: ChangeEvent<HTMLInputElement>, newValue: MeasurementType) =>
@@ -198,7 +200,7 @@ export default function RecipeItemsList(props: {
           />
           <AdditionalInputAutocomplete
             // TODO Replace measurementsystem once hooked up
-            options={measurementunits.filter(
+            options={measurementunits.value.filter(
               (measurementunit) =>
                 (measurementunit.measurementsystemid === 1 || measurementunit.measurementsystemid === null) &&
                 item.measurementtype &&

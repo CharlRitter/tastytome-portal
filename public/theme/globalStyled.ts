@@ -31,7 +31,7 @@ export const StyledRating = styled(Rating)<StyledProps>(({ theme }) => ({
   },
 })) as typeof Rating;
 
-export const DifficultyRating = styled(Rating)<StyledProps>(({ theme }) => ({
+export const EffortRating = styled(Rating)<StyledProps>(({ theme }) => ({
   '& .MuiRating-iconFilled': {
     color: theme.palette.secondary.main
   },

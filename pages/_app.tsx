@@ -30,6 +30,7 @@ function StatefulThemeProvider({ children }: StatefulThemeProviderProps): ReactE
   const theme = darkTheme;
 
   useEffect(() => {
+    // Add error handling for this.
     dispatch(getCategories());
     dispatch(getMeasurementSystems());
     dispatch(getMeasurementTypes());

@@ -1,4 +1,5 @@
 import { Category, MeasurementSystem, MeasurementType, MeasurementUnit } from '@/types/enum';
+import { SliceItem } from '@/types/common';
 
 export interface RecipeCategory {
   id: number;
@@ -55,10 +56,8 @@ export interface Recipe {
 }
 
 export interface RecipeState {
-  error: string | null;
-  loading: boolean;
-  totalCount: number;
-  recipes: Recipe[];
+  recipes: SliceItem<Recipe[]>;
+  recipe: SliceItem<Recipe>;
 }
 export interface GetRecipeResponse {
   totalCount: number;

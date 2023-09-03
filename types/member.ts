@@ -1,4 +1,5 @@
 import { MeasurementSystem, Theme } from '@/types/enum';
+import { SliceItem } from '@/types/common';
 
 export interface MemberSettings {
   id: number;
@@ -25,7 +26,5 @@ export interface Member {
 }
 
 export interface MemberState {
-  error: string | null;
-  loading: boolean;
-  member: Member | null;
+  member: SliceItem<Member | null>;
 }

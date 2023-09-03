@@ -2,17 +2,41 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as api from '@/api/enumApi';
 import { Category, EnumState, MeasurementSystem, MeasurementType, MeasurementUnit } from '@/types/enum';
+import { OperationTypes, StatusTypes } from '@/constants/general';
 import handleAsyncThunk from '@/utils/api';
 import { Theme } from '@mui/material';
 
 const initialState: EnumState = {
-  error: null,
-  loading: false,
-  categories: [],
-  measurementsystems: [],
-  measurementtypes: [],
-  measurementunits: [],
-  themes: []
+  categories: {
+    error: null,
+    status: StatusTypes.Fulfilled,
+    operation: null,
+    value: []
+  },
+  measurementsystems: {
+    error: null,
+    status: StatusTypes.Fulfilled,
+    operation: null,
+    value: []
+  },
+  measurementtypes: {
+    error: null,
+    status: StatusTypes.Fulfilled,
+    operation: null,
+    value: []
+  },
+  measurementunits: {
+    error: null,
+    status: StatusTypes.Fulfilled,
+    operation: null,
+    value: []
+  },
+  themes: {
+    error: null,
+    status: StatusTypes.Fulfilled,
+    operation: null,
+    value: []
+  }
 };
 
 export const getCategories = createAsyncThunk(
@@ -47,59 +71,69 @@ const enumSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getCategories.pending, (state) => {
-        state.loading = true;
+        state.categories.error = null;
+        state.categories.status = StatusTypes.Pending;
+        state.categories.operation = OperationTypes.Get;
       })
       .addCase(getCategories.fulfilled, (state, action) => {
-        state.categories = action.payload;
-        state.loading = false;
+        state.categories.value = action.payload;
+        state.categories.status = StatusTypes.Fulfilled;
       })
       .addCase(getCategories.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.categories.error = action.payload as string | null;
+        state.categories.status = StatusTypes.Rejected;
       })
       .addCase(getMeasurementSystems.pending, (state) => {
-        state.loading = true;
+        state.measurementsystems.error = null;
+        state.measurementsystems.status = StatusTypes.Pending;
+        state.measurementsystems.operation = OperationTypes.Get;
       })
       .addCase(getMeasurementSystems.fulfilled, (state, action) => {
-        state.measurementsystems = action.payload;
-        state.loading = false;
+        state.measurementsystems.value = action.payload;
+        state.measurementsystems.status = StatusTypes.Fulfilled;
       })
       .addCase(getMeasurementSystems.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.measurementsystems.error = action.payload as string | null;
+        state.measurementsystems.status = StatusTypes.Rejected;
       })
       .addCase(getMeasurementTypes.pending, (state) => {
-        state.loading = true;
+        state.measurementtypes.error = null;
+        state.measurementtypes.status = StatusTypes.Pending;
+        state.measurementtypes.operation = OperationTypes.Get;
       })
       .addCase(getMeasurementTypes.fulfilled, (state, action) => {
-        state.loading = false;
-        state.measurementtypes = action.payload;
+        state.measurementtypes.value = action.payload;
+        state.measurementtypes.status = StatusTypes.Fulfilled;
       })
       .addCase(getMeasurementTypes.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.measurementtypes.error = action.payload as string | null;
+        state.measurementtypes.status = StatusTypes.Rejected;
       })
       .addCase(getMeasurementUnits.pending, (state) => {
-        state.loading = true;
+        state.measurementunits.error = null;
+        state.measurementunits.status = StatusTypes.Pending;
+        state.measurementunits.operation = OperationTypes.Get;
       })
       .addCase(getMeasurementUnits.fulfilled, (state, action) => {
-        state.loading = false;
-        state.measurementunits = action.payload;
+        state.measurementunits.value = action.payload;
+        state.measurementunits.status = StatusTypes.Fulfilled;
       })
       .addCase(getMeasurementUnits.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.measurementunits.error = action.payload as string | null;
+        state.measurementunits.status = StatusTypes.Rejected;
       })
       .addCase(getThemes.pending, (state) => {
-        state.loading = true;
+        state.themes.error = null;
+        state.themes.status = StatusTypes.Pending;
+        state.themes.operation = OperationTypes.Get;
       })
       .addCase(getThemes.fulfilled, (state, action) => {
-        state.loading = false;
-        state.themes = action.payload;
+        state.themes.value = action.payload;
+        state.themes.status = StatusTypes.Fulfilled;
       })
       .addCase(getThemes.rejected, (state, action) => {
-        state.error = action.payload as string | null;
-        state.loading = false;
+        state.themes.error = action.payload as string | null;
+        state.themes.status = StatusTypes.Rejected;
       });
   }
 });

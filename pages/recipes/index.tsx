@@ -7,7 +7,6 @@ import {
   Alert,
   Autocomplete,
   Button,
-  CircularProgress,
   Fab,
   Grid,
   IconButton,
@@ -27,24 +26,30 @@ import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 import { VscClose } from 'react-icons/vsc';
 import PageContainer from '@/components/page-container';
 import RecipeCards from '@/components/recipe-cards';
-import { getRecipes } from '@/slices/recipeSlice';
+import { clearRecipes, getRecipes } from '@/slices/recipeSlice';
 import { Category, EnumState } from '@/types/enum';
 import { Recipe, RecipeState } from '@/types/recipe';
-import { DifficultyRating, StyledRating } from '@/public/theme/globalStyled';
+import { OperationTypes, StatusTypes } from '@/constants/general';
+import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
 import { usePrevious } from '@/utils/common';
 import { ActionsAccordion, StickyWrapper } from './styled';
 
 export default function Recipes(): ReactElement {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { categories: recipeCategories } = useSelector((state: { enum: EnumState }) => state.enum);
+  const { value: recipeCategories } = useSelector((state: { enum: EnumState }) => state.enum.categories);
   const {
-    recipes: storeRecipes,
-    loading: loadingRecipes,
+    value: storeRecipes,
+    status: statusRecipes,
+    operation: operationRecipes,
     totalCount: recipeTotalCount,
-    error: errorRecipe
-  } = useSelector((state: { recipe: RecipeState }) => state.recipe);
-
+    error: errorRecipesMessage
+  } = useSelector((state: { recipe: RecipeState }) => state.recipe.recipes);
+  const {
+    status: statusRecipe,
+    error: errorRecipeMessage,
+    operation: operationRecipe
+  } = useSelector((state: { recipe: RecipeState }) => state.recipe.recipe);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isListLayout, setIsListLayout] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
@@ -52,7 +57,8 @@ export default function Recipes(): ReactElement {
   const [rating, setRating] = useState<number>(0);
   const [effort, setEffort] = useState<number>(0);
   const [isDateAscending, setIsDateAscending] = useState<boolean>(false);
-  const [openSnackbar, setOpenSnackbar] = useState<boolean>(true);
+  const [openErrorRecipes, setOpenErrorRecipes] = useState<boolean>(false);
+  const [openErrorRecipeDelete, setOpenErrorRecipeDelete] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const prevCategories = usePrevious<Category[]>(categories);
   const prevEffort = usePrevious<number>(effort);
@@ -60,7 +66,12 @@ export default function Recipes(): ReactElement {
   const prevIsDateAscending = usePrevious<boolean>(isDateAscending);
 
   const pageSize = 12;
-  const isMoreRecipes = recipeTotalCount > currentPage * pageSize || false;
+  const isMoreRecipes = (recipeTotalCount as number) > currentPage * pageSize || false;
+  const isGettingRecipes = operationRecipes === OperationTypes.Get;
+  const isLoadingRecipes = statusRecipes === StatusTypes.Pending;
+  const isErrorRecipes = statusRecipes === StatusTypes.Rejected;
+  const isDeletingRecipe = operationRecipe === OperationTypes.Delete;
+  const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
 
   function handleClearFilters() {
     setCategories([]);
@@ -73,7 +84,7 @@ export default function Recipes(): ReactElement {
     async function handleScroll() {
       const { scrollHeight, scrollTop, clientHeight } = document.documentElement;
 
-      if (scrollHeight - (scrollTop + clientHeight) < 100 && !loadingRecipes && isMoreRecipes) {
+      if (scrollHeight - (scrollTop + clientHeight) < 100 && !isLoadingRecipes && !isErrorRecipes && isMoreRecipes) {
         setCurrentPage((prevPage) => prevPage + 1);
       }
     }
@@ -83,7 +94,7 @@ export default function Recipes(): ReactElement {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [loadingRecipes, isMoreRecipes]);
+  }, [isLoadingRecipes, isMoreRecipes, isErrorRecipes]);
 
   useEffect(() => {
     if (
@@ -105,6 +116,7 @@ export default function Recipes(): ReactElement {
     } else {
       setCurrentPage(1);
       setRecipes([]);
+      dispatch(clearRecipes());
     }
   }, [
     categories,
@@ -124,15 +136,19 @@ export default function Recipes(): ReactElement {
   }, [storeRecipes]);
 
   useEffect(() => {
-    setOpenSnackbar(errorRecipe !== null);
-  }, [errorRecipe]);
+    if (isGettingRecipes && isErrorRecipes) {
+      setOpenErrorRecipes(isErrorRecipes);
+    } else if (isDeletingRecipe && isErrorRecipe) {
+      setOpenErrorRecipeDelete(isErrorRecipe);
+    }
+  }, [isDeletingRecipe, isErrorRecipe, isErrorRecipes, isGettingRecipes]);
 
   return (
     <PageContainer>
-      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
-        <Alert onClose={() => setOpenSnackbar(false)} severity="error">
+      <Snackbar open={openErrorRecipes} autoHideDuration={6000} onClose={() => setOpenErrorRecipes(false)}>
+        <Alert onClose={() => setOpenErrorRecipes(false)} severity="error">
           <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-            <Typography>Could not load recipes — {errorRecipe}</Typography>
+            <Typography>Could not load recipes — {errorRecipesMessage}</Typography>
             <Button
               variant="contained"
               color="error"
@@ -152,6 +168,11 @@ export default function Recipes(): ReactElement {
               Reload
             </Button>
           </Stack>
+        </Alert>
+      </Snackbar>
+      <Snackbar open={openErrorRecipeDelete} autoHideDuration={6000} onClose={() => setOpenErrorRecipeDelete(false)}>
+        <Alert onClose={() => setOpenErrorRecipeDelete(false)} severity="error">
+          <Typography>Could not delete recipe — {errorRecipeMessage}</Typography>
         </Alert>
       </Snackbar>
       <StickyWrapper>
@@ -220,7 +241,7 @@ export default function Recipes(): ReactElement {
                 <Typography component="legend" color={theme.palette.text.secondary}>
                   Difficulty
                 </Typography>
-                <DifficultyRating
+                <EffortRating
                   value={effort}
                   onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setEffort(value)}
                   size="large"
@@ -248,14 +269,9 @@ export default function Recipes(): ReactElement {
         </ActionsAccordion>
       </StickyWrapper>
       <Grid container spacing={2} className="mb-5">
-        <RecipeCards recipes={recipes} isListLayout={isListLayout} loading={loadingRecipes && recipes.length === 0} />
+        <RecipeCards recipes={recipes} isListLayout={isListLayout} loading={isLoadingRecipes} setRecipes={setRecipes} />
       </Grid>
-      {loadingRecipes && recipes.length > 0 && (
-        <Stack className="w-full mt-6 mb-5" justifyContent="center" direction="row">
-          <CircularProgress />
-        </Stack>
-      )}
-      {!loadingRecipes && recipes.length === 0 && !isMoreRecipes && (
+      {!isLoadingRecipes && recipes.length === 0 && !isMoreRecipes && (
         <Stack className="w-full mt-6 mb-5" justifyContent="center" direction="row">
           <Typography>No more recipes</Typography>
         </Stack>
