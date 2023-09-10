@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode, useEffect } from 'react';
-import { Provider, useDispatch, useSelector } from 'react-redux';
+import { Provider } from 'react-redux';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { StyledEngineProvider, ThemeProvider } from '@mui/system';
@@ -18,14 +18,15 @@ import {
 import { SettingsRootState } from '@/types/settings';
 import '@/public/theme/global.scss';
 import '@/public/theme/tailwind.css';
+import { useAppDispatch } from '@/reducers/hooks';
 
 interface StatefulThemeProviderProps {
   children: ReactNode;
 }
 
 function StatefulThemeProvider({ children }: StatefulThemeProviderProps): ReactElement {
-  // const { isDarkTheme } = useSelector((state: SettingsRootState) => state.settings);
-  const dispatch = useDispatch();
+  // const { isDarkTheme } = useAppSelector((state: SettingsRootState) => state.settings);
+  const dispatch = useAppDispatch();
   // const theme = isDarkTheme ? darkTheme : lightTheme;
   const theme = darkTheme;
 
@@ -48,7 +49,7 @@ function StatefulThemeProvider({ children }: StatefulThemeProviderProps): ReactE
   );
 }
 
-export default function CookScribe({ Component, ...rest }: AppProps) {
+export default function CookScribe({ Component, ...rest }: AppProps): ReactElement {
   const { store, props } = storeWrapper.useWrappedStore(rest);
   const { pageProps } = props;
   const title = 'CookScribe';

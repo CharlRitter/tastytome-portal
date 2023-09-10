@@ -1,81 +1,109 @@
 /* eslint-disable no-param-reassign */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { SerializedError, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as api from '@/api/memberApi';
-import { Member, MemberSettings, MemberState } from '@/types/member';
-import { OperationTypes, StatusTypes } from '@/constants/general';
+import {
+  ConfirmResetMemberPasswordData,
+  CreateMemberData,
+  LoginMemberData,
+  Member,
+  MemberState,
+  ResetMemberPasswordData,
+  UpdateMemberData,
+  UpdateMemberPasswordData,
+  UpdateMemberSettingsData
+} from '@/types/member';
+import { SuccessResponse } from '@/types/api';
+import { SliceItem } from '@/types/common';
+import { StatusTypes } from '@/constants/general';
 import handleAsyncThunk from '@/utils/api';
 
 const initialState: MemberState = {
   member: {
     error: null,
     status: StatusTypes.Fulfilled,
-    operation: null,
-    value: null
+    data: {
+      id: 0,
+      firstname: '',
+      lastname: '',
+      emailaddress: '',
+      password: '',
+      ispremium: false,
+      membersettings: {
+        id: 0,
+        memberid: 0,
+        theme: {
+          id: 0,
+          value: ''
+        },
+        measurementsystem: {
+          id: 0,
+          value: ''
+        },
+        usepantry: false,
+        usenegativepantry: false,
+        displaynutritionalinformation: false,
+        createdat: '',
+        editedat: ''
+      },
+      createdat: '',
+      editedat: ''
+    },
+    totalCount: null
   }
 };
 
-export const getMemberById = createAsyncThunk(
-  'member/getMemberById',
-  async (id: number, thunkAPI): Promise<Member> => handleAsyncThunk(thunkAPI, () => api.getMemberById(id))
+export const getMember = createAsyncThunk(
+  'member/getMember',
+  async (_, thunkAPI): Promise<SuccessResponse<Member>> => handleAsyncThunk(thunkAPI, () => api.getMember())
 );
 
 export const createMember = createAsyncThunk(
   'member/createMember',
-  async (data: Member, thunkAPI): Promise<Member> => handleAsyncThunk(thunkAPI, () => api.createMember(data))
+  async (data: CreateMemberData, thunkAPI): Promise<void> => handleAsyncThunk(thunkAPI, () => api.createMember(data))
 );
 
 export const updateMember = createAsyncThunk(
   'member/updateMember',
-  async ({ id, data }: { id: number; data: Member }, thunkAPI) => {
-    handleAsyncThunk(thunkAPI, () => api.updateMember(id, data));
-
-    thunkAPI.dispatch(getMemberById(id));
-  }
+  async (data: UpdateMemberData, thunkAPI): Promise<void> => handleAsyncThunk(thunkAPI, () => api.updateMember(data))
 );
 
 export const deleteMember = createAsyncThunk(
   'member/deleteMember',
-  async (id: number, thunkAPI): Promise<void> => handleAsyncThunk(thunkAPI, () => api.deleteMember(id))
+  async (_, thunkAPI): Promise<void> => handleAsyncThunk(thunkAPI, () => api.deleteMember())
 );
 
 export const updateMemberPassword = createAsyncThunk(
   'member/updateMemberPassword',
-  async ({ id, data }: { id: number; data: { currentPassword: string; newPassword: string } }, thunkAPI) => {
-    handleAsyncThunk(thunkAPI, () => api.updateMemberPassword(id, data));
-
-    thunkAPI.dispatch(getMemberById(id));
-  }
+  async (data: UpdateMemberPasswordData, thunkAPI): Promise<void> =>
+    handleAsyncThunk(thunkAPI, () => api.updateMemberPassword(data))
 );
 
 export const resetMemberPassword = createAsyncThunk(
   'member/resetMemberPassword',
-  async (data: { emailAddress: string }, thunkAPI): Promise<void> =>
+  async (data: ResetMemberPasswordData, thunkAPI): Promise<void> =>
     handleAsyncThunk(thunkAPI, () => api.resetMemberPassword(data))
 );
 
 export const confirmResetMemberPassword = createAsyncThunk(
   'member/confirmResetMemberPassword',
-  async (data: { token: string; newPassword: string }, thunkAPI): Promise<void> =>
-    handleAsyncThunk(thunkAPI, () => api.confirmResetMemberPassword(data.token, { newPassword: data.newPassword }))
+  async (data: ConfirmResetMemberPasswordData, thunkAPI): Promise<void> =>
+    handleAsyncThunk(thunkAPI, () => api.confirmResetMemberPassword(data))
 );
 
 export const loginMember = createAsyncThunk(
   'member/loginMember',
-  async (id: number, thunkAPI): Promise<Member> => handleAsyncThunk(thunkAPI, () => api.loginMember(id))
+  async (data: LoginMemberData, thunkAPI): Promise<void> => handleAsyncThunk(thunkAPI, () => api.loginMember(data))
 );
 
 export const logoutMember = createAsyncThunk(
   'member/logoutMember',
-  async (id: number, thunkAPI): Promise<Member> => handleAsyncThunk(thunkAPI, () => api.logoutMember(id))
+  async (_, thunkAPI): Promise<void> => handleAsyncThunk(thunkAPI, () => api.logoutMember())
 );
 
 export const updateMemberSettings = createAsyncThunk(
   'member/updateMemberSettings',
-  async ({ id, memberId, data }: { id: number; memberId: number; data: MemberSettings }, thunkAPI) => {
-    handleAsyncThunk(thunkAPI, () => api.updateMemberSettings(id, data));
-
-    thunkAPI.dispatch(getMemberById(memberId));
-  }
+  async (data: UpdateMemberSettingsData, thunkAPI): Promise<void> =>
+    handleAsyncThunk(thunkAPI, () => api.updateMemberSettings(data))
 );
 
 const memberSlice = createSlice({
@@ -83,130 +111,124 @@ const memberSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addCase(getMemberById.pending, (state) => {
-        state.member.error = null;
-        state.member.status = StatusTypes.Pending;
-        state.member.operation = OperationTypes.Get;
-      })
-      .addCase(getMemberById.fulfilled, (state, action) => {
-        state.member.value = action.payload;
-        state.member.status = StatusTypes.Fulfilled;
-      })
-      .addCase(getMemberById.rejected, (state, action) => {
-        state.member.error = action.payload as string | null;
-        state.member.status = StatusTypes.Rejected;
-      })
-      .addCase(createMember.pending, (state) => {
-        state.member.error = null;
-        state.member.status = StatusTypes.Pending;
-        state.member.operation = OperationTypes.Create;
-      })
-      .addCase(createMember.fulfilled, (state) => {
-        state.member.status = StatusTypes.Fulfilled;
-      })
-      .addCase(createMember.rejected, (state, action) => {
-        state.member.error = action.payload as string | null;
-        state.member.status = StatusTypes.Rejected;
-      })
-      .addCase(updateMember.pending, (state) => {
-        state.member.error = null;
-        state.member.status = StatusTypes.Pending;
-        state.member.operation = OperationTypes.Get;
-      })
-      .addCase(updateMember.fulfilled, (state) => {
-        state.member.status = StatusTypes.Fulfilled;
-      })
-      .addCase(updateMember.rejected, (state, action) => {
-        state.member.error = action.payload as string | null;
-        state.member.status = StatusTypes.Rejected;
-      })
-      .addCase(deleteMember.pending, (state) => {
-        state.member.error = null;
-        state.member.status = StatusTypes.Pending;
-        state.member.operation = OperationTypes.Delete;
-      })
-      .addCase(deleteMember.fulfilled, (state) => {
-        state.member.status = StatusTypes.Fulfilled;
-      })
-      .addCase(deleteMember.rejected, (state, action) => {
-        state.member.error = action.payload as string | null;
-        state.member.status = StatusTypes.Rejected;
-      })
-      .addCase(updateMemberPassword.pending, (state) => {
-        state.member.error = null;
-        state.member.status = StatusTypes.Pending;
-        state.member.operation = OperationTypes.Update;
-      })
-      .addCase(updateMemberPassword.fulfilled, (state) => {
-        state.member.status = StatusTypes.Fulfilled;
-      })
-      .addCase(updateMemberPassword.rejected, (state, action) => {
-        state.member.error = action.payload as string | null;
-        state.member.status = StatusTypes.Rejected;
-      })
-      .addCase(resetMemberPassword.pending, (state) => {
-        state.member.error = null;
-        state.member.status = StatusTypes.Pending;
-        state.member.operation = OperationTypes.Update;
-      })
-      .addCase(resetMemberPassword.fulfilled, (state) => {
-        state.member.status = StatusTypes.Fulfilled;
-      })
-      .addCase(resetMemberPassword.rejected, (state, action) => {
-        state.member.error = action.payload as string | null;
-        state.member.status = StatusTypes.Rejected;
-      })
-      .addCase(confirmResetMemberPassword.pending, (state) => {
-        state.member.error = null;
-        state.member.status = StatusTypes.Pending;
-        state.member.operation = OperationTypes.Update;
-      })
-      .addCase(confirmResetMemberPassword.fulfilled, (state) => {
-        state.member.status = StatusTypes.Fulfilled;
-      })
-      .addCase(confirmResetMemberPassword.rejected, (state, action) => {
-        state.member.error = action.payload as string | null;
-        state.member.status = StatusTypes.Rejected;
-      })
-      .addCase(loginMember.pending, (state) => {
-        state.member.error = null;
-        state.member.status = StatusTypes.Pending;
-        state.member.operation = OperationTypes.Get;
-      })
-      .addCase(loginMember.fulfilled, (state, action) => {
-        state.member.value = action.payload;
-        state.member.status = StatusTypes.Rejected;
-      })
-      .addCase(loginMember.rejected, (state, action) => {
-        state.member.error = action.payload as string | null;
-        state.member.status = StatusTypes.Rejected;
-      })
-      .addCase(logoutMember.pending, (state) => {
-        state.member.error = null;
-        state.member.status = StatusTypes.Pending;
-        state.member.operation = OperationTypes.Update;
-      })
-      .addCase(logoutMember.fulfilled, (state) => {
-        state.member.status = StatusTypes.Fulfilled;
-      })
-      .addCase(logoutMember.rejected, (state, action) => {
-        state.member.error = action.payload as string | null;
-        state.member.status = StatusTypes.Rejected;
-      })
-      .addCase(updateMemberSettings.pending, (state) => {
-        state.member.error = null;
-        state.member.status = StatusTypes.Pending;
-        state.member.operation = OperationTypes.Update;
-      })
-      .addCase(updateMemberSettings.fulfilled, (state) => {
-        state.member.status = StatusTypes.Fulfilled;
-      })
-      .addCase(updateMemberSettings.rejected, (state, action) => {
-        state.member.error = action.payload as string | null;
-        state.member.status = StatusTypes.Rejected;
-      });
+    builder.addCase(getMember.pending, (state) => {
+      state.member.error = null;
+      state.member.status = StatusTypes.Pending;
+    });
+    builder.addCase(getMember.fulfilled, (state, action) => {
+      const { data } = action.payload as SuccessResponse<Member>;
+
+      state.member.data = data;
+      state.member.status = StatusTypes.Fulfilled;
+    });
+    builder.addCase(getMember.rejected, (state, action) => {
+      state.member.error = action.payload as SerializedError;
+      state.member.status = StatusTypes.Rejected;
+    });
+    builder.addCase(createMember.pending, (state) => {
+      state.member.error = null;
+      state.member.status = StatusTypes.Pending;
+    });
+    builder.addCase(createMember.fulfilled, (state) => {
+      state.member.status = StatusTypes.Fulfilled;
+    });
+    builder.addCase(createMember.rejected, (state, action) => {
+      state.member.error = action.payload as SerializedError;
+      state.member.status = StatusTypes.Rejected;
+    });
+    builder.addCase(updateMember.pending, (state) => {
+      state.member.error = null;
+      state.member.status = StatusTypes.Pending;
+    });
+    builder.addCase(updateMember.fulfilled, (state) => {
+      state.member.status = StatusTypes.Fulfilled;
+    });
+    builder.addCase(updateMember.rejected, (state, action) => {
+      state.member.error = action.payload as SerializedError;
+      state.member.status = StatusTypes.Rejected;
+    });
+    builder.addCase(deleteMember.pending, (state) => {
+      state.member.error = null;
+      state.member.status = StatusTypes.Pending;
+    });
+    builder.addCase(deleteMember.fulfilled, (state) => {
+      state.member.status = StatusTypes.Fulfilled;
+    });
+    builder.addCase(deleteMember.rejected, (state, action) => {
+      state.member.error = action.payload as SerializedError;
+      state.member.status = StatusTypes.Rejected;
+    });
+    builder.addCase(updateMemberPassword.pending, (state) => {
+      state.member.error = null;
+      state.member.status = StatusTypes.Pending;
+    });
+    builder.addCase(updateMemberPassword.fulfilled, (state) => {
+      state.member.status = StatusTypes.Fulfilled;
+    });
+    builder.addCase(updateMemberPassword.rejected, (state, action) => {
+      state.member.error = action.payload as SerializedError;
+      state.member.status = StatusTypes.Rejected;
+    });
+    builder.addCase(resetMemberPassword.pending, (state) => {
+      state.member.error = null;
+      state.member.status = StatusTypes.Pending;
+    });
+    builder.addCase(resetMemberPassword.fulfilled, (state) => {
+      state.member.status = StatusTypes.Fulfilled;
+    });
+    builder.addCase(resetMemberPassword.rejected, (state, action) => {
+      state.member.error = action.payload as SerializedError;
+      state.member.status = StatusTypes.Rejected;
+    });
+    builder.addCase(confirmResetMemberPassword.pending, (state) => {
+      state.member.error = null;
+      state.member.status = StatusTypes.Pending;
+    });
+    builder.addCase(confirmResetMemberPassword.fulfilled, (state) => {
+      state.member.status = StatusTypes.Fulfilled;
+    });
+    builder.addCase(confirmResetMemberPassword.rejected, (state, action) => {
+      state.member.error = action.payload as SerializedError;
+      state.member.status = StatusTypes.Rejected;
+    });
+    builder.addCase(loginMember.pending, (state) => {
+      state.member.error = null;
+      state.member.status = StatusTypes.Pending;
+    });
+    builder.addCase(loginMember.fulfilled, (state) => {
+      state.member.status = StatusTypes.Fulfilled;
+    });
+    builder.addCase(loginMember.rejected, (state, action) => {
+      state.member.error = action.payload as SerializedError;
+      state.member.status = StatusTypes.Rejected;
+    });
+    builder.addCase(logoutMember.pending, (state) => {
+      state.member.error = null;
+      state.member.status = StatusTypes.Pending;
+    });
+    builder.addCase(logoutMember.fulfilled, (state) => {
+      state.member.status = StatusTypes.Fulfilled;
+    });
+    builder.addCase(logoutMember.rejected, (state, action) => {
+      state.member.error = action.payload as SerializedError;
+      state.member.status = StatusTypes.Rejected;
+    });
+    builder.addCase(updateMemberSettings.pending, (state) => {
+      state.member.error = null;
+      state.member.status = StatusTypes.Pending;
+    });
+    builder.addCase(updateMemberSettings.fulfilled, (state) => {
+      state.member.status = StatusTypes.Fulfilled;
+    });
+    builder.addCase(updateMemberSettings.rejected, (state, action) => {
+      state.member.error = action.payload as SerializedError;
+      state.member.status = StatusTypes.Rejected;
+    });
   }
 });
+
+export function selectMember(state: MemberState): SliceItem<Member> {
+  return state.member;
+}
 
 export default memberSlice.reducer;

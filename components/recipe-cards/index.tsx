@@ -18,7 +18,7 @@ export default function RecipeCards(props: RecipeCardsProps): ReactElement {
       {recipes.map((recipe) => (
         <Grid key={recipe.id} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
           <RecipeCard
-            recipeID={recipe.id as number}
+            recipeId={recipe.id as number}
             isListLayout={isListLayout}
             title={recipe.title}
             dateCreated={recipe.createdat as string}

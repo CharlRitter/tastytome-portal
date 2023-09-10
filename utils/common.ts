@@ -51,24 +51,6 @@ export function formatDate(date: string) {
   return new Date(date).toLocaleDateString('en-GB', options);
 }
 
-function isValidQueryParam(value: string | number | null): boolean {
-  if (value === null || value === '' || value === 'desc' || value === 0) {
-    return false;
-  }
-
-  return true;
-}
-
-export function constructApiQuery(params: QueryParams): string {
-  const validParams = Object.fromEntries(Object.entries(params).filter(([key, value]) => isValidQueryParam(value)));
-
-  const queryParameters = Object.keys(validParams)
-    .map((key) => `${key}=${validParams[key]}`)
-    .join('&');
-
-  return queryParameters ? `?${queryParameters}` : '';
-}
-
 export function usePrevious<T>(value: T): T | undefined {
   const ref = useRef<T>();
 

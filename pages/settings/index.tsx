@@ -1,5 +1,4 @@
 import React, { ChangeEvent, ReactElement } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Autocomplete, Grid, Paper, Switch, TextField, Typography } from '@mui/material';
 import PageContainer from '@/components/page-container';
 import { SettingsRootState } from '@/types/settings';
@@ -14,9 +13,9 @@ import { SettingsRootState } from '@/types/settings';
 // import { MeasurementSystems } from '@/constants/measurements';
 
 export default function Settings(): ReactElement {
-  // const dispatch = useDispatch();
-  // const { theme, pantryStock, negativePantryStock, nutritionalInformation } = useSelector(
-  //   (state: SettingsRootState) => state.settings
+  // const dispatch = useAppDispatch();
+  // const { theme, pantryStock, negativePantryStock, nutritionalInformation } = useAppSelector(
+  //   (state: SettingsRootState):SliceItem<> => state.settings
   // );
   // const measurementSystemOptions = Object.values(MeasurementSystems);
   // const themeSettingOptions = Object.values(ThemeSettingOptions);

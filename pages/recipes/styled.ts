@@ -30,9 +30,9 @@ export const RatingStack = styled(Stack)<StyledProps>(({ theme }) => ({
   color: theme.palette.text.secondary,
   borderRadius: '5px',
   padding: '9px'
-}));
+})) as typeof Stack;
 
-export const DropzoneBox = styled('div')<StyledProps>(({ theme, isMediumScreen }) => ({
+export const DropzoneBox = styled(Box)<StyledProps>(({ theme, isMediumScreen }) => ({
   border: `1px solid ${theme.palette.action.disabled}`,
   color: theme.palette.text.secondary,
   borderRadius: '5px',
@@ -40,7 +40,7 @@ export const DropzoneBox = styled('div')<StyledProps>(({ theme, isMediumScreen }
   minWidth: isMediumScreen ? 'unset' : '403px'
 }));
 
-export const DropBox = styled('div')<StyledProps>(({ theme, disabled, isDragActive }) => ({
+export const DropBox = styled(Box)<StyledProps>(({ theme, disabled, isDragActive }) => ({
   border: `1px solid ${isDragActive ? theme.palette.action.active : 'transparent'}`,
   color: theme.palette.text.secondary,
   borderRadius: '5px',

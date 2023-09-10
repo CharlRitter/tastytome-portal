@@ -2009,7 +2009,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-redux@npm:^7.1.20":
+"@types/react-redux@npm:^7.1.20, @types/react-redux@npm:^7.1.26":
   version: 7.1.26
   resolution: "@types/react-redux@npm:7.1.26"
   dependencies:
@@ -2038,6 +2038,15 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: ffed203bfe7aad772b8286f7953305c9181ac3a8f27d3f5400fbbc2a8e27ca8e5bbff818ee014f39ca0d19d2b3bb154e5bdbec7e232c6f80b59069375aa78349
+  languageName: node
+  linkType: hard
+
+"@types/redux-thunk@npm:^2.1.0":
+  version: 2.1.32
+  resolution: "@types/redux-thunk@npm:2.1.32"
+  dependencies:
+    redux: ^3.6.0
+  checksum: 9f20ef229a62163127c72f7cbd72f0f5cb4fa27874b47649a456574c33efc021ecf8f1fe50dfe616c09342e2c02f63316d8c41fe9afa25a59d739951e2837fae
   languageName: node
   linkType: hard
 
@@ -3501,6 +3510,8 @@ __metadata:
     "@types/react-beautiful-dnd": ^13.1.4
     "@types/react-dom": ^18.0.5
     "@types/react-google-recaptcha": ^2.1.5
+    "@types/react-redux": ^7.1.26
+    "@types/redux-thunk": ^2.1.0
     "@types/styled-components": ^5.1.25
     "@typescript-eslint/eslint-plugin": ^5.60.0
     "@typescript-eslint/parser": ^5.60.0
@@ -7145,6 +7156,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash-es@npm:^4.2.1":
+  version: 4.17.21
+  resolution: "lodash-es@npm:4.17.21"
+  checksum: 05cbffad6e2adbb331a4e16fbd826e7faee403a1a04873b82b42c0f22090f280839f85b95393f487c1303c8a3d2a010048bf06151a6cbe03eee4d388fb0a12d2
+  languageName: node
+  linkType: hard
+
 "lodash._basebind@npm:~2.3.0":
   version: 2.3.0
   resolution: "lodash._basebind@npm:2.3.0"
@@ -7366,7 +7384,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:4.17.21, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21":
+"lodash@npm:4.17.21, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.2.1":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -9500,6 +9518,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"redux@npm:^3.6.0":
+  version: 3.7.2
+  resolution: "redux@npm:3.7.2"
+  dependencies:
+    lodash: ^4.2.1
+    lodash-es: ^4.2.1
+    loose-envify: ^1.1.0
+    symbol-observable: ^1.0.3
+  checksum: c349b77e68d009bc530d3cb6252a6a3e43e20a6e52f9483a048b24cd2f266d9bfa6f0bbd4769d40fe36795e2f7a7a884c3ddc92c13e82efd3328890f94821091
+  languageName: node
+  linkType: hard
+
 "redux@npm:^4.0.0, redux@npm:^4.0.4, redux@npm:^4.2.1":
   version: 4.2.1
   resolution: "redux@npm:4.2.1"
@@ -10606,6 +10636,13 @@ __metadata:
   version: 1.0.0
   resolution: "svg-tags@npm:1.0.0"
   checksum: 407e5ef87cfa2fb81c61d738081c2decd022ce13b922d035b214b49810630bf5d1409255a4beb3a940b77b32f6957806deff16f1bf0ce1ab11c7a184115a0b7f
+  languageName: node
+  linkType: hard
+
+"symbol-observable@npm:^1.0.3":
+  version: 1.2.0
+  resolution: "symbol-observable@npm:1.2.0"
+  checksum: 48ffbc22e3d75f9853b3ff2ae94a44d84f386415110aea5effc24d84c502e03a4a6b7a8f75ebaf7b585780bda34eb5d6da3121f826a6f93398429d30032971b6
   languageName: node
   linkType: hard
 

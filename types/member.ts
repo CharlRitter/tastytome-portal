@@ -26,5 +26,34 @@ export interface Member {
 }
 
 export interface MemberState {
-  member: SliceItem<Member | null>;
+  member: SliceItem<Member>;
+}
+
+export interface CreateMemberData {
+  body: Member;
+}
+
+export interface UpdateMemberData {
+  body: Member;
+}
+
+export interface UpdateMemberPasswordData {
+  body: { currentPassword: string; newPassword: string };
+}
+
+export interface ResetMemberPasswordData {
+  body: { emailAddress: string };
+}
+
+export interface ConfirmResetMemberPasswordData {
+  token: string;
+  body: { newPassword: string };
+}
+
+export interface LoginMemberData {
+  body: { emailaddress: string; password: string };
+}
+
+export interface UpdateMemberSettingsData {
+  body: MemberSettings;
 }

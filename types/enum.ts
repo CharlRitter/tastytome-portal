@@ -1,4 +1,4 @@
-import { SliceItem } from "@/types/common";
+import { SliceItem } from '@/types/common';
 
 export interface Category {
   id: number;

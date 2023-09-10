@@ -1,5 +1,4 @@
 import React, { ChangeEvent, MouseEvent, ReactElement, useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import router from 'next/router';
 import {
   AccordionDetails,
@@ -26,30 +25,27 @@ import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 import { VscClose } from 'react-icons/vsc';
 import PageContainer from '@/components/page-container';
 import RecipeCards from '@/components/recipe-cards';
+import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { clearRecipes, getRecipes } from '@/slices/recipeSlice';
-import { Category, EnumState } from '@/types/enum';
-import { Recipe, RecipeState } from '@/types/recipe';
-import { OperationTypes, StatusTypes } from '@/constants/general';
+import { SliceItem } from '@/types/common';
+import { Category } from '@/types/enum';
+import { Recipe } from '@/types/recipe';
+import { RootState } from '@/reducers/store';
+import { StatusTypes } from '@/constants/general';
 import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
 import { usePrevious } from '@/utils/common';
 import { ActionsAccordion, StickyWrapper } from './styled';
 
 export default function Recipes(): ReactElement {
   const theme = useTheme();
-  const dispatch = useDispatch();
-  const { value: recipeCategories } = useSelector((state: { enum: EnumState }) => state.enum.categories);
+  const dispatch = useAppDispatch();
+  const { data: recipeCategories } = useAppSelector((state: RootState): SliceItem<Category[]> => state.enum.categories);
   const {
-    value: storeRecipes,
+    data: storeRecipes,
     status: statusRecipes,
-    operation: operationRecipes,
     totalCount: recipeTotalCount,
-    error: errorRecipesMessage
-  } = useSelector((state: { recipe: RecipeState }) => state.recipe.recipes);
-  const {
-    status: statusRecipe,
-    error: errorRecipeMessage,
-    operation: operationRecipe
-  } = useSelector((state: { recipe: RecipeState }) => state.recipe.recipe);
+    error: errorRecipes
+  } = useAppSelector((state: RootState): SliceItem<Recipe[]> => state.recipe.recipes);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isListLayout, setIsListLayout] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
@@ -58,7 +54,6 @@ export default function Recipes(): ReactElement {
   const [effort, setEffort] = useState<number>(0);
   const [isDateAscending, setIsDateAscending] = useState<boolean>(false);
   const [openErrorRecipes, setOpenErrorRecipes] = useState<boolean>(false);
-  const [openErrorRecipeDelete, setOpenErrorRecipeDelete] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const prevCategories = usePrevious<Category[]>(categories);
   const prevEffort = usePrevious<number>(effort);
@@ -67,11 +62,8 @@ export default function Recipes(): ReactElement {
 
   const pageSize = 12;
   const isMoreRecipes = (recipeTotalCount as number) > currentPage * pageSize || false;
-  const isGettingRecipes = operationRecipes === OperationTypes.Get;
   const isLoadingRecipes = statusRecipes === StatusTypes.Pending;
   const isErrorRecipes = statusRecipes === StatusTypes.Rejected;
-  const isDeletingRecipe = operationRecipe === OperationTypes.Delete;
-  const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
 
   function handleClearFilters() {
     setCategories([]);
@@ -105,12 +97,14 @@ export default function Recipes(): ReactElement {
     ) {
       dispatch(
         getRecipes({
-          categories: categories.map((category) => category.id).join(','),
-          orderBy: isDateAscending ? 'asc' : 'desc',
-          effort,
-          rating,
-          page: currentPage,
-          pageSize
+          params: {
+            categories: categories.map((category) => category.id).join(','),
+            orderBy: isDateAscending ? 'asc' : 'desc',
+            effort,
+            rating,
+            page: currentPage,
+            pageSize
+          }
         })
       );
     } else {
@@ -136,43 +130,39 @@ export default function Recipes(): ReactElement {
   }, [storeRecipes]);
 
   useEffect(() => {
-    if (isGettingRecipes && isErrorRecipes) {
-      setOpenErrorRecipes(isErrorRecipes);
-    } else if (isDeletingRecipe && isErrorRecipe) {
-      setOpenErrorRecipeDelete(isErrorRecipe);
+    if (isErrorRecipes) {
+      setOpenErrorRecipes(true);
     }
-  }, [isDeletingRecipe, isErrorRecipe, isErrorRecipes, isGettingRecipes]);
+  }, [isErrorRecipes]);
 
   return (
     <PageContainer>
       <Snackbar open={openErrorRecipes} autoHideDuration={6000} onClose={() => setOpenErrorRecipes(false)}>
         <Alert onClose={() => setOpenErrorRecipes(false)} severity="error">
           <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-            <Typography>Could not load recipes — {errorRecipesMessage}</Typography>
+            <Typography>Could not load recipes — {errorRecipes?.message}</Typography>
             <Button
               variant="contained"
               color="error"
-              onClick={() =>
+              onClick={() => {
+                setOpenErrorRecipes(false);
                 dispatch(
                   getRecipes({
-                    categories: categories.map((category) => category.id).join(','),
-                    orderBy: isDateAscending ? 'asc' : 'desc',
-                    effort,
-                    rating,
-                    page: currentPage,
-                    pageSize
+                    params: {
+                      categories: categories.map((category) => category.id).join(','),
+                      orderBy: isDateAscending ? 'asc' : 'desc',
+                      effort,
+                      rating,
+                      page: currentPage,
+                      pageSize
+                    }
                   })
-                )
-              }
+                );
+              }}
             >
               Reload
             </Button>
           </Stack>
-        </Alert>
-      </Snackbar>
-      <Snackbar open={openErrorRecipeDelete} autoHideDuration={6000} onClose={() => setOpenErrorRecipeDelete(false)}>
-        <Alert onClose={() => setOpenErrorRecipeDelete(false)} severity="error">
-          <Typography>Could not delete recipe — {errorRecipeMessage}</Typography>
         </Alert>
       </Snackbar>
       <StickyWrapper>

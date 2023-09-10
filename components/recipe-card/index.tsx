@@ -1,5 +1,4 @@
-import React, { Dispatch, ReactElement, SetStateAction, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { Dispatch, ReactElement, SetStateAction, useEffect, useState } from 'react';
 import router from 'next/router';
 import {
   Avatar,
@@ -20,14 +19,20 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  Skeleton
+  Skeleton,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { FaChevronDown, FaChevronRight, FaCopy, FaEdit, FaTrash } from 'react-icons/fa';
 import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
+import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { abbreviateTitle, formatDate, stringToColor } from '@/utils/common';
 import { clearRecipes, deleteRecipe } from '@/slices/recipeSlice';
+import { StatusTypes } from '@/constants/general';
 import { Recipe, RecipeCategory } from '@/types/recipe';
+import { RootState } from '@/reducers/store';
+import { SliceItem } from '@/types/common';
 import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
 import { RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon } from './styled';
 
@@ -37,7 +42,7 @@ interface RecipeCardProps {
   dateCreated: string;
   description: string;
   recipeCategories: RecipeCategory[];
-  recipeID: number;
+  recipeId: number;
   imagePath?: string | null;
   rating?: number;
   effort?: number;
@@ -52,7 +57,7 @@ export default function RecipeCard(props: RecipeCardProps): ReactElement {
     description,
     recipeCategories,
     imagePath,
-    recipeID,
+    recipeId,
     rating,
     effort,
     loading,
@@ -60,11 +65,18 @@ export default function RecipeCard(props: RecipeCardProps): ReactElement {
   } = props;
 
   const theme = useTheme();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { status: statusRecipe, error: errorRecipe } = useAppSelector(
+    (state: RootState): SliceItem<Recipe> => state.recipe.recipe
+  );
   const [openSpeedDial, setOpenSpeedDial] = useState<boolean>(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
-  const [deleting, setDeleting] = useState<boolean>(false);
+  const [openErrorRecipeDelete, setOpenErrorRecipeDelete] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const isListLayout = useMediaQuery('(max-width: 899px)') ? false : props.isListLayout;
+
+  const isLoadingRecipe = statusRecipe === StatusTypes.Pending;
+  const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
 
   const buttonActions = [
     {
@@ -73,7 +85,7 @@ export default function RecipeCard(props: RecipeCardProps): ReactElement {
       ariaLabel: 'edit',
       command: () => {
         dispatch(clearRecipes());
-        router.push(`/recipes/edit/${recipeID}`);
+        router.push(`/recipes/edit/${recipeId}`);
       }
     },
     {
@@ -82,14 +94,36 @@ export default function RecipeCard(props: RecipeCardProps): ReactElement {
       ariaLabel: 'duplicate',
       command: () => {
         dispatch(clearRecipes());
-        router.push(`/recipes/add/${recipeID}`);
+        router.push(`/recipes/add/${recipeId}`);
       }
     },
     { icon: <FaTrash />, title: 'Delete', ariaLabel: 'delete', command: () => setDeleteConfirmation(true) }
   ];
 
+  async function dispatchDelete() {
+    try {
+      setIsDeleting(true);
+      setDeleteConfirmation(false);
+      await dispatch(deleteRecipe({ recipeId }));
+      setRecipes((prevRecipes) => prevRecipes.filter((recipe) => recipe.id !== recipeId));
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
+  useEffect(() => {
+    if (isDeleting && isLoadingRecipe && isErrorRecipe) {
+      setOpenErrorRecipeDelete(true);
+    }
+  }, [isErrorRecipe, isLoadingRecipe, isDeleting]);
+
   return loading ? (
     <Card>
+      <Snackbar open={openErrorRecipeDelete} autoHideDuration={6000} onClose={() => setOpenErrorRecipeDelete(false)}>
+        <Alert onClose={() => setOpenErrorRecipeDelete(false)} severity="error">
+          <Typography>Could not delete recipe — {errorRecipe?.message}</Typography>
+        </Alert>
+      </Snackbar>
       <Stack direction={isListLayout ? 'row' : 'column'} width="100%">
         <CardActionArea>
           <Stack direction={isListLayout ? 'row' : 'column'} width="100%" height="100%">
@@ -144,25 +178,10 @@ export default function RecipeCard(props: RecipeCardProps): ReactElement {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteConfirmation(false)} disabled={deleting}>
+          <Button onClick={() => setDeleteConfirmation(false)} disabled={isDeleting}>
             Cancel
           </Button>
-          <LoadingButton
-            onClick={() => {
-              setDeleting(true);
-              dispatch(deleteRecipe(recipeID))
-                .unwrap()
-                .then(() => {
-                  setDeleting(false);
-                  setDeleteConfirmation(false);
-                  setRecipes((prevRecipes) => prevRecipes.filter((recipe) => recipe.id !== recipeID));
-                })
-                .catch(() => setDeleting(false));
-            }}
-            autoFocus
-            loading={deleting}
-            disabled={deleting}
-          >
+          <LoadingButton onClick={() => dispatchDelete()} autoFocus loading={isDeleting} disabled={isDeleting}>
             Delete
           </LoadingButton>
         </DialogActions>
@@ -171,7 +190,7 @@ export default function RecipeCard(props: RecipeCardProps): ReactElement {
         <CardActionArea
           onClick={() => {
             dispatch(clearRecipes());
-            router.push(`/recipes/view/${recipeID}`);
+            router.push(`/recipes/view/${recipeId}`);
           }}
         >
           <Stack direction={isListLayout ? 'row' : 'column'} width="100%" height="100%">

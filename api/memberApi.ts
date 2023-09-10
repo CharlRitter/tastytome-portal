@@ -1,48 +1,68 @@
-import { AxiosResponse } from 'axios';
-import axiosInstance from '@/api/axios';
-import { Member, MemberSettings } from '@/types/member';
+import axiosInstance, { AxiosResponse } from '@/api/axios';
+import { SuccessResponse } from '@/types/api';
+import {
+  ConfirmResetMemberPasswordData,
+  CreateMemberData,
+  LoginMemberData,
+  Member,
+  ResetMemberPasswordData,
+  UpdateMemberData,
+  UpdateMemberPasswordData,
+  UpdateMemberSettingsData
+} from '@/types/member';
 
 const path = '/v1/member';
 
-export async function getMemberById(id: number): Promise<AxiosResponse> {
-  return axiosInstance.get(`${path}/${id}`);
+export async function getMember(): Promise<AxiosResponse<SuccessResponse<Member>>> {
+  return axiosInstance.get(path);
 }
 
-export async function createMember(data: Member): Promise<AxiosResponse> {
-  return axiosInstance.post(path, data);
+export async function createMember(data: CreateMemberData): Promise<AxiosResponse<void>> {
+  const { body } = data;
+
+  return axiosInstance.post(path, body);
 }
 
-export async function updateMember(id: number, data: Member): Promise<AxiosResponse> {
-  return axiosInstance.put(`${path}/${id}`, data);
+export async function updateMember(data: UpdateMemberData): Promise<AxiosResponse<void>> {
+  const { body } = data;
+
+  return axiosInstance.put(path, body);
 }
 
-export async function deleteMember(id: number): Promise<AxiosResponse> {
-  return axiosInstance.delete(`${path}/${id}`);
+export async function deleteMember(): Promise<AxiosResponse<void>> {
+  return axiosInstance.delete(path);
 }
 
-export async function updateMemberPassword(
-  id: number,
-  data: { currentPassword: string; newPassword: string }
-): Promise<AxiosResponse> {
-  return axiosInstance.put(`${path}/password/update/${id}`, data);
+export async function updateMemberPassword(data: UpdateMemberPasswordData): Promise<AxiosResponse<void>> {
+  const { body } = data;
+
+  return axiosInstance.put(`${path}/password/update`, body);
 }
 
-export async function resetMemberPassword(data: { emailAddress: string }): Promise<AxiosResponse> {
-  return axiosInstance.put(`${path}/password/reset`, data);
+export async function resetMemberPassword(data: ResetMemberPasswordData): Promise<AxiosResponse<void>> {
+  const { body } = data;
+
+  return axiosInstance.put(`${path}/password/reset`, body);
 }
 
-export async function confirmResetMemberPassword(token: string, data: { newPassword: string }): Promise<AxiosResponse> {
-  return axiosInstance.put(`${path}/password/reset/${token}`, data);
+export async function confirmResetMemberPassword(data: ConfirmResetMemberPasswordData): Promise<AxiosResponse<void>> {
+  const { token, body } = data;
+
+  return axiosInstance.put(`${path}/password/reset/${token}`, body);
 }
 
-export async function loginMember(id: number): Promise<AxiosResponse> {
-  return axiosInstance.post(`${path}/login/${id}`);
+export async function loginMember(data: LoginMemberData): Promise<AxiosResponse<void>> {
+  const { body } = data;
+
+  return axiosInstance.post(`${path}/login`, body);
 }
 
-export async function logoutMember(id: number): Promise<AxiosResponse> {
-  return axiosInstance.post(`${path}/logout/${id}`);
+export async function logoutMember(): Promise<AxiosResponse<void>> {
+  return axiosInstance.post(`${path}/logout`);
 }
 
-export async function updateMemberSettings(id: number, data: MemberSettings): Promise<AxiosResponse> {
-  return axiosInstance.put(`${path}/settings/${id}`, data);
+export async function updateMemberSettings(data: UpdateMemberSettingsData): Promise<AxiosResponse<void>> {
+  const { body } = data;
+
+  return axiosInstance.put(`${path}/settings`, body);
 }

@@ -7,7 +7,7 @@ import recipeSlice from '@/slices/recipeSlice';
 const rootReducer = combineReducers({
   enum: enumSlice,
   member: memberSlice,
-  recipe: recipeSlice,
+  recipe: recipeSlice
   // settings: settingsReducer,
 });
 

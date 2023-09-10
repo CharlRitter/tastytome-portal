@@ -1,5 +1,4 @@
 import React, { ChangeEvent, FormEvent, ReactElement, useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { isEmpty } from 'lodash';
 import { TbCircleCheck, TbCircleOff, TbRectangle, TbRectangleFilled, TbUpload } from 'react-icons/tb';
@@ -22,24 +21,30 @@ import { FileRejection, useDropzone } from 'react-dropzone';
 import PageContainer from '@/components/page-container';
 import RecipeItemsList from '@/components/recipe-items-list';
 import { createRecipe, getRecipe, updateRecipe } from '@/slices/recipeSlice';
-import { ListTypes, Mode, OperationTypes, StatusTypes } from '@/constants/general';
-import { RecipeIngredient, RecipeInstruction, RecipeState, RecipeTimer } from '@/types/recipe';
+import { ListTypes, Mode, StatusTypes } from '@/constants/general';
+import { Recipe, RecipeIngredient, RecipeInstruction, RecipeState, RecipeTimer } from '@/types/recipe';
 import { Category, EnumState } from '@/types/enum';
+import { SliceItem } from '@/types/common';
+import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
 import { DropBox, DropzoneBox, RatingStack } from './styled';
 
 export default function RecipeAction(): ReactElement {
   const router = useRouter();
   const theme = useTheme();
-  const dispatch = useDispatch();
-  const { value: categories } = useSelector((state: { enum: EnumState }) => state.enum.categories);
+  const dispatch = useAppDispatch();
+  const { data: categories } = useAppSelector(
+    (state: { enum: EnumState }): SliceItem<Category[]> => state.enum.categories
+  );
   const {
-    value: recipe,
+    data: recipe,
     status: statusRecipe,
-    operation: operationRecipe,
-    error: errorRecipeMessage
-  } = useSelector((state: { recipe: RecipeState }) => state.recipe.recipe);
-  const [query, setQuery] = useState<{ action: null | string; id: null | number }>({ action: null, id: null });
+    error: errorRecipe
+  } = useAppSelector((state: { recipe: RecipeState }): SliceItem<Recipe> => state.recipe.recipe);
+  const [query, setQuery] = useState<{ action: null | string; recipeId: null | number }>({
+    action: null,
+    recipeId: null
+  });
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [recipeCategories, setRecipeCategories] = useState<Category[]>([]);
@@ -55,10 +60,9 @@ export default function RecipeAction(): ReactElement {
   const [recipeTimers, setRecipeTimers] = useState<Partial<RecipeTimer>[]>([]);
   const [openErrorGetRecipe, setOpenErrorGetRecipe] = useState<boolean>(false);
   const [openErrorUpdateRecipe, setOpenErrorUpdateRecipe] = useState<boolean>(false);
+  const [isSubmitting, setisSubmitting] = useState<boolean>(false);
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-  const isUpdatingRecipe = operationRecipe === OperationTypes.Update || operationRecipe === OperationTypes.Create;
-  const isGettingRecipe = operationRecipe === OperationTypes.Get;
   const isLoadingRecipe = statusRecipe === StatusTypes.Pending;
   const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
   const isAddMode = query.action === Mode.Add;
@@ -91,13 +95,43 @@ export default function RecipeAction(): ReactElement {
     event.preventDefault();
   }
 
+  async function dispatchSubmit() {
+    const body = {
+      title,
+      description,
+      image: imagePath || acceptedImage || null,
+      recipecategories: recipeCategories.map((recipeCategory) => recipeCategory.id),
+      rating,
+      effort,
+      measurementsystemid: 1,
+      recipeingredients: recipeIngredients.map((recipeIngredient) => ({
+        ...recipeIngredient,
+        measurementtypeid: recipeIngredient.measurementtype?.id as number,
+        measurementunitid: recipeIngredient.measurementunit?.id as number
+      })) as RecipeIngredient[],
+      recipeinstructions: recipeInstructions.map((recipeInstruction) => recipeInstruction.title as string),
+      recipetimers: recipeTimers as RecipeTimer[]
+    };
+
+    try {
+      if (isAddMode) {
+        await dispatch(createRecipe({ body }));
+      } else {
+        await dispatch(updateRecipe({ recipeId: 2, body }));
+      }
+    } finally {
+      setisSubmitting(false);
+      router.push('/recipes');
+    }
+  }
+
   useEffect(() => {
-    if (isGettingRecipe && isErrorRecipe) {
+    if (!isSubmitting && isErrorRecipe) {
       setOpenErrorGetRecipe(isErrorRecipe);
-    } else if (isUpdatingRecipe && isErrorRecipe) {
+    } else if (isSubmitting && isErrorRecipe) {
       setOpenErrorUpdateRecipe(isErrorRecipe);
     }
-  }, [isErrorRecipe, isGettingRecipe, isUpdatingRecipe]);
+  }, [isErrorRecipe, isSubmitting]);
 
   useEffect(() => {
     if (recipe.id) {
@@ -125,29 +159,29 @@ export default function RecipeAction(): ReactElement {
 
     const { slug } = router.query as { slug: string[] };
     const action = slug[0];
-    let id: number | null = null;
+    let recipeId: number | null = null;
 
     if (slug.length === 2) {
-      id = parseInt(slug[1], 10);
+      recipeId = parseInt(slug[1], 10);
     }
 
     if (
       slug.length > 2 ||
       (action !== Mode.Edit && action !== Mode.Add) ||
       (action === Mode.Edit && slug.length !== 2) ||
-      (slug.length === 2 && Number.isNaN(id))
+      (slug.length === 2 && Number.isNaN(recipeId))
     ) {
       router.push('/recipes');
     }
 
-    setQuery({ action, id });
+    setQuery({ action, recipeId });
   }, [router]);
 
   useEffect(() => {
-    const { id } = query;
+    const { recipeId } = query;
 
-    if (id) {
-      dispatch(getRecipe(id));
+    if (recipeId) {
+      dispatch(getRecipe({ recipeId }));
     }
   }, [dispatch, query]);
 
@@ -337,14 +371,23 @@ export default function RecipeAction(): ReactElement {
     <PageContainer>
       <Snackbar open={openErrorUpdateRecipe} autoHideDuration={6000} onClose={() => setOpenErrorUpdateRecipe(false)}>
         <Alert onClose={() => setOpenErrorUpdateRecipe(false)} severity="error">
-          Could not add recipe — {errorRecipeMessage}
+          Could not add recipe — {errorRecipe?.message}
         </Alert>
       </Snackbar>
       <Snackbar open={openErrorGetRecipe} autoHideDuration={6000} onClose={() => setOpenErrorGetRecipe(false)}>
         <Alert onClose={() => setOpenErrorGetRecipe(false)} severity="error">
           <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-            <Typography> Could not load recipe — {errorRecipeMessage}</Typography>
-            <Button variant="contained" color="error" onClick={() => dispatch(getRecipe(query.id))}>
+            <Typography> Could not load recipe — {errorRecipe?.message}</Typography>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                const recipeId = query.recipeId as number;
+
+                setOpenErrorGetRecipe(false);
+                dispatch(getRecipe({ recipeId }));
+              }}
+            >
               Reload
             </Button>
           </Stack>
@@ -378,35 +421,8 @@ export default function RecipeAction(): ReactElement {
               type="button"
               variant="contained"
               disabled={canSubmit || isLoadingRecipe}
-              loading={isLoadingRecipe && isUpdatingRecipe}
-              // TODO Use member id once implemented
-              onClick={() => {
-                const data = {
-                  id: 2,
-                  data: {
-                    title,
-                    description,
-                    image: imagePath || acceptedImage || null,
-                    recipecategories: recipeCategories.map((recipeCategory) => recipeCategory.id),
-                    rating,
-                    effort,
-                    measurementsystemid: 1,
-                    recipeingredients: recipeIngredients.map((recipeIngredient) => ({
-                      ...recipeIngredient,
-                      measurementtypeid: recipeIngredient.measurementtype?.id as number,
-                      measurementunitid: recipeIngredient.measurementunit?.id as number
-                    })) as RecipeIngredient[],
-                    recipeinstructions: recipeInstructions.map(
-                      (recipeInstruction) => recipeInstruction.title as string
-                    ),
-                    recipetimers: recipeTimers as RecipeTimer[]
-                  }
-                };
-
-                dispatch(isAddMode ? createRecipe(data) : updateRecipe(data))
-                  .unwrap()
-                  .then(() => router.push('/recipes'));
-              }}
+              loading={isLoadingRecipe && isSubmitting}
+              onClick={() => dispatchSubmit()}
             >
               {isAddMode ? 'Add' : 'Update'} Recipe
             </LoadingButton>

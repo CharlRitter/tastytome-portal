@@ -1,5 +1,4 @@
 import React, { ChangeEvent, KeyboardEvent, ReactElement, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { VscClose } from 'react-icons/vsc';
 import { BiSend } from 'react-icons/bi';
 import {
@@ -19,23 +18,33 @@ import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided } 
 import { cloneDeep } from 'lodash';
 import { ListTypes } from '@/constants/general';
 import { RecipeIngredient, RecipeInstruction, RecipeTimer } from '@/types/recipe';
-import { EnumState, MeasurementType, MeasurementUnit } from '@/types/enum';
+import { MeasurementType, MeasurementUnit } from '@/types/enum';
+import { SliceItem } from '@/types/common';
+import { useAppSelector } from '@/reducers/hooks';
+import { RootState } from '@/reducers/store';
 import { ListContainer, SendButton, AdditionalInputAutocomplete, AdditionalInputTextField } from './styled';
 
-export default function RecipeItemsList(props: {
+interface RecipeItemsListProps {
   title: string;
   items: Partial<RecipeIngredient>[] | Partial<RecipeInstruction>[] | Partial<RecipeTimer>[];
   label: string;
   type?: string;
   handleSetItems: (value: Partial<RecipeIngredient>[] | Partial<RecipeInstruction>[] | Partial<RecipeTimer>[]) => void;
-}): ReactElement {
-  const theme = useTheme();
-  const { measurementtypes, measurementunits } = useSelector((state: { enum: EnumState }) => state.enum);
-  const { title, items, label, type, handleSetItems } = props;
-  const [fieldText, setFieldText] = useState('');
+}
 
-  const ariaLableItem = label.charAt(0).toLowerCase() + label.slice(1);
+export default function RecipeItemsList(props: RecipeItemsListProps): ReactElement {
+  const theme = useTheme();
+  const { data: measurementtypes } = useAppSelector(
+    (state: RootState): SliceItem<MeasurementType[]> => state.enum.measurementtypes
+  );
+  const { data: measurementunits } = useAppSelector(
+    (state: RootState): SliceItem<MeasurementUnit[]> => state.enum.measurementunits
+  );
+  const [fieldText, setFieldText] = useState('');
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+  const { title, items, label, type, handleSetItems } = props;
+  const ariaLableItem = label.charAt(0).toLowerCase() + label.slice(1);
 
   function HandleItemAdd(event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) {
     if (fieldText.trim() !== '') {
@@ -188,7 +197,7 @@ export default function RecipeItemsList(props: {
           alignItems={isMediumScreen ? 'stretch' : 'center'}
         >
           <AdditionalInputAutocomplete
-            options={measurementtypes.value.filter(
+            options={measurementtypes.filter(
               (measurementtype) => measurementtype.id !== 2 && measurementtype.id !== 3
             )}
             getOptionLabel={(option) => option.value}
@@ -200,7 +209,7 @@ export default function RecipeItemsList(props: {
           />
           <AdditionalInputAutocomplete
             // TODO Replace measurementsystem once hooked up
-            options={measurementunits.value.filter(
+            options={measurementunits.filter(
               (measurementunit) =>
                 (measurementunit.measurementsystemid === 1 || measurementunit.measurementsystemid === null) &&
                 item.measurementtype &&

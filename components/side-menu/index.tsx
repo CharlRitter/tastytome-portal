@@ -31,7 +31,11 @@ import { capitaliseFirstLetter } from '@/utils/common';
 import { InfoModal, Page } from '@/types/constants';
 import { NextLink } from '@/public/theme/globalStyled';
 
-export default function SideMenu(props: { drawerWidth: number }): ReactElement {
+interface SideMenuProps {
+  drawerWidth: number;
+}
+
+export default function SideMenu(props: SideMenuProps): ReactElement {
   const router = useRouter();
   const [openModal, setOpenModal] = useState<number>(INFO_MODALS.unsetModal);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);

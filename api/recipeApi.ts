@@ -1,33 +1,42 @@
-import { AxiosResponse } from 'axios';
-import axiosInstance from '@/api/axios';
-import { Recipe } from '@/types/recipe';
-import { constructApiQuery } from '@/utils/common';
+import axiosInstance, { AxiosResponse } from '@/api/axios';
+import { SuccessResponse } from '@/types/api';
+import {
+  CreateRecipeData,
+  DeleteRecipeData,
+  GetRecipeData,
+  GetRecipesData,
+  Recipe,
+  UpdateRecipeData
+} from '@/types/recipe';
 
 const path = '/v1/recipe';
 
-export async function getRecipes(query: {
-  categories?: string;
-  dateAscending?: string;
-  effort?: number;
-  rating?: number;
-  page?: number;
-  pageSize?: number;
-}): Promise<AxiosResponse> {
-  return axiosInstance.get(`${path}${constructApiQuery(query)}`);
+export async function getRecipes(data: GetRecipesData): Promise<AxiosResponse<SuccessResponse<Recipe[]>>> {
+  const { params } = data;
+
+  return axiosInstance.get(path, { params });
 }
 
-export async function getRecipe(id: number): Promise<AxiosResponse> {
-  return axiosInstance.get(`${path}/${id}`);
+export async function getRecipe(data: GetRecipeData): Promise<AxiosResponse<SuccessResponse<Recipe>>> {
+  const { recipeId } = data;
+
+  return axiosInstance.get(`${path}/${recipeId}`);
 }
 
-export async function createRecipe(id: number, data: Partial<Recipe>): Promise<AxiosResponse> {
-  return axiosInstance.post(`${path}/${id}`, data);
+export async function createRecipe(data: CreateRecipeData): Promise<AxiosResponse<void>> {
+  const { body } = data;
+
+  return axiosInstance.post(path, body);
 }
 
-export async function updateRecipe(id: number, data: Partial<Recipe>): Promise<AxiosResponse> {
-  return axiosInstance.put(`${path}/${id}`, data);
+export async function updateRecipe(data: UpdateRecipeData): Promise<AxiosResponse<void>> {
+  const { body, recipeId } = data;
+
+  return axiosInstance.put(`${path}/${recipeId}`, body);
 }
 
-export async function deleteRecipe(id: number): Promise<AxiosResponse> {
-  return axiosInstance.delete(`${path}/${id}`);
+export async function deleteRecipe(data: DeleteRecipeData): Promise<AxiosResponse<void>> {
+  const { recipeId } = data;
+
+  return axiosInstance.delete(`${path}/${recipeId}`);
 }

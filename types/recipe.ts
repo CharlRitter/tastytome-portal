@@ -59,7 +59,37 @@ export interface RecipeState {
   recipes: SliceItem<Recipe[]>;
   recipe: SliceItem<Recipe>;
 }
-export interface GetRecipeResponse {
-  totalCount: number;
-  recipes: Recipe[];
+
+export interface GetRecipesData {
+  params: {
+    categories?: string;
+    effort?: number;
+    rating?: number;
+    orderBy?: string;
+    page?: number;
+    pageSize?: number;
+  };
+}
+export interface GetRecipeData {
+  recipeId: number;
+}
+export interface CreateRecipeData {
+  body: Partial<Recipe> & {
+    recipecategories: number[];
+    recipeingredients: Partial<RecipeIngredient[]>;
+    recipeinstructions: string[];
+    recipetimers: Partial<RecipeTimer[]>;
+  };
+}
+export interface UpdateRecipeData {
+  recipeId: number;
+  body: Partial<Recipe> & {
+    recipecategories: number[];
+    recipeingredients: Partial<RecipeIngredient[]>;
+    recipeinstructions: string[];
+    recipetimers: Partial<RecipeTimer[]>;
+  };
+}
+export interface DeleteRecipeData {
+  recipeId: number;
 }

@@ -1,4 +1,5 @@
 import { Theme } from '@mui/system';
+import { SerializedError } from '@reduxjs/toolkit';
 
 export interface StyledProps {
   theme?: Theme;
@@ -8,9 +9,8 @@ export interface StyledProps {
 }
 
 export interface SliceItem<T> {
-  value: T;
+  data: T;
   status: string;
-  operation: string | null;
-  error: string | null;
-  totalCount?: number;
+  error: SerializedError | null;
+  totalCount: number | null;
 }
