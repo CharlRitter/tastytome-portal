@@ -1,6 +1,6 @@
 import { ThemeOptions, createTheme } from '@mui/material/styles';
 import { colours, sharedColours } from '@/public/theme/colours';
-import overrides from '@/public/theme/overrides';
+import { overrides } from '@/public/theme/overrides';
 
 const lightThemeOptions: ThemeOptions = {
   palette: {
@@ -14,7 +14,7 @@ const lightThemeOptions: ThemeOptions = {
     background: {
       default: colours.lightBackground
     },
-    common: sharedColours,
+    common: sharedColours
   },
   ...overrides
 };

@@ -1,21 +1,21 @@
 import { SliceItem } from '@/types/common';
 
-export interface Category {
+export type Category = {
   id: number;
   value: string;
-}
+};
 
-export interface MeasurementSystem {
+export type MeasurementSystem = {
   id: number;
   value: string;
-}
+};
 
-export interface MeasurementType {
+export type MeasurementType = {
   id: number;
   value: string;
-}
+};
 
-export interface MeasurementUnit {
+export type MeasurementUnit = {
   id: number;
   measurementsystemid: number | null;
   measurementsystem: MeasurementSystem | null;
@@ -23,17 +23,17 @@ export interface MeasurementUnit {
   measurementtype: MeasurementType;
   value: string;
   abbreviation: string;
-}
+};
 
-export interface Theme {
+export type Theme = {
   id: number;
   value: string;
-}
+};
 
-export interface EnumState {
+export type EnumState = {
   categories: SliceItem<Category[]>;
   measurementsystems: SliceItem<MeasurementSystem[]>;
   measurementtypes: SliceItem<MeasurementType[]>;
   measurementunits: SliceItem<MeasurementUnit[]>;
   themes: SliceItem<Theme[]>;
-}
+};

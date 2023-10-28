@@ -1,4 +1,4 @@
-export default {
+export const overrides = {
   shape: {
     borderRadius: 5
   },
@@ -7,9 +7,9 @@ export default {
       styleOverrides: {
         root: {
           '&.main': {
-            padding: '20px 25px',
-          },
-        },
+            padding: '20px 25px'
+          }
+        }
       }
     }
   }

@@ -1,15 +1,15 @@
 import React from 'react';
 import {
-  FaRegUser,
+  FaBook,
+  FaBox,
+  FaCog,
+  FaInfoCircle,
   FaRegEnvelope,
   FaRegFileAlt,
-  FaInfoCircle,
-  FaCog,
-  FaBook,
-  FaShoppingBasket,
-  FaBox,
-  FaRegFile
+  FaRegUser,
+  FaShoppingBasket
 } from 'react-icons/fa';
+
 import { InfoModals, Page } from '@/types/constants';
 
 export const PAGES: Page[] = [
@@ -55,11 +55,6 @@ export const INFO_MODALS: InfoModals = {
     },
     {
       id: 2,
-      title: 'Changelog',
-      icon: <FaRegFile />
-    },
-    {
-      id: 3,
       title: 'Terms',
       icon: <FaRegFileAlt />
     }

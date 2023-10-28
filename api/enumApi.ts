@@ -1,4 +1,4 @@
-import axiosInstance, { AxiosResponse } from '@/api/axios';
+import { AxiosResponse, axiosInstance } from '@/api/axios';
 import { SuccessResponse } from '@/types/api';
 import { Category, MeasurementSystem, MeasurementType, MeasurementUnit, Theme } from '@/types/enum';
 

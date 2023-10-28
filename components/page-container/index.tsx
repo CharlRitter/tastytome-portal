@@ -1,10 +1,88 @@
-import React, { ReactElement, ReactNode } from 'react';
 import { Box, Container } from '@mui/material';
-import SideMenu from '@/components/side-menu';
-import { DRAWER_WIDTH } from '@/constants/general';
+import { useRouter } from 'next/router';
+import React, { JSX, ReactNode, useCallback, useEffect } from 'react';
 
-export default function PageContainer(props: { children?: ReactNode }): ReactElement {
+import { SideMenu } from '@/components/side-menu';
+import { DRAWER_WIDTH, StatusTypes } from '@/constants/general';
+import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
+import { RootState } from '@/reducers/store';
+import {
+  getCategories,
+  getMeasurementSystems,
+  getMeasurementTypes,
+  getMeasurementUnits,
+  getThemes
+} from '@/slices/enumSlice';
+import { getMember, logoutMember } from '@/slices/memberSlice';
+import { SliceItem } from '@/types/common';
+import { EnumState } from '@/types/enum';
+import { MemberResponse } from '@/types/member';
+
+export type PageContainerProps = {
+  children: ReactNode;
+};
+
+export function PageContainer(props: PageContainerProps): JSX.Element {
   const { children } = props;
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { data: member, status: memberStatus } = useAppSelector(
+    (state: RootState): SliceItem<MemberResponse> => state.memberSlice.member
+  );
+  const { categories, measurementsystems, measurementtypes, measurementunits, themes } = useAppSelector(
+    (state: RootState): EnumState => state.enumSlice
+  );
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await dispatch(logoutMember());
+
+      if (memberStatus === StatusTypes.Fulfilled) {
+        router.push('/');
+      }
+    } catch (error) {
+      // empty
+    }
+  }, [dispatch, memberStatus, router]);
+
+  useEffect(() => {
+    const hasToken = sessionStorage.getItem('jwtToken');
+
+    if (!hasToken) {
+      handleLogout();
+    } else {
+      // TODO Add error handling for this.
+      if (member.id === 0) {
+        dispatch(getMember());
+      }
+      if (categories.data.length === 0) {
+        dispatch(getCategories());
+      }
+      if (measurementsystems.data.length === 0) {
+        dispatch(getMeasurementSystems());
+      }
+      if (measurementtypes.data.length === 0) {
+        dispatch(getMeasurementTypes());
+      }
+      if (measurementunits.data.length === 0) {
+        dispatch(getMeasurementUnits());
+      }
+      if (themes.data.length === 0) {
+        dispatch(getThemes());
+      }
+    }
+  }, [
+    categories.data.length,
+    dispatch,
+    handleLogout,
+    measurementsystems.data.length,
+    measurementtypes.data.length,
+    measurementunits.data.length,
+    member.id,
+    memberStatus,
+    router,
+    themes.data.length
+  ]);
 
   return (
     <Box

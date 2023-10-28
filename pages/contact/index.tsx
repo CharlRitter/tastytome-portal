@@ -1,27 +1,28 @@
-import React, { ChangeEvent, ReactElement, useState } from 'react';
 import { Button, Grid, Paper, TextField } from '@mui/material';
+import React, { ChangeEvent, JSX, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
-import PageContainer from '@/components/page-container';
 
-export default function Contact(): ReactElement {
+import { PageContainer } from '@/components/page-container';
+
+export default function Contact(): JSX.Element {
   const [isCaptchaVerified, setIsCaptchaVerified] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [message, setMessage] = useState<string>('');
-  const handleSubmit = (event) => {
+
+  function handleSubmit() {
     // TODO
-    event.preventDefault();
 
     if (!isCaptchaVerified) {
       // Captcha not verified, display error or prevent form submission
     }
 
     // Handle form submission logic here
-  };
+  }
 
   return (
     <PageContainer>
-      <Paper classes={{ root: 'main' }} component="form" onSubmit={handleSubmit}>
+      <Paper classes={{ root: 'main' }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -57,7 +58,13 @@ export default function Contact(): ReactElement {
             <ReCAPTCHA sitekey="YOUR_RECAPTCHA_SITE_KEY" size="invisible" onChange={() => setIsCaptchaVerified(true)} />
           </Grid>
           <Grid item xs={12}>
-            <Button type="button" variant="contained" color="primary" disabled={!name || !email || !message}>
+            <Button
+              type="button"
+              variant="contained"
+              color="primary"
+              disabled={!name || !email || !message}
+              onClick={() => handleSubmit()}
+            >
               Submit
             </Button>
           </Grid>

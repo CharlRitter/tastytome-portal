@@ -1,18 +1,18 @@
 import { ReactNode } from 'react';
 
-export interface Page {
+export type Page = {
   title: string;
   route: string;
   icon: ReactNode;
-}
+};
 
-export interface InfoModal {
+export type InfoModal = {
   id: number;
   title: string;
   icon: ReactNode;
-}
+};
 
-export interface InfoModals {
+export type InfoModals = {
   unsetModal: number;
   modals: InfoModal[];
-}
+};

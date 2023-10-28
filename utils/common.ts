@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { QueryParams } from '@/types/utils';
+/* eslint-disable no-bitwise */
+import { AxiosResponse } from '@/api/axios';
 
 export function capitaliseFirstLetter(word: string, seperator?: string): string {
   let words: string[] = [word];
@@ -51,12 +51,39 @@ export function formatDate(date: string) {
   return new Date(date).toLocaleDateString('en-GB', options);
 }
 
-export function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T>();
+export function interpolateColor(color1: string, color2: string, percentage: number, opacity?: number) {
+  function hexToRgb(hex: string) {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
 
-  useEffect(() => {
-    ref.current = value;
-  });
+    return [r, g, b];
+  }
 
-  return ref.current;
+  const color1Rgb = hexToRgb(color1);
+  const color2Rgb = hexToRgb(color2);
+
+  if (color1Rgb && color2Rgb) {
+    const interpolatedColor = color1Rgb.map((c1, index) => {
+      const c2 = color2Rgb[index];
+
+      return Math.round(c1 + (c2 - c1) * percentage);
+    });
+
+    return `rgb(${interpolatedColor[0]}, ${interpolatedColor[1]}, ${interpolatedColor[2]}, ${opacity ?? 1})`;
+  }
+
+  return color2;
+}
+
+export async function withJWTSessionStorage<T>(promise: Promise<AxiosResponse<T>>): Promise<AxiosResponse<T>> {
+  const response = await promise;
+  const jwtToken = response.headers.authorization;
+
+  if (jwtToken || jwtToken === '') {
+    sessionStorage.setItem('jwtToken', jwtToken);
+  }
+
+  return response;
 }

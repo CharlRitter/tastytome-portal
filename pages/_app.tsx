@@ -1,46 +1,58 @@
-import React, { ReactElement, ReactNode, useEffect } from 'react';
-import { Provider } from 'react-redux';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeOptions } from '@mui/material/styles';
+import { StyledEngineProvider, ThemeProvider } from '@mui/system';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import { StyledEngineProvider, ThemeProvider } from '@mui/system';
-import CssBaseline from '@mui/material/CssBaseline';
-import { lightTheme, darkTheme } from '@/public/theme/themes';
-import { storeWrapper } from '@/reducers/store';
-// TODO fix settings
-// import { setIsDarkTheme } from '@/slices/settingsSlice';
-import {
-  getCategories,
-  getMeasurementSystems,
-  getMeasurementTypes,
-  getMeasurementUnits,
-  getThemes
-} from '@/slices/enumSlice';
-import { SettingsRootState } from '@/types/settings';
+import React, { JSX, ReactNode, useEffect, useState } from 'react';
+import { Provider } from 'react-redux';
+
+import { ThemeStates } from '@/constants/general';
+import { darkTheme, lightTheme } from '@/public/theme/themes';
+import { useAppSelector } from '@/reducers/hooks';
+import { RootState, storeWrapper } from '@/reducers/store';
+import { SliceItem } from '@/types/common';
+import { MemberResponse } from '@/types/member';
 import '@/public/theme/global.scss';
 import '@/public/theme/tailwind.css';
-import { useAppDispatch } from '@/reducers/hooks';
 
-interface StatefulThemeProviderProps {
+export type StatefulThemeProviderProps = {
   children: ReactNode;
-}
+};
 
-function StatefulThemeProvider({ children }: StatefulThemeProviderProps): ReactElement {
-  // const { isDarkTheme } = useAppSelector((state: SettingsRootState) => state.settings);
-  const dispatch = useAppDispatch();
-  // const theme = isDarkTheme ? darkTheme : lightTheme;
-  const theme = darkTheme;
+function StatefulThemeProvider({ children }: StatefulThemeProviderProps): JSX.Element {
+  const {
+    data: { membersettings }
+  } = useAppSelector((state: RootState): SliceItem<MemberResponse> => state.memberSlice.member);
+  const [theme, setTheme] = useState<ThemeOptions>(darkTheme);
+  const [systemTheme, setSystemTheme] = useState<ThemeOptions>(darkTheme);
 
   useEffect(() => {
-    // Add error handling for this.
-    dispatch(getCategories());
-    dispatch(getMeasurementSystems());
-    dispatch(getMeasurementTypes());
-    dispatch(getMeasurementUnits());
-    dispatch(getThemes());
-    //   dispatch(
-    //     setIsDarkTheme(typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    //   );
-  }, [dispatch]);
+    function handleColorSchemeChange({ matches }: { matches: boolean }) {
+      if (matches) {
+        setSystemTheme(darkTheme);
+      } else {
+        setSystemTheme(lightTheme);
+      }
+    }
+
+    const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
+
+    mediaQueryList.addEventListener('change', handleColorSchemeChange);
+
+    return () => {
+      mediaQueryList.removeEventListener('change', handleColorSchemeChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (membersettings.theme.id === ThemeStates.System) {
+      setTheme(systemTheme);
+    } else if (membersettings.theme.id === ThemeStates.Dark) {
+      setTheme(darkTheme);
+    } else if (membersettings.theme.id === ThemeStates.Light) {
+      setTheme(lightTheme);
+    }
+  }, [membersettings.theme.id, systemTheme]);
 
   return (
     <StyledEngineProvider injectFirst>
@@ -49,10 +61,10 @@ function StatefulThemeProvider({ children }: StatefulThemeProviderProps): ReactE
   );
 }
 
-export default function CookScribe({ Component, ...rest }: AppProps): ReactElement {
+export default function TastyTome({ Component, ...rest }: AppProps): JSX.Element {
   const { store, props } = storeWrapper.useWrappedStore(rest);
   const { pageProps } = props;
-  const title = 'CookScribe';
+  const title = 'TastyTome';
   const description = 'Description of your website';
 
   return (
@@ -73,6 +85,7 @@ export default function CookScribe({ Component, ...rest }: AppProps): ReactEleme
       <Provider store={store}>
         <StatefulThemeProvider>
           <CssBaseline />
+          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
           <Component {...pageProps} />
         </StatefulThemeProvider>
       </Provider>

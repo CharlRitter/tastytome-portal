@@ -1,5 +1,4 @@
 import { SpeedDial, SpeedDialAction, SpeedDialIcon, styled } from '@mui/material';
-import { StyledProps } from '@/types/common';
 
 export const RecipeSpeedDial = styled(SpeedDial)(() => ({
   '.MuiSpeedDial-fab': {
@@ -23,7 +22,7 @@ export const RecipeSpeedDialIcon = styled(SpeedDialIcon)(() => ({
   }
 }));
 
-export const RecipeSpeedDialAction = styled(SpeedDialAction)<StyledProps>(({ theme }) => ({
+export const RecipeSpeedDialAction = styled(SpeedDialAction)(({ theme }) => ({
   backgroundColor: theme.palette.secondary.main,
 
   '&:hover': {

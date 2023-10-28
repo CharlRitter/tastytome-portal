@@ -1,66 +1,98 @@
-import { Category, MeasurementSystem, MeasurementType, MeasurementUnit } from '@/types/enum';
 import { SliceItem } from '@/types/common';
+import { Category, MeasurementSystem, MeasurementType, MeasurementUnit } from '@/types/enum';
 
-export interface RecipeCategory {
+export type RecipeCategory = {
   id: number;
   recipeid: number;
   categoryid: number;
   category: Category;
   createdat: string;
-}
+};
 
-export interface RecipeIngredient {
-  id: number | null;
-  recipeid: number;
+export type RecipeIngredientBase = {
   title: string;
-  measurementtypeid: number;
-  measurementtype?: MeasurementType | null;
-  measurementunitid: number;
-  measurementunit?: MeasurementUnit | null;
+};
+
+export type RecipeIngredientRequest = RecipeIngredientBase & {
+  title: string;
+  measurementtype: MeasurementType | null;
+  measurementunit: MeasurementUnit | null;
   measurementamount: number | null;
-  createdat: string;
-}
+};
 
-export interface RecipeInstruction {
-  id: number | null;
+export type RecipeIngredientResponse = RecipeIngredientBase & {
+  id: number;
   recipeid: number;
-  title: string;
-  createdat: string;
-}
+  measurementtypeid: number;
+  measurementtype: MeasurementType;
+  measurementunitid: number;
+  measurementunit: MeasurementUnit;
+  measurementamount: number;
+};
 
-export interface RecipeTimer {
-  id: number | null;
+export type RecipeInstructionBase = {
+  title: string;
+};
+
+// TODO: ADD LINKS TO TIMERS & TEMPS HERE
+export type RecipeInstructionRequest = RecipeInstructionBase;
+
+export type RecipeInstructionResponse = RecipeInstructionBase & {
+  id: number;
   recipeid: number;
-  title: string;
-  hours: number | null;
-  minutes: number | null;
   createdat: string;
-}
+};
 
-export interface Recipe {
-  id?: number;
-  memberid?: number;
+export type RecipeTimerBase = {
+  title: string;
+  hours: number;
+  minutes: number;
+};
+
+export type RecipeTimerRequest = RecipeTimerBase;
+
+export type RecipeTimerResponse = RecipeTimerBase & {
+  id: number;
+  recipeid: number;
+  createdat: string;
+};
+
+export type RecipeBase = {
   title: string;
   description: string;
   image: string | File | null;
   rating: number;
   effort: number;
-  measurementsystem?: MeasurementSystem;
+};
+
+export type RecipeRequest = RecipeBase & {
   measurementsystemid: number;
-  createdat?: string;
-  editedat?: string;
+  recipecategories: number[];
+  recipeingredients: RecipeIngredientRequest[];
+  recipeinstructions: string[];
+  recipetimers: RecipeTimerRequest[];
+};
+
+export type RecipeResponse = RecipeBase & {
+  id: number;
+  memberid: number;
+  image: string | null;
+  measurementsystemid: number;
+  createdat: string;
+  editedat: string;
+  measurementsystem: MeasurementSystem;
   recipecategory: RecipeCategory[];
-  recipeingredient: RecipeIngredient[];
-  recipeinstruction: RecipeInstruction[];
-  recipetimer: RecipeTimer[];
-}
+  recipeingredient: RecipeIngredientResponse[];
+  recipeinstruction: RecipeInstructionResponse[];
+  recipetimer: RecipeTimerResponse[];
+};
 
-export interface RecipeState {
-  recipes: SliceItem<Recipe[]>;
-  recipe: SliceItem<Recipe>;
-}
+export type RecipeState = {
+  recipes: SliceItem<RecipeResponse[]>;
+  recipe: SliceItem<RecipeResponse>;
+};
 
-export interface GetRecipesData {
+export type GetRecipesData = {
   params: {
     categories?: string;
     effort?: number;
@@ -69,27 +101,25 @@ export interface GetRecipesData {
     page?: number;
     pageSize?: number;
   };
-}
-export interface GetRecipeData {
+};
+
+export type GetRecipeData = {
   recipeId: number;
-}
-export interface CreateRecipeData {
-  body: Partial<Recipe> & {
+};
+
+export type CreateRecipeData = {
+  body: RecipeRequest & {
     recipecategories: number[];
-    recipeingredients: Partial<RecipeIngredient[]>;
+    recipeingredients: Partial<RecipeIngredientRequest[]>;
     recipeinstructions: string[];
-    recipetimers: Partial<RecipeTimer[]>;
+    recipetimers: Partial<RecipeTimerRequest[]>;
   };
-}
-export interface UpdateRecipeData {
+};
+
+export type UpdateRecipeData = CreateRecipeData & {
   recipeId: number;
-  body: Partial<Recipe> & {
-    recipecategories: number[];
-    recipeingredients: Partial<RecipeIngredient[]>;
-    recipeinstructions: string[];
-    recipetimers: Partial<RecipeTimer[]>;
-  };
-}
-export interface DeleteRecipeData {
+};
+
+export type DeleteRecipeData = {
   recipeId: number;
-}
+};

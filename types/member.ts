@@ -1,59 +1,71 @@
-import { MeasurementSystem, Theme } from '@/types/enum';
 import { SliceItem } from '@/types/common';
+import { MeasurementSystem, Theme } from '@/types/enum';
 
-export interface MemberSettings {
+export type MemberSettingsBase = {
+  themeid: number;
+  measurementsystemid: number;
+  usepantry: boolean;
+  usenegativepantry: boolean;
+  displaynutritionalinformation: boolean;
+};
+
+export type MemberSettingsRequest = MemberSettingsBase;
+
+export type MemberSettingsResponse = MemberSettingsBase & {
   id: number;
   memberid: number;
   theme: Theme;
   measurementsystem: MeasurementSystem;
-  usepantry: boolean;
-  usenegativepantry: boolean;
-  displaynutritionalinformation: boolean;
   createdat: string;
   editedat: string;
-}
+};
 
-export interface Member {
-  id: number;
+export type MemberBase = {
   firstname: string;
   lastname: string;
   emailaddress: string;
   password: string;
+};
+
+export type MemberRequest = MemberBase;
+
+export type MemberResponse = MemberBase & {
+  id: number;
   ispremium: boolean;
-  membersettings: MemberSettings;
+  membersettings: MemberSettingsResponse;
   createdat: string;
   editedat: string;
-}
+};
 
-export interface MemberState {
-  member: SliceItem<Member>;
-}
+export type MemberState = {
+  member: SliceItem<MemberResponse>;
+};
 
-export interface CreateMemberData {
-  body: Member;
-}
+export type CreateMemberData = {
+  body: MemberRequest;
+};
 
-export interface UpdateMemberData {
-  body: Member;
-}
+export type UpdateMemberData = {
+  body: MemberRequest;
+};
 
-export interface UpdateMemberPasswordData {
+export type UpdateMemberPasswordData = {
   body: { currentPassword: string; newPassword: string };
-}
+};
 
-export interface ResetMemberPasswordData {
+export type ResetMemberPasswordData = {
   body: { emailAddress: string };
-}
+};
 
-export interface ConfirmResetMemberPasswordData {
+export type ConfirmResetMemberPasswordData = {
   token: string;
   body: { newPassword: string };
-}
+};
 
-export interface LoginMemberData {
+export type LoginMemberData = {
   body: { emailaddress: string; password: string };
-}
+};
 
-export interface UpdateMemberSettingsData {
-  body: MemberSettings;
-}
+export type UpdateMemberSettingsData = {
+  body: MemberSettingsRequest;
+};

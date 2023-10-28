@@ -1,3 +1,5 @@
+import { CommonColors } from '@mui/material';
+
 export const colours = {
   lightPrimary: '#432d4e',
   lightSecondary: '#fdd3a3',
@@ -9,7 +11,7 @@ export const colours = {
   veryLightBlack: '#000'
 };
 
-export const sharedColours = {
+export const sharedColours: Partial<CommonColors & typeof colours> = {
   lightGray: colours.lightGray,
   veryLightBlack: colours.veryLightBlack
 };

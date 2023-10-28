@@ -1,16 +1,11 @@
-import React, { ChangeEvent, MouseEvent, ReactElement, useEffect, useState } from 'react';
-import router from 'next/router';
 import {
   AccordionDetails,
   AccordionSummary,
-  Alert,
   Autocomplete,
-  Button,
   Fab,
   Grid,
   IconButton,
   Paper,
-  Snackbar,
   Stack,
   Switch,
   TextField,
@@ -20,151 +15,99 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import router from 'next/router';
+import React, { ChangeEvent, JSX, MouseEvent, useEffect, useState } from 'react';
 import { BsFillGridFill, BsFilter, BsList, BsPlus } from 'react-icons/bs';
 import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 import { VscClose } from 'react-icons/vsc';
-import PageContainer from '@/components/page-container';
-import RecipeCards from '@/components/recipe-cards';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
+import { EllipsisLoader } from '@/components/ellipsis-loader';
+import { PageContainer } from '@/components/page-container';
+import { RecipeCard } from '@/components/recipe-card';
+import { Toast } from '@/components/toast';
+import { StatusTypes } from '@/constants/general';
+import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
+import { RootState } from '@/reducers/store';
 import { clearRecipes, getRecipes } from '@/slices/recipeSlice';
 import { SliceItem } from '@/types/common';
 import { Category } from '@/types/enum';
-import { Recipe } from '@/types/recipe';
-import { RootState } from '@/reducers/store';
-import { StatusTypes } from '@/constants/general';
-import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
-import { usePrevious } from '@/utils/common';
+import { RecipeResponse } from '@/types/recipe';
+
 import { ActionsAccordion, StickyWrapper } from './styled';
 
-export default function Recipes(): ReactElement {
+export default function Recipes(): JSX.Element {
   const theme = useTheme();
   const dispatch = useAppDispatch();
-  const { data: recipeCategories } = useAppSelector((state: RootState): SliceItem<Category[]> => state.enum.categories);
+  const { data: recipeCategories } = useAppSelector(
+    (state: RootState): SliceItem<Category[]> => state.enumSlice.categories
+  );
   const {
-    data: storeRecipes,
+    data: recipes,
     status: statusRecipes,
     totalCount: recipeTotalCount,
     error: errorRecipes
-  } = useAppSelector((state: RootState): SliceItem<Recipe[]> => state.recipe.recipes);
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  } = useAppSelector((state: RootState): SliceItem<RecipeResponse[]> => state.recipeSlice.recipes);
+
   const [isListLayout, setIsListLayout] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [rating, setRating] = useState<number>(0);
   const [effort, setEffort] = useState<number>(0);
   const [isDateAscending, setIsDateAscending] = useState<boolean>(false);
-  const [openErrorRecipes, setOpenErrorRecipes] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const prevCategories = usePrevious<Category[]>(categories);
-  const prevEffort = usePrevious<number>(effort);
-  const prevRating = usePrevious<number>(rating);
-  const prevIsDateAscending = usePrevious<boolean>(isDateAscending);
+  const [openErrorToast, setOpenErrorToast] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
 
   const pageSize = 12;
-  const isMoreRecipes = (recipeTotalCount as number) > currentPage * pageSize || false;
-  const isLoadingRecipes = statusRecipes === StatusTypes.Pending;
+  const isMoreRecipes = recipeTotalCount ? recipeTotalCount > page * pageSize : false;
   const isErrorRecipes = statusRecipes === StatusTypes.Rejected;
 
+  useEffect(
+    () => () => {
+      dispatch(clearRecipes());
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    dispatch(
+      getRecipes({
+        params: {
+          categories: categories.map((category) => category.id).join(','),
+          orderBy: isDateAscending ? 'asc' : 'desc',
+          effort,
+          rating,
+          page,
+          pageSize
+        }
+      })
+    );
+  }, [categories, dispatch, effort, isDateAscending, page, rating]);
+
+  useEffect(() => {
+    if (isErrorRecipes) {
+      setOpenErrorToast(true);
+    }
+  }, [isErrorRecipes]);
+
   function handleClearFilters() {
+    dispatch(clearRecipes());
+    setPage(1);
     setCategories([]);
     setRating(0);
     setEffort(0);
     setIsDateAscending(false);
   }
 
-  useEffect(() => {
-    async function handleScroll() {
-      const { scrollHeight, scrollTop, clientHeight } = document.documentElement;
-
-      if (scrollHeight - (scrollTop + clientHeight) < 100 && !isLoadingRecipes && !isErrorRecipes && isMoreRecipes) {
-        setCurrentPage((prevPage) => prevPage + 1);
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [isLoadingRecipes, isMoreRecipes, isErrorRecipes]);
-
-  useEffect(() => {
-    if (
-      categories.length === prevCategories?.length &&
-      isDateAscending === prevIsDateAscending &&
-      effort === prevEffort &&
-      rating === prevRating
-    ) {
-      dispatch(
-        getRecipes({
-          params: {
-            categories: categories.map((category) => category.id).join(','),
-            orderBy: isDateAscending ? 'asc' : 'desc',
-            effort,
-            rating,
-            page: currentPage,
-            pageSize
-          }
-        })
-      );
-    } else {
-      setCurrentPage(1);
-      setRecipes([]);
-      dispatch(clearRecipes());
-    }
-  }, [
-    categories,
-    currentPage,
-    dispatch,
-    effort,
-    isDateAscending,
-    prevCategories?.length,
-    prevEffort,
-    prevIsDateAscending,
-    prevRating,
-    rating
-  ]);
-
-  useEffect(() => {
-    setRecipes((prevRecipes) => [...prevRecipes, ...storeRecipes]);
-  }, [storeRecipes]);
-
-  useEffect(() => {
-    if (isErrorRecipes) {
-      setOpenErrorRecipes(true);
-    }
-  }, [isErrorRecipes]);
-
   return (
     <PageContainer>
-      <Snackbar open={openErrorRecipes} autoHideDuration={6000} onClose={() => setOpenErrorRecipes(false)}>
-        <Alert onClose={() => setOpenErrorRecipes(false)} severity="error">
-          <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-            <Typography>Could not load recipes — {errorRecipes?.message}</Typography>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => {
-                setOpenErrorRecipes(false);
-                dispatch(
-                  getRecipes({
-                    params: {
-                      categories: categories.map((category) => category.id).join(','),
-                      orderBy: isDateAscending ? 'asc' : 'desc',
-                      effort,
-                      rating,
-                      page: currentPage,
-                      pageSize
-                    }
-                  })
-                );
-              }}
-            >
-              Reload
-            </Button>
-          </Stack>
-        </Alert>
-      </Snackbar>
+      <Toast
+        open={openErrorToast}
+        onClose={() => setOpenErrorToast(false)}
+        severity="error"
+        message={errorRecipes?.message ?? ''}
+      />
       <StickyWrapper>
         <Paper className="p-3">
           <Stack justifyContent="space-between" alignItems="center" direction="row">
@@ -173,7 +116,7 @@ export default function Recipes(): ReactElement {
                 aria-label="layout button group"
                 className="mr-3"
                 value={isListLayout}
-                onChange={(event: MouseEvent<HTMLElement>, value: boolean) => value !== null && setIsListLayout(value)}
+                onChange={(event: MouseEvent<HTMLElement>, value: boolean) => setIsListLayout(value)}
                 sx={{ display: { xs: 'none', md: 'block' } }}
                 color="primary"
                 exclusive
@@ -181,7 +124,7 @@ export default function Recipes(): ReactElement {
                 <ToggleButton className="p-3" aria-label="grid layout" value={false}>
                   <BsFillGridFill className="large-icon" />
                 </ToggleButton>
-                <ToggleButton className="p-3" aria-label="list layout" value={true}>
+                <ToggleButton className="p-3" aria-label="list layout" value>
                   <BsList className="large-icon" />
                 </ToggleButton>
               </ToggleButtonGroup>
@@ -191,14 +134,14 @@ export default function Recipes(): ReactElement {
                 color="primary"
                 onClick={() => setShowFilters(!showFilters)}
               >
-                <ToggleButton value={true} aria-label="show filters">
+                <ToggleButton value aria-label="show filters">
                   <BsFilter className="large-icon" />
                 </ToggleButton>
               </ToggleButtonGroup>
             </Stack>
             <Tooltip title="Add Recipe">
               <Fab color="primary" size="medium" aria-label="add recipe" onClick={() => router.push('/recipes/add')}>
-                <BsPlus className={'large-icon'} />
+                <BsPlus className="large-icon" />
               </Fab>
             </Tooltip>
           </Stack>
@@ -210,11 +153,15 @@ export default function Recipes(): ReactElement {
               <Autocomplete
                 multiple
                 limitTags={3}
-                options={recipeCategories as Category[]}
+                options={recipeCategories}
                 getOptionLabel={(option) => option.value}
                 value={categories}
                 renderInput={(params) => <TextField {...params} label="Categories" />}
-                onChange={(event: ChangeEvent<HTMLInputElement>, value: Category[]) => setCategories(value)}
+                onChange={(_, value: Category[]) => {
+                  dispatch(clearRecipes());
+                  setPage(1);
+                  setCategories(value);
+                }}
                 className="w-3/12"
               />
               <Stack direction="row" spacing={1}>
@@ -223,7 +170,11 @@ export default function Recipes(): ReactElement {
                 </Typography>
                 <StyledRating
                   value={rating}
-                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setRating(value)}
+                  onChange={(_, value: number | null) => {
+                    dispatch(clearRecipes());
+                    setPage(1);
+                    setRating(value ?? 0);
+                  }}
                   size="large"
                 />
               </Stack>
@@ -233,7 +184,11 @@ export default function Recipes(): ReactElement {
                 </Typography>
                 <EffortRating
                   value={effort}
-                  onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setEffort(value)}
+                  onChange={(_, value: number | null) => {
+                    dispatch(clearRecipes());
+                    setPage(1);
+                    setEffort(value ?? 0);
+                  }}
                   size="large"
                   icon={<TbRectangleFilled />}
                   emptyIcon={<TbRectangle />}
@@ -246,26 +201,55 @@ export default function Recipes(): ReactElement {
                 </Typography>
                 <Switch
                   checked={isDateAscending}
-                  onChange={(event: ChangeEvent<HTMLInputElement>, checked: boolean) => setIsDateAscending(checked)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>, checked: boolean) => {
+                    dispatch(clearRecipes());
+                    setPage(1);
+                    setIsDateAscending(checked);
+                  }}
                 />
               </Stack>
               <Tooltip title="Clear Filters">
                 <IconButton color="primary" aria-label="clear filters" onClick={() => handleClearFilters()}>
-                  <VscClose className={'large-icon'} />
+                  <VscClose className="large-icon" />
                 </IconButton>
               </Tooltip>
             </Stack>
           </AccordionDetails>
         </ActionsAccordion>
       </StickyWrapper>
-      <Grid container spacing={2} className="mb-5">
-        <RecipeCards recipes={recipes} isListLayout={isListLayout} loading={isLoadingRecipes} setRecipes={setRecipes} />
-      </Grid>
-      {!isLoadingRecipes && recipes.length === 0 && !isMoreRecipes && (
-        <Stack className="w-full mt-6 mb-5" justifyContent="center" direction="row">
-          <Typography>No more recipes</Typography>
-        </Stack>
-      )}
+      <InfiniteScroll
+        dataLength={recipes.length}
+        next={() => setPage((prevPage) => prevPage + 1)}
+        hasMore={isMoreRecipes}
+        loader={
+          <Stack className="w-full mt-6 mb-5" alignItems="center">
+            <EllipsisLoader />
+          </Stack>
+        }
+        endMessage={
+          <Stack className="w-full mt-6 mb-5" alignItems="center">
+            <Typography>No more recipes</Typography>
+          </Stack>
+        }
+      >
+        <Grid container spacing={2} className="mb-5">
+          {recipes.map((recipe) => (
+            <Grid key={recipe.id} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
+              <RecipeCard
+                recipeId={recipe.id}
+                isListLayout={isListLayout}
+                title={recipe.title}
+                dateCreated={recipe.createdat}
+                description={recipe.description}
+                recipeCategories={recipe.recipecategory}
+                imagePath={recipe.image}
+                rating={recipe.rating}
+                effort={recipe.effort}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </InfiniteScroll>
     </PageContainer>
   );
 }

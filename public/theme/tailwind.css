@@ -102,16 +102,31 @@
   visibility: hidden
 }
 
+.static {
+  position: static
+}
+
 .fixed {
   position: fixed
+}
+
+.absolute {
+  position: absolute
+}
+
+.relative {
+  position: relative
 }
 
 .sticky {
   position: sticky
 }
 
-.my-2 {
-  margin-top: 0.5rem;
+.float-right {
+  float: right
+}
+
+.mb-2 {
   margin-bottom: 0.5rem
 }
 
@@ -135,12 +150,24 @@
   margin-right: 0.75rem
 }
 
+.mt-1 {
+  margin-top: 0.25rem
+}
+
+.mt-2 {
+  margin-top: 0.5rem
+}
+
 .mt-6 {
   margin-top: 1.5rem
 }
 
 .block {
   display: block
+}
+
+.inline-block {
+  display: inline-block
 }
 
 .flex {
@@ -163,6 +190,11 @@
   width: 25%
 }
 
+.w-fit {
+  width: -moz-fit-content;
+  width: fit-content
+}
+
 .w-full {
   width: 100%
 }
@@ -175,10 +207,6 @@
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
 }
 
-.items-start {
-  align-items: flex-start
-}
-
 .items-end {
   align-items: flex-end
 }
@@ -187,16 +215,12 @@
   align-items: center
 }
 
-.gap-1 {
-  gap: 0.25rem
+.justify-end {
+  justify-content: flex-end
 }
 
 .gap-5 {
   gap: 1.25rem
-}
-
-.rounded {
-  border-radius: 0.25rem
 }
 
 .border {
@@ -214,6 +238,16 @@
 .px-3 {
   padding-left: 0.75rem;
   padding-right: 0.75rem
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem
+}
+
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem
 }
 
 .pb-0 {

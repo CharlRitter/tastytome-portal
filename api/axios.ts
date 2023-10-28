@@ -1,15 +1,22 @@
 import axios, { AxiosResponse } from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: process.env.API_BASE_URL || 'http://localhost:8000'
+  baseURL: process.env.API_BASE_URL || 'http://localhost:8000',
+  withCredentials: true
 });
 
-// TODO remove and put on all endpoints
-const authToken =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6MiwiaWF0IjoxNjk0Mzc2MTA4LCJleHAiOjE2OTQzOTc3MDh9.aM1WlWi30Hb9Pl4D7rgr3gENhn14MjqQzrQSVvnApX0';
+axiosInstance.interceptors.request.use((config) => {
+  const jwtToken = sessionStorage.getItem('jwtToken');
 
-axiosInstance.defaults.headers.common.Authorization = `Bearer ${authToken}`;
+  if (jwtToken) {
+    const updatedConfig = { ...config };
+    updatedConfig.headers.Authorization = jwtToken;
 
+    return updatedConfig;
+  }
+
+  return config;
+});
+
+export { axiosInstance };
 export type { AxiosResponse };
-
-export default axiosInstance;

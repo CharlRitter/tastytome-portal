@@ -1,6 +1,11 @@
-import React, { ReactElement } from 'react';
-import PageContainer from '@/components/page-container';
+import React, { JSX } from 'react';
 
-export default function ShoppingList() : ReactElement {
-  return <PageContainer />;
+import { PageContainer } from '@/components/page-container';
+
+export default function ShoppingList(): JSX.Element {
+  return (
+    <PageContainer>
+      <p>ShoppingList</p>
+    </PageContainer>
+  );
 }

@@ -1,14 +1,11 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import settingsReducer from '@/slices/settingsSlice';
-import enumSlice from '@/slices/enumSlice';
-import memberSlice from '@/slices/memberSlice';
-import recipeSlice from '@/slices/recipeSlice';
 
-const rootReducer = combineReducers({
-  enum: enumSlice,
-  member: memberSlice,
-  recipe: recipeSlice
-  // settings: settingsReducer,
+import { enumReducer } from '@/slices/enumSlice';
+import { memberReducer } from '@/slices/memberSlice';
+import { recipeReducer } from '@/slices/recipeSlice';
+
+export const rootReducer = combineReducers({
+  enumSlice: enumReducer,
+  memberSlice: memberReducer,
+  recipeSlice: recipeReducer
 });
-
-export default rootReducer;

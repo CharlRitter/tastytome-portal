@@ -1,7 +1,6 @@
 import { Autocomplete, Box, IconButton, TextField, styled } from '@mui/material';
-import { StyledProps } from '@/types/common';
 
-export const ListContainer = styled(Box)<StyledProps>(({ theme }) => ({
+export const ListContainer = styled(Box)(({ theme }) => ({
   border: `1px solid ${theme.palette.action.disabled}`,
   color: theme.palette.text.secondary,
   borderRadius: '5px',

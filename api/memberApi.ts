@@ -1,10 +1,10 @@
-import axiosInstance, { AxiosResponse } from '@/api/axios';
+import { AxiosResponse, axiosInstance } from '@/api/axios';
 import { SuccessResponse } from '@/types/api';
 import {
   ConfirmResetMemberPasswordData,
   CreateMemberData,
   LoginMemberData,
-  Member,
+  MemberResponse,
   ResetMemberPasswordData,
   UpdateMemberData,
   UpdateMemberPasswordData,
@@ -13,7 +13,7 @@ import {
 
 const path = '/v1/member';
 
-export async function getMember(): Promise<AxiosResponse<SuccessResponse<Member>>> {
+export async function getMember(): Promise<AxiosResponse<SuccessResponse<MemberResponse>>> {
   return axiosInstance.get(path);
 }
 

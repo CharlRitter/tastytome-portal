@@ -1,8 +1,3 @@
-import React, { ReactElement, useState } from 'react';
-import getConfig from 'next/config';
-import dynamic from 'next/dynamic';
-import { usePathname, useRouter } from 'next/navigation';
-import { DateTime } from 'luxon';
 import {
   AppBar,
   Box,
@@ -25,33 +20,43 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { DateTime } from 'luxon';
+import getConfig from 'next/config';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { JSX, useState } from 'react';
 import { FaBars, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
-import { PAGES, INFO_MODALS } from '@/constants/navigationItems';
-import { capitaliseFirstLetter } from '@/utils/common';
-import { InfoModal, Page } from '@/types/constants';
+
+import { INFO_MODALS, PAGES } from '@/constants/navigationItems';
 import { NextLink } from '@/public/theme/globalStyled';
+import { InfoModal, Page } from '@/types/constants';
+import { capitaliseFirstLetter } from '@/utils/common';
 
-interface SideMenuProps {
+export type SideMenuProps = {
   drawerWidth: number;
-}
+};
 
-export default function SideMenu(props: SideMenuProps): ReactElement {
+export function SideMenu(props: SideMenuProps): JSX.Element {
   const router = useRouter();
   const [openModal, setOpenModal] = useState<number>(INFO_MODALS.unsetModal);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const { drawerWidth } = props;
   const { publicRuntimeConfig } = getConfig();
   const currentRoute = usePathname();
-  const routeSections = currentRoute ? currentRoute.split('/').filter((element) => element.trim() !== '') : [];
+  const routeSections = currentRoute
+    ? currentRoute
+        .split('/')
+        .filter((routeSection) => routeSection.trim() !== '' && Number.isNaN(parseInt(routeSection, 10)))
+    : [];
   const now = DateTime.local();
   const currentYear = now.year;
   const theme = useTheme();
   const isSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   let breadcrumbsHref = '';
-  const breadcrumbs = routeSections.map((routeSection: string, index: number) => {
+
+  const breadcrumbs = routeSections.map((routeSection, index) => {
     breadcrumbsHref += `/${routeSection}`;
-    let content: string | ReactElement = capitaliseFirstLetter(routeSection, routeSection.includes('-') ? '-' : '');
+    let content: string | JSX.Element = capitaliseFirstLetter(routeSection, routeSection.includes('-') ? '-' : '');
     const lastItem = index === routeSections.length - 1;
 
     if (!lastItem) {
@@ -84,9 +89,7 @@ export default function SideMenu(props: SideMenuProps): ReactElement {
   ));
 
   const infoModals = INFO_MODALS.modals.map((modal: InfoModal) => {
-    const Content = dynamic(() => import(`@/public/files/${modal.title.toLowerCase()}.mdx`), {
-      loading: () => <div>Loading...</div>
-    });
+    const Content = () => import(`@/public/files/${modal.title.toLowerCase()}.mdx`);
 
     return (
       <ListItem key={modal.title} disablePadding>
@@ -121,7 +124,7 @@ export default function SideMenu(props: SideMenuProps): ReactElement {
     <>
       <Toolbar>
         <Typography variant="h6" noWrap component="div">
-          CookScribe
+          TastyTome
         </Typography>
       </Toolbar>
       <Divider />
@@ -147,7 +150,7 @@ export default function SideMenu(props: SideMenuProps): ReactElement {
               <FaLinkedin />
             </IconButton>
           </Box>
-          <Typography variant="caption">© {currentYear} CookScribe.</Typography>
+          <Typography variant="caption">© {currentYear} TastyTome.</Typography>
         </Box>
       </Box>
     </>

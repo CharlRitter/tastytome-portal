@@ -1,46 +1,46 @@
-import React, { ChangeEvent, FormEvent, ReactElement, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { isEmpty } from 'lodash';
-import { TbCircleCheck, TbCircleOff, TbRectangle, TbRectangleFilled, TbUpload } from 'react-icons/tb';
+import { LoadingButton } from '@mui/lab';
 import {
-  Alert,
   Autocomplete,
   Button,
   Divider,
   Paper,
-  Skeleton,
-  Snackbar,
   Stack,
   TextField,
   Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
+import { isEmpty } from 'lodash';
+import { useRouter } from 'next/router';
+import React, { JSX, useEffect, useState } from 'react';
 import { FileRejection, useDropzone } from 'react-dropzone';
-import PageContainer from '@/components/page-container';
-import RecipeItemsList from '@/components/recipe-items-list';
-import { createRecipe, getRecipe, updateRecipe } from '@/slices/recipeSlice';
-import { ListTypes, Mode, StatusTypes } from '@/constants/general';
-import { Recipe, RecipeIngredient, RecipeInstruction, RecipeState, RecipeTimer } from '@/types/recipe';
-import { Category, EnumState } from '@/types/enum';
-import { SliceItem } from '@/types/common';
-import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
-import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
-import { DropBox, DropzoneBox, RatingStack } from './styled';
+import { TbCircleCheck, TbCircleOff, TbRectangle, TbRectangleFilled, TbUpload } from 'react-icons/tb';
 
-export default function RecipeAction(): ReactElement {
+import { EllipsisLoader } from '@/components/ellipsis-loader';
+import { PageContainer } from '@/components/page-container';
+import { RecipeIngredients, RecipeInstructions, RecipeTimers } from '@/components/recipe-items';
+import { Toast } from '@/components/toast';
+import { Mode, StatusTypes } from '@/constants/general';
+import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
+import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
+import { RootState } from '@/reducers/store';
+import { clearRecipe, createRecipe, getRecipe, updateRecipe } from '@/slices/recipeSlice';
+import { SliceItem } from '@/types/common';
+import { Category } from '@/types/enum';
+import { RecipeIngredientRequest, RecipeInstructionRequest, RecipeResponse, RecipeTimerRequest } from '@/types/recipe';
+
+import { DropBox, DropzoneBox, LoadingStack, RatingStack } from './styled';
+
+export default function RecipeAction(): JSX.Element {
   const router = useRouter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
-  const { data: categories } = useAppSelector(
-    (state: { enum: EnumState }): SliceItem<Category[]> => state.enum.categories
-  );
+  const { data: categories } = useAppSelector((state: RootState): SliceItem<Category[]> => state.enumSlice.categories);
   const {
     data: recipe,
     status: statusRecipe,
     error: errorRecipe
-  } = useAppSelector((state: { recipe: RecipeState }): SliceItem<Recipe> => state.recipe.recipe);
+  } = useAppSelector((state: RootState): SliceItem<RecipeResponse> => state.recipeSlice.recipe);
   const [query, setQuery] = useState<{ action: null | string; recipeId: null | number }>({
     action: null,
     recipeId: null
@@ -55,18 +55,16 @@ export default function RecipeAction(): ReactElement {
   const [effort, setEffort] = useState<number>(0);
   // TODO set to user's default measurement system
   // const [measurementSystemId, setMeasurementSystemId] = useState<number>(1);
-  const [recipeIngredients, setRecipeIngredients] = useState<Partial<RecipeIngredient>[]>([]);
-  const [recipeInstructions, setRecipeInstructions] = useState<Partial<RecipeInstruction>[]>([]);
-  const [recipeTimers, setRecipeTimers] = useState<Partial<RecipeTimer>[]>([]);
-  const [openErrorGetRecipe, setOpenErrorGetRecipe] = useState<boolean>(false);
-  const [openErrorUpdateRecipe, setOpenErrorUpdateRecipe] = useState<boolean>(false);
-  const [isSubmitting, setisSubmitting] = useState<boolean>(false);
+  const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredientRequest[]>([]);
+  const [recipeInstructions, setRecipeInstructions] = useState<RecipeInstructionRequest[]>([]);
+  const [recipeTimers, setRecipeTimers] = useState<RecipeTimerRequest[]>([]);
+  const [openErrorToast, setOpenErrorToast] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const isLoadingRecipe = statusRecipe === StatusTypes.Pending;
   const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
   const isAddMode = query.action === Mode.Add;
-
   const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
     accept: {
       'image/*': ['.jpeg', '.png']
@@ -79,7 +77,6 @@ export default function RecipeAction(): ReactElement {
       setRejectedImage(fileRejections[0]);
     }
   });
-
   const canSubmit =
     !title ||
     !description ||
@@ -91,47 +88,11 @@ export default function RecipeAction(): ReactElement {
     isEmpty(recipeInstructions) ||
     (recipeTimers && recipeTimers.some((item) => item.hours === null && item.minutes === null));
 
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-  }
-
-  async function dispatchSubmit() {
-    const body = {
-      title,
-      description,
-      image: imagePath || acceptedImage || null,
-      recipecategories: recipeCategories.map((recipeCategory) => recipeCategory.id),
-      rating,
-      effort,
-      measurementsystemid: 1,
-      recipeingredients: recipeIngredients.map((recipeIngredient) => ({
-        ...recipeIngredient,
-        measurementtypeid: recipeIngredient.measurementtype?.id as number,
-        measurementunitid: recipeIngredient.measurementunit?.id as number
-      })) as RecipeIngredient[],
-      recipeinstructions: recipeInstructions.map((recipeInstruction) => recipeInstruction.title as string),
-      recipetimers: recipeTimers as RecipeTimer[]
-    };
-
-    try {
-      if (isAddMode) {
-        await dispatch(createRecipe({ body }));
-      } else {
-        await dispatch(updateRecipe({ recipeId: 2, body }));
-      }
-    } finally {
-      setisSubmitting(false);
-      router.push('/recipes');
-    }
-  }
-
   useEffect(() => {
-    if (!isSubmitting && isErrorRecipe) {
-      setOpenErrorGetRecipe(isErrorRecipe);
-    } else if (isSubmitting && isErrorRecipe) {
-      setOpenErrorUpdateRecipe(isErrorRecipe);
+    if (isErrorRecipe) {
+      setOpenErrorToast(true);
     }
-  }, [isErrorRecipe, isSubmitting]);
+  }, [isErrorRecipe]);
 
   useEffect(() => {
     if (recipe.id) {
@@ -139,7 +100,7 @@ export default function RecipeAction(): ReactElement {
       setDescription(recipe.description);
       setRating(recipe.rating);
       setEffort(recipe.effort);
-      setImagePath((recipe.image || '') as string);
+      setImagePath(recipe.image ?? '');
       setRecipeCategories(
         recipe.recipecategory.map((recipeCategory) => ({
           id: recipeCategory.category.id,
@@ -157,7 +118,12 @@ export default function RecipeAction(): ReactElement {
       return;
     }
 
-    const { slug } = router.query as { slug: string[] };
+    const { slug } = router.query;
+
+    if (!Array.isArray(slug)) {
+      return;
+    }
+
     const action = slug[0];
     let recipeId: number | null = null;
 
@@ -183,10 +149,52 @@ export default function RecipeAction(): ReactElement {
     if (recipeId) {
       dispatch(getRecipe({ recipeId }));
     }
+
+    return () => {
+      dispatch(clearRecipe());
+    };
   }, [dispatch, query]);
 
+  async function dispatchSubmit() {
+    const body = {
+      title,
+      description,
+      image: imagePath || acceptedImage || null,
+      recipecategories: recipeCategories.map((recipeCategory) => recipeCategory.id),
+      rating,
+      effort,
+      measurementsystemid: 1,
+      recipeingredients: recipeIngredients.map((recipeIngredient) => ({
+        ...recipeIngredient,
+        measurementtypeid: recipeIngredient.measurementtype?.id,
+        measurementunitid: recipeIngredient.measurementunit?.id
+      })),
+      recipeinstructions: recipeInstructions.map((recipeInstruction) => recipeInstruction.title),
+      recipetimers: recipeTimers
+    };
+
+    try {
+      setIsSubmitting(true);
+
+      if (isAddMode) {
+        await dispatch(createRecipe({ body }));
+      } else {
+        await dispatch(updateRecipe({ recipeId: 2, body }));
+      }
+    } finally {
+      setIsSubmitting(false);
+      router.push('/recipes');
+    }
+  }
+
   let dropzoneContent = (
-    <DropBox isDragActive={isDragActive} {...getRootProps()}>
+    <DropBox
+      sx={{
+        border: `1px solid ${isDragActive ? theme.palette.action.active : 'transparent'}`,
+        backgroundColor: isDragActive ? theme.palette.action.hover : 'inherit'
+      }}
+      {...getRootProps()}
+    >
       <input {...getInputProps()} />
       <Stack alignItems="center" spacing={1}>
         <TbUpload size={50} color={theme.palette.primary.main} />
@@ -248,7 +256,7 @@ export default function RecipeAction(): ReactElement {
     );
   } else if (imagePath) {
     dropzoneContent = (
-      <DropBox disabled>
+      <DropBox sx={{ opacity: 0.7 }}>
         <Stack alignItems="center" spacing={1}>
           <TbUpload size={50} color={theme.palette.primary.main} />
           <Typography className="pb-8">Click to choose an image or drag it here</Typography>
@@ -260,174 +268,124 @@ export default function RecipeAction(): ReactElement {
     );
   }
 
-  const titleGroupContent = (
-    <Stack direction="column" className="w-full" spacing={1}>
-      <TextField
-        label="Title"
-        name="title"
-        value={title}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)}
-        required
-      />
-      <TextField
-        label="Description"
-        name="description"
-        value={description}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => setDescription(event.target.value)}
-        multiline
-        rows={isMediumScreen ? 2 : 11}
-        required
-      />
-    </Stack>
-  );
-  const dropzoneBoxContent = (
-    <DropzoneBox isMediumScreen={isMediumScreen}>
-      <Typography variant="h6">Image</Typography>
-      {dropzoneContent}
-      <Divider className="mb-3">OR</Divider>
-      <Stack alignItems="center">
-        <TextField
-          label="Enter a URL to an image"
-          name="image url"
-          value={imagePath}
-          disabled={Boolean(acceptedImage) || Boolean(rejectedImage)}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => setImagePath(event.target.value)}
-        />
-      </Stack>
-    </DropzoneBox>
-  );
-  const categoriesContent = (
-    <Autocomplete
-      multiple
-      limitTags={3}
-      className="w-full"
-      options={categories as Category[]}
-      getOptionLabel={(option) => option.value}
-      value={recipeCategories || []}
-      renderInput={(params) => <TextField {...params} label="Categories *" />}
-      onChange={(event: ChangeEvent<HTMLInputElement>, value: Category[]) => setRecipeCategories(value)}
-    />
-  );
-  const ratingStackContent = (
-    <RatingStack
-      direction={isMediumScreen ? 'column' : 'row'}
-      spacing={1}
-      alignItems={isMediumScreen ? 'baseline' : 'center'}
-      justifyContent="space-between"
-    >
-      <Stack direction="row" spacing={1} alignItems="center">
-        <Typography component="legend" color={theme.palette.text.secondary}>
-          Rating
-        </Typography>
-        <StyledRating
-          value={rating}
-          onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setRating(value)}
-          size="large"
-        />
-      </Stack>
-      <Stack direction="row" spacing={1} alignItems="center">
-        <Typography component="legend" color={theme.palette.text.secondary}>
-          Difficulty
-        </Typography>
-        <EffortRating
-          value={effort}
-          onChange={(event: ChangeEvent<HTMLInputElement>, value: number) => setEffort(value)}
-          size="large"
-          icon={<TbRectangleFilled />}
-          emptyIcon={<TbRectangle />}
-          max={3}
-        />
-      </Stack>
-    </RatingStack>
-  );
-  const ingredientsContent = (
-    <RecipeItemsList
-      title="Ingredients *"
-      items={recipeIngredients}
-      type={ListTypes.Ingredients}
-      handleSetItems={(value) => setRecipeIngredients(value)}
-      label="ingredient"
-    />
-  );
-  const instructionsContent = (
-    <RecipeItemsList
-      title="Instructions *"
-      items={recipeInstructions}
-      handleSetItems={(value) => setRecipeInstructions(value)}
-      label="instruction"
-    />
-  );
-  const timersContent = (
-    <RecipeItemsList
-      title="Timers"
-      items={recipeTimers}
-      type={ListTypes.Timers}
-      handleSetItems={(value) => setRecipeTimers(value)}
-      label="timer"
-    />
-  );
-
   return (
     <PageContainer>
-      <Snackbar open={openErrorUpdateRecipe} autoHideDuration={6000} onClose={() => setOpenErrorUpdateRecipe(false)}>
-        <Alert onClose={() => setOpenErrorUpdateRecipe(false)} severity="error">
-          Could not add recipe — {errorRecipe?.message}
-        </Alert>
-      </Snackbar>
-      <Snackbar open={openErrorGetRecipe} autoHideDuration={6000} onClose={() => setOpenErrorGetRecipe(false)}>
-        <Alert onClose={() => setOpenErrorGetRecipe(false)} severity="error">
-          <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-            <Typography> Could not load recipe — {errorRecipe?.message}</Typography>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => {
-                const recipeId = query.recipeId as number;
-
-                setOpenErrorGetRecipe(false);
-                dispatch(getRecipe({ recipeId }));
-              }}
-            >
-              Reload
-            </Button>
+      <Toast
+        open={openErrorToast}
+        onClose={() => setOpenErrorToast(false)}
+        severity="error"
+        message={errorRecipe?.message ?? ''}
+      />
+      <Paper classes={{ root: 'main' }}>
+        {isLoadingRecipe ? (
+          <LoadingStack className="w-full" justifyContent="center" alignItems="center">
+            <EllipsisLoader />
+          </LoadingStack>
+        ) : (
+          <Stack direction="column" spacing={2}>
+            <Stack direction={isMediumScreen ? 'column' : 'row'} spacing={1} justifyContent="space-between">
+              <Stack direction="column" className="w-full" spacing={1}>
+                <TextField
+                  label="Title"
+                  name="title"
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  required
+                />
+                <TextField
+                  label="Description"
+                  name="description"
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                  multiline
+                  rows={isMediumScreen ? 2 : 11}
+                  required
+                />
+              </Stack>
+              <DropzoneBox sx={{ minWidth: isMediumScreen ? 'unset' : '403px' }}>
+                <Typography variant="h6">Image</Typography>
+                {dropzoneContent}
+                <Divider className="mb-3">OR</Divider>
+                <Stack alignItems="center">
+                  <TextField
+                    label="Enter a URL to an image"
+                    name="image url"
+                    value={imagePath}
+                    disabled={Boolean(acceptedImage) || Boolean(rejectedImage)}
+                    onChange={(event) => setImagePath(event.target.value)}
+                  />
+                </Stack>
+              </DropzoneBox>
+            </Stack>
+            <Stack direction={isMediumScreen ? 'column' : 'row'} spacing={1} justifyContent="space-between">
+              <Autocomplete
+                multiple
+                limitTags={3}
+                className="w-full"
+                options={categories}
+                getOptionLabel={(option) => option.value}
+                value={recipeCategories || []}
+                renderInput={(params) => <TextField {...params} label="Categories *" />}
+                onChange={(_, value: Category[]) => setRecipeCategories(value)}
+              />
+              <RatingStack
+                direction={isMediumScreen ? 'column' : 'row'}
+                spacing={1}
+                alignItems={isMediumScreen ? 'baseline' : 'center'}
+                justifyContent="space-between"
+              >
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography component="legend" color={theme.palette.text.secondary}>
+                    Rating
+                  </Typography>
+                  <StyledRating value={rating} onChange={(_, value) => value && setRating(value)} size="large" />
+                </Stack>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography component="legend" color={theme.palette.text.secondary}>
+                    Difficulty
+                  </Typography>
+                  <EffortRating
+                    value={effort}
+                    onChange={(_, value) => value && setEffort(value)}
+                    size="large"
+                    icon={<TbRectangleFilled />}
+                    emptyIcon={<TbRectangle />}
+                    max={3}
+                  />
+                </Stack>
+              </RatingStack>
+            </Stack>
+            <RecipeIngredients items={recipeIngredients} handleSetItems={(value) => setRecipeIngredients(value)} />
+            <RecipeInstructions items={recipeInstructions} handleSetItems={(value) => setRecipeInstructions(value)} />
+            <RecipeTimers items={recipeTimers} handleSetItems={(value) => setRecipeTimers(value)} />
+            <Stack direction="row" spacing={2}>
+              <Button
+                type="button"
+                variant="contained"
+                color="secondary"
+                disabled={isLoadingRecipe}
+                onClick={() => {
+                  if (window.history.length === 1) {
+                    router.push('/recipes');
+                  } else {
+                    router.back();
+                  }
+                }}
+              >
+                Cancel
+              </Button>
+              <LoadingButton
+                type="button"
+                variant="contained"
+                disabled={canSubmit || isLoadingRecipe}
+                loading={isLoadingRecipe && isSubmitting}
+                onClick={() => dispatchSubmit()}
+              >
+                {isAddMode ? 'Add' : 'Update'} Recipe
+              </LoadingButton>
+            </Stack>
           </Stack>
-        </Alert>
-      </Snackbar>
-      <Paper classes={{ root: 'main' }} component="form" onSubmit={handleSubmit}>
-        <Stack direction="column" spacing={2}>
-          <Stack direction={isMediumScreen ? 'column' : 'row'} spacing={1} justifyContent="space-between">
-            {isLoadingRecipe ? <Skeleton width="60%">{titleGroupContent}</Skeleton> : titleGroupContent}
-            {isLoadingRecipe ? <Skeleton width="40%">{dropzoneBoxContent}</Skeleton> : dropzoneBoxContent}
-          </Stack>
-          <Stack direction={isMediumScreen ? 'column' : 'row'} spacing={1} justifyContent="space-between">
-            {isLoadingRecipe ? <Skeleton width="60%">{categoriesContent}</Skeleton> : categoriesContent}
-            {isLoadingRecipe ? <Skeleton width="40%">{ratingStackContent}</Skeleton> : ratingStackContent}
-          </Stack>
-          {isLoadingRecipe ? <Skeleton width="100%">{ingredientsContent}</Skeleton> : ingredientsContent}
-          {isLoadingRecipe ? <Skeleton width="100%">{instructionsContent}</Skeleton> : instructionsContent}
-          {isLoadingRecipe ? <Skeleton width="100%">{timersContent}</Skeleton> : timersContent}
-
-          <Stack direction="row" spacing={2}>
-            <Button
-              type="button"
-              variant="contained"
-              color="secondary"
-              disabled={isLoadingRecipe}
-              onClick={() => router.push('/recipes')}
-            >
-              Cancel
-            </Button>
-            <LoadingButton
-              type="button"
-              variant="contained"
-              disabled={canSubmit || isLoadingRecipe}
-              loading={isLoadingRecipe && isSubmitting}
-              onClick={() => dispatchSubmit()}
-            >
-              {isAddMode ? 'Add' : 'Update'} Recipe
-            </LoadingButton>
-          </Stack>
-        </Stack>
+        )}
       </Paper>
     </PageContainer>
   );

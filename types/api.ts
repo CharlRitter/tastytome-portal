@@ -1,4 +1,4 @@
-export interface SuccessResponse<T> {
+export type SuccessResponse<T> = {
   data: T;
-  meta: { totalCount?: number };
-}
+  meta: { totalCount: number };
+};

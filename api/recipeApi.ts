@@ -1,23 +1,23 @@
-import axiosInstance, { AxiosResponse } from '@/api/axios';
+import { AxiosResponse, axiosInstance } from '@/api/axios';
 import { SuccessResponse } from '@/types/api';
 import {
   CreateRecipeData,
   DeleteRecipeData,
   GetRecipeData,
   GetRecipesData,
-  Recipe,
+  RecipeResponse,
   UpdateRecipeData
 } from '@/types/recipe';
 
 const path = '/v1/recipe';
 
-export async function getRecipes(data: GetRecipesData): Promise<AxiosResponse<SuccessResponse<Recipe[]>>> {
+export async function getRecipes(data: GetRecipesData): Promise<AxiosResponse<SuccessResponse<RecipeResponse[]>>> {
   const { params } = data;
 
   return axiosInstance.get(path, { params });
 }
 
-export async function getRecipe(data: GetRecipeData): Promise<AxiosResponse<SuccessResponse<Recipe>>> {
+export async function getRecipe(data: GetRecipeData): Promise<AxiosResponse<SuccessResponse<RecipeResponse>>> {
   const { recipeId } = data;
 
   return axiosInstance.get(`${path}/${recipeId}`);

@@ -1,40 +1,40 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "ES2022",
     "lib": [
-      "es6",
+      "ES2022",
       "dom",
       "dom.iterable",
       "esnext"
     ],
     "moduleResolution": "node",
-    "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "incremental": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "module": "esnext",
     "isolatedModules": true,
     "jsx": "preserve",
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
-      "@/*": ["*"]
+      "@/*": [
+        "*"
+      ]
     },
     "plugins": [
-      { "name": "next" }
+      {
+        "name": "next"
+      }
     ],
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "types.d.ts",
     ".eslintrc.js",
     ".next/types/**/*.ts",
     "tsconfig.json"

@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { styled } from '@mui/system';
 import { Rating } from '@mui/material';
-import { StyledProps } from '@/types/common';
 
 export const NextLink = styled(Link)(() => ({
   color: 'inherit',
@@ -25,13 +24,13 @@ export const NextLink = styled(Link)(() => ({
   }
 }));
 
-export const StyledRating = styled(Rating)<StyledProps>(({ theme }) => ({
+export const StyledRating = styled(Rating)(({ theme }) => ({
   '& .MuiRating-iconFilled': {
     color: theme.palette.primary.main
   },
 })) as typeof Rating;
 
-export const EffortRating = styled(Rating)<StyledProps>(({ theme }) => ({
+export const EffortRating = styled(Rating)(({ theme }) => ({
   '& .MuiRating-iconFilled': {
     color: theme.palette.secondary.main
   },
