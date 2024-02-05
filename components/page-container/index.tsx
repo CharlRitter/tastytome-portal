@@ -1,9 +1,9 @@
 import { Box, Container } from '@mui/material';
 import { useRouter } from 'next/router';
-import React, { JSX, ReactNode, useCallback, useEffect } from 'react';
+import React, { JSX, ReactNode, useEffect } from 'react';
 
 import { SideMenu } from '@/components/side-menu';
-import { DRAWER_WIDTH, StatusTypes } from '@/constants/general';
+import { DRAWER_WIDTH } from '@/constants/general';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { RootState } from '@/reducers/store';
 import {
@@ -26,30 +26,18 @@ export function PageContainer(props: PageContainerProps): JSX.Element {
   const { children } = props;
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { data: member, status: memberStatus } = useAppSelector(
-    (state: RootState): SliceItem<MemberResponse> => state.memberSlice.member
-  );
+  const { data: member } = useAppSelector((state: RootState): SliceItem<MemberResponse> => state.memberSlice.member);
   const { categories, measurementsystems, measurementtypes, measurementunits, themes } = useAppSelector(
     (state: RootState): EnumState => state.enumSlice
   );
-
-  const handleLogout = useCallback(async () => {
-    try {
-      await dispatch(logoutMember());
-
-      if (memberStatus === StatusTypes.Fulfilled) {
-        router.push('/');
-      }
-    } catch (error) {
-      // empty
-    }
-  }, [dispatch, memberStatus, router]);
 
   useEffect(() => {
     const hasToken = sessionStorage.getItem('jwtToken');
 
     if (!hasToken) {
-      handleLogout();
+      dispatch(logoutMember());
+
+      router.push('/');
     } else {
       // TODO Add error handling for this.
       if (member.id === 0) {
@@ -74,12 +62,10 @@ export function PageContainer(props: PageContainerProps): JSX.Element {
   }, [
     categories.data.length,
     dispatch,
-    handleLogout,
     measurementsystems.data.length,
     measurementtypes.data.length,
     measurementunits.data.length,
     member.id,
-    memberStatus,
     router,
     themes.data.length
   ]);
