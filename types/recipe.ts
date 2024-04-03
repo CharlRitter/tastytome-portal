@@ -14,7 +14,6 @@ export type RecipeIngredientBase = {
 };
 
 export type RecipeIngredientRequest = RecipeIngredientBase & {
-  title: string;
   measurementtype: MeasurementType | null;
   measurementunit: MeasurementUnit | null;
   measurementamount: number | null;
@@ -87,9 +86,19 @@ export type RecipeResponse = RecipeBase & {
   recipetimer: RecipeTimerResponse[];
 };
 
+export type ScrapedRecipeResponse = {
+  title: string;
+  description: string;
+  image: string | null;
+  measurementsystemid: number;
+  recipeingredients: string[];
+  recipeinstructions: string[];
+};
+
 export type RecipeState = {
   recipes: SliceItem<RecipeResponse[]>;
   recipe: SliceItem<RecipeResponse>;
+  scrapedRecipe: SliceItem<ScrapedRecipeResponse>;
 };
 
 export type GetRecipesData = {
@@ -122,4 +131,8 @@ export type UpdateRecipeData = CreateRecipeData & {
 
 export type DeleteRecipeData = {
   recipeId: number;
+};
+
+export type ScrapeRecipeData = {
+  body: { recipeUrl: string };
 };

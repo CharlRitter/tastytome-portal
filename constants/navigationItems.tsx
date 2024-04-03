@@ -1,3 +1,4 @@
+import getConfig from 'next/config';
 import React from 'react';
 import {
   FaBook,
@@ -12,6 +13,8 @@ import {
 
 import { InfoModals, Page } from '@/types/constants';
 
+const { publicRuntimeConfig } = getConfig();
+
 export const PAGES: Page[] = [
   {
     title: 'Recipes',
@@ -21,12 +24,14 @@ export const PAGES: Page[] = [
   {
     title: 'Pantry',
     route: '/pantry',
-    icon: <FaBox />
+    icon: <FaBox />,
+    isDisabled: !publicRuntimeConfig?.ENABLE_PANTRY
   },
   {
     title: 'Shopping List',
     route: '/shopping-list',
-    icon: <FaShoppingBasket />
+    icon: <FaShoppingBasket />,
+    isDisabled: !publicRuntimeConfig?.ENABLE_SHOPPING_LIST
   },
   {
     title: 'Account',

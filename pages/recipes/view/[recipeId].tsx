@@ -175,7 +175,7 @@ export default function RecipeView(): JSX.Element {
               </Typography>
               <Typography>{recipe.createdat && formatDate(recipe.createdat)}</Typography>
             </Stack>
-            <Typography>{recipe.description}</Typography>
+            <Typography sx={{ whiteSpace: 'pre-wrap' }}>{recipe.description}</Typography>
             <Stack direction="row" justifyContent="space-between" className="mb-4">
               <StyledRating name="read-only" value={recipe.rating} readOnly size="large" />
               <EffortRating

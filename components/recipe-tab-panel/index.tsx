@@ -19,7 +19,7 @@ export function RecipeTabPanel(props: RecipeTabPanelProps): JSX.Element {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box>{children}</Box>}``
+      {value === index && <Box>{children}</Box>}
     </Box>
   );
 }

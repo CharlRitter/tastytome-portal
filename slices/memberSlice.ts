@@ -1,9 +1,10 @@
 /* eslint-disable no-param-reassign */
-import { SerializedError, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
+import { AxiosResponse } from '@/api/axios';
 import * as api from '@/api/memberApi';
 import { StatusTypes } from '@/constants/general';
-import { SuccessResponse } from '@/types/api';
+import { CustomSerializedError, SuccessResponse } from '@/types/api';
 import {
   ConfirmResetMemberPasswordData,
   CreateMemberData,
@@ -54,162 +55,142 @@ const initialState: MemberState = {
 };
 
 export const getMember = createAsyncThunk<
-  SuccessResponse<MemberResponse>,
-  void,
-  {
-    rejectValue: SerializedError;
-  }
+  AxiosResponse<SuccessResponse<MemberResponse>>,
+  AxiosResponse<void>,
+  { rejectValue: CustomSerializedError }
 >('member/getMember', async (_, thunkAPI) => {
   try {
-    const response = await withJWTSessionStorage(api.getMember());
-
-    return response.data;
+    return await withJWTSessionStorage(api.getMember());
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const createMember = createAsyncThunk<
-  void,
+  AxiosResponse<void>,
   CreateMemberData,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('member/createMember', async (data, thunkAPI) => {
   try {
-    const response = await api.createMember(data);
-
-    return response.data;
+    return await api.createMember(data);
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const updateMember = createAsyncThunk<
-  void,
+  AxiosResponse<void>,
   UpdateMemberData,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('member/updateMember', async (data, thunkAPI) => {
   try {
-    const response = await withJWTSessionStorage(api.updateMember(data));
-
-    return response.data;
+    return await withJWTSessionStorage(api.updateMember(data));
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const deleteMember = createAsyncThunk<
-  void,
-  void,
-  {
-    rejectValue: SerializedError;
-  }
+  AxiosResponse<void>,
+  AxiosResponse<void>,
+  { rejectValue: CustomSerializedError }
 >('member/deleteMember', async (_, thunkAPI) => {
   try {
-    const response = await withJWTSessionStorage(api.deleteMember());
-
-    return response.data;
+    return await withJWTSessionStorage(api.deleteMember());
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const updateMemberPassword = createAsyncThunk<
-  void,
+  AxiosResponse<void>,
   UpdateMemberPasswordData,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('member/updateMemberPassword', async (data, thunkAPI) => {
   try {
-    const response = await withJWTSessionStorage(api.updateMemberPassword(data));
-
-    return response.data;
+    return await withJWTSessionStorage(api.updateMemberPassword(data));
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const resetMemberPassword = createAsyncThunk<
-  void,
+  AxiosResponse<void>,
   ResetMemberPasswordData,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('member/resetMemberPassword', async (data, thunkAPI) => {
   try {
-    const response = await api.resetMemberPassword(data);
-
-    return response.data;
+    return await api.resetMemberPassword(data);
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const confirmResetMemberPassword = createAsyncThunk<
-  void,
+  AxiosResponse<void>,
   ConfirmResetMemberPasswordData,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('member/confirmResetMemberPassword', async (data, thunkAPI) => {
   try {
-    const response = await api.confirmResetMemberPassword(data);
-
-    return response.data;
+    return await api.confirmResetMemberPassword(data);
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const loginMember = createAsyncThunk<
-  void,
+  AxiosResponse<void>,
   LoginMemberData,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('member/loginMember', async (data, thunkAPI) => {
   try {
-    const response = await withJWTSessionStorage(api.loginMember(data));
-
-    return response.data;
+    return await withJWTSessionStorage(api.loginMember(data));
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const logoutMember = createAsyncThunk<
-  void,
-  void,
-  {
-    rejectValue: SerializedError;
-  }
+  AxiosResponse<void>,
+  AxiosResponse<void>,
+  { rejectValue: CustomSerializedError }
 >('member/logoutMember', async (_, thunkAPI) => {
   try {
-    const response = await withJWTSessionStorage(api.logoutMember());
-
-    return response.data;
+    return await withJWTSessionStorage(api.logoutMember());
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const updateMemberSettings = createAsyncThunk<
-  void,
+  AxiosResponse<void>,
   UpdateMemberSettingsData,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('member/updateMemberSettings', async (data, thunkAPI) => {
   try {
-    const response = await withJWTSessionStorage(api.updateMemberSettings(data));
-
-    return response.data;
+    return await withJWTSessionStorage(api.updateMemberSettings(data));
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
@@ -223,7 +204,9 @@ const memberSlice = createSlice({
       state.member.status = StatusTypes.Pending;
     });
     builder.addCase(getMember.fulfilled, (state, action) => {
-      const { data } = action.payload;
+      const {
+        data: { data }
+      } = action.payload;
 
       state.member.data = data;
       state.member.status = StatusTypes.Fulfilled;

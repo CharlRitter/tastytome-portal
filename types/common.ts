@@ -1,8 +1,8 @@
-import { SerializedError } from '@reduxjs/toolkit';
+import { CustomSerializedError } from '@/types/api';
 
 export type SliceItem<T> = {
   data: T;
   status: string;
-  error: SerializedError;
+  error: CustomSerializedError;
   totalCount?: number;
 };

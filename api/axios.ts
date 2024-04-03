@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: process.env.API_BASE_URL || 'http://localhost:8000',
@@ -19,4 +19,4 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 export { axiosInstance };
-export type { AxiosResponse };
+export type { AxiosResponse, AxiosError };

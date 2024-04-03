@@ -4,6 +4,7 @@ export type Page = {
   title: string;
   route: string;
   icon: ReactNode;
+  isDisabled?: boolean;
 };
 
 export type InfoModal = {

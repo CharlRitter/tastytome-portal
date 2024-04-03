@@ -2,7 +2,9 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeOptions } from '@mui/material/styles';
 import { StyledEngineProvider, ThemeProvider } from '@mui/system';
 import { AppProps } from 'next/app';
+import getConfig from 'next/config';
 import Head from 'next/head';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { JSX, ReactNode, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 
@@ -20,6 +22,9 @@ export type StatefulThemeProviderProps = {
 };
 
 function StatefulThemeProvider({ children }: StatefulThemeProviderProps): JSX.Element {
+  const router = useRouter();
+  const currentRoute = usePathname();
+  const { publicRuntimeConfig } = getConfig();
   const {
     data: { membersettings }
   } = useAppSelector((state: RootState): SliceItem<MemberResponse> => state.memberSlice.member);
@@ -53,6 +58,19 @@ function StatefulThemeProvider({ children }: StatefulThemeProviderProps): JSX.El
       setTheme(lightTheme);
     }
   }, [membersettings.theme.id, systemTheme]);
+
+  useEffect(() => {
+    if (
+      (currentRoute === '/pantry' && !publicRuntimeConfig.ENABLE_PANTRY) ||
+      (currentRoute === '/shopping-list' && !publicRuntimeConfig.ENABLE_SHOPPING_LIST)
+    ) {
+      if (window.history.length > 1) {
+        router.back();
+      } else {
+        router.push('/recipes');
+      }
+    }
+  }, [currentRoute, publicRuntimeConfig.ENABLE_PANTRY, publicRuntimeConfig.ENABLE_SHOPPING_LIST, router]);
 
   return (
     <StyledEngineProvider injectFirst>

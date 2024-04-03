@@ -1,9 +1,10 @@
 /* eslint-disable no-param-reassign */
-import { SerializedError, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
+import { AxiosResponse } from '@/api/axios';
 import * as api from '@/api/enumApi';
 import { StatusTypes } from '@/constants/general';
-import { SuccessResponse } from '@/types/api';
+import { CustomSerializedError, SuccessResponse } from '@/types/api';
 import { SliceItem } from '@/types/common';
 import { Category, EnumState, MeasurementSystem, MeasurementType, MeasurementUnit, Theme } from '@/types/enum';
 
@@ -36,82 +37,72 @@ const initialState: EnumState = {
 };
 
 export const getCategories = createAsyncThunk<
-  SuccessResponse<Category[]>,
+  AxiosResponse<SuccessResponse<Category[]>>,
   void,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('enum/getCategories', async (_, thunkAPI) => {
   try {
-    const response = await api.getCategories();
-
-    return response.data;
+    return await api.getCategories();
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const getMeasurementSystems = createAsyncThunk<
-  SuccessResponse<MeasurementSystem[]>,
+  AxiosResponse<SuccessResponse<MeasurementSystem[]>>,
   void,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('enum/getMeasurementSystems', async (_, thunkAPI) => {
   try {
-    const response = await api.getMeasurementSystems();
-
-    return response.data;
+    return await api.getMeasurementSystems();
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const getMeasurementTypes = createAsyncThunk<
-  SuccessResponse<MeasurementType[]>,
+  AxiosResponse<SuccessResponse<MeasurementType[]>>,
   void,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('enum/getMeasurementTypes', async (_, thunkAPI) => {
   try {
-    const response = await api.getMeasurementTypes();
-
-    return response.data;
+    return await api.getMeasurementTypes();
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const getMeasurementUnits = createAsyncThunk<
-  SuccessResponse<MeasurementUnit[]>,
+  AxiosResponse<SuccessResponse<MeasurementUnit[]>>,
   void,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('enum/getMeasurementUnits', async (_, thunkAPI) => {
   try {
-    const response = await api.getMeasurementUnits();
-
-    return response.data;
+    return await api.getMeasurementUnits();
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
 export const getThemes = createAsyncThunk<
-  SuccessResponse<Theme[]>,
+  AxiosResponse<SuccessResponse<Theme[]>>,
   void,
-  {
-    rejectValue: SerializedError;
-  }
+  { rejectValue: CustomSerializedError }
 >('enum/getThemes', async (_, thunkAPI) => {
   try {
-    const response = await api.getThemes();
-
-    return response.data;
+    return await api.getThemes();
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong' });
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
 });
 
@@ -125,7 +116,9 @@ const enumSlice = createSlice({
       state.categories.status = StatusTypes.Pending;
     });
     builder.addCase(getCategories.fulfilled, (state, action) => {
-      const { data } = action.payload;
+      const {
+        data: { data }
+      } = action.payload;
 
       state.categories.data = data;
       state.categories.status = StatusTypes.Fulfilled;
@@ -142,7 +135,9 @@ const enumSlice = createSlice({
       state.measurementsystems.status = StatusTypes.Pending;
     });
     builder.addCase(getMeasurementSystems.fulfilled, (state, action) => {
-      const { data } = action.payload;
+      const {
+        data: { data }
+      } = action.payload;
 
       state.measurementsystems.data = data;
       state.measurementsystems.status = StatusTypes.Fulfilled;
@@ -159,7 +154,9 @@ const enumSlice = createSlice({
       state.measurementtypes.status = StatusTypes.Pending;
     });
     builder.addCase(getMeasurementTypes.fulfilled, (state, action) => {
-      const { data } = action.payload;
+      const {
+        data: { data }
+      } = action.payload;
 
       state.measurementtypes.data = data;
       state.measurementtypes.status = StatusTypes.Fulfilled;
@@ -176,7 +173,9 @@ const enumSlice = createSlice({
       state.measurementunits.status = StatusTypes.Pending;
     });
     builder.addCase(getMeasurementUnits.fulfilled, (state, action) => {
-      const { data } = action.payload;
+      const {
+        data: { data }
+      } = action.payload;
 
       state.measurementunits.data = data;
       state.measurementunits.status = StatusTypes.Fulfilled;
@@ -193,7 +192,9 @@ const enumSlice = createSlice({
       state.themes.status = StatusTypes.Pending;
     });
     builder.addCase(getThemes.fulfilled, (state, action) => {
-      const { data } = action.payload;
+      const {
+        data: { data }
+      } = action.payload;
 
       state.themes.data = data;
       state.themes.status = StatusTypes.Fulfilled;

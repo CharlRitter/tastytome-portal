@@ -186,6 +186,10 @@
   height: 100%
 }
 
+.w-1\/5 {
+  width: 20%
+}
+
 .w-3\/12 {
   width: 25%
 }
@@ -197,6 +201,10 @@
 
 .w-full {
   width: 100%
+}
+
+.min-w-\[200px\] {
+  min-width: 200px
 }
 
 .shrink {

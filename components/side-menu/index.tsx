@@ -79,7 +79,7 @@ export function SideMenu(props: SideMenuProps): JSX.Element {
     );
   });
 
-  const pages = PAGES.map((page: Page) => (
+  const pages = PAGES.filter((page: Page) => !page?.isDisabled).map((page: Page) => (
     <ListItem key={page.title} disablePadding>
       <ListItemButton selected={currentRoute === page.route} onClick={() => router.push(page.route)}>
         <ListItemIcon>{page.icon}</ListItemIcon>

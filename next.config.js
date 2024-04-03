@@ -8,7 +8,9 @@ const nextConfig = {
     mdxRs: true
   },
   publicRuntimeConfig: {
-    version
+    version,
+    enablePantry: process.env.ENABLE_PANTRY === 'true',
+    enableShoppingList: process.env.ENABLE_SHOPPING_LIST === 'true'
   }
 };
 

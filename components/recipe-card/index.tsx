@@ -197,7 +197,11 @@ export function RecipeCard(props: RecipeCardProps): JSX.Element {
                 }
               />
               <CardContent>
-                <Typography sx={{ minHeight: '60px' }} variant="body2" color="text.secondary">
+                <Typography
+                  sx={{ maxHeight: '20px', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
+                  variant="body2"
+                  color="text.secondary"
+                >
                   {description}
                 </Typography>
               </CardContent>

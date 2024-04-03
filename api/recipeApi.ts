@@ -6,6 +6,8 @@ import {
   GetRecipeData,
   GetRecipesData,
   RecipeResponse,
+  ScrapeRecipeData,
+  ScrapedRecipeResponse,
   UpdateRecipeData
 } from '@/types/recipe';
 
@@ -39,4 +41,12 @@ export async function deleteRecipe(data: DeleteRecipeData): Promise<AxiosRespons
   const { recipeId } = data;
 
   return axiosInstance.delete(`${path}/${recipeId}`);
+}
+
+export async function scrapeRecipe(
+  data: ScrapeRecipeData
+): Promise<AxiosResponse<SuccessResponse<ScrapedRecipeResponse>>> {
+  const { body } = data;
+
+  return axiosInstance.post(`${path}/scrape`, body, );
 }
