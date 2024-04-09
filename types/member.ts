@@ -1,12 +1,10 @@
 import { SliceItem } from '@/types/common';
-import { MeasurementSystem, Theme } from '@/types/enum';
+import { Theme } from '@/types/enum';
 
 export type MemberSettingsBase = {
   themeid: number;
-  measurementsystemid: number;
   usepantry: boolean;
   usenegativepantry: boolean;
-  displaynutritionalinformation: boolean;
 };
 
 export type MemberSettingsRequest = MemberSettingsBase;
@@ -15,7 +13,6 @@ export type MemberSettingsResponse = MemberSettingsBase & {
   id: number;
   memberid: number;
   theme: Theme;
-  measurementsystem: MeasurementSystem;
   createdat: string;
   editedat: string;
 };

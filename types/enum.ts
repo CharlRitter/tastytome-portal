@@ -23,6 +23,7 @@ export type MeasurementUnit = {
   measurementtype: MeasurementType;
   value: string;
   abbreviation: string;
+  conversionfactor: string;
 };
 
 export type Theme = {

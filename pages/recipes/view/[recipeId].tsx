@@ -205,18 +205,55 @@ export default function RecipeView(): JSX.Element {
                 <Tab label="Timers" id="recipe-tab-2" aria-controls="recipe timers" />
               </Tabs>
               <RecipeTabPanel value={currentTab} index={0}>
-                {recipe.recipeingredient.map((ingredient) => (
-                  <Box key={`ingredient-${ingredient.id}`} className={`${isMD && 'px-4'}`}>
-                    <Box className="py-4">
-                      <Typography>{`${ingredient.measurementamount} ${
-                        ingredient.measurementamount && ingredient.measurementamount <= 1
-                          ? ingredient.measurementunit?.value.slice(0, ingredient.measurementunit.value.length - 1)
-                          : ingredient.measurementunit?.value
-                      } ${ingredient.title}`}</Typography>
+                {recipe.recipeingredient.map((ingredient) => {
+                  const measurementunit =
+                    ingredient.measurementtypeid !== 1 &&
+                    ingredient.measurementamount &&
+                    ingredient.measurementamount <= 1
+                      ? ingredient.measurementunit?.value.slice(0, ingredient.measurementunit.value.length - 1)
+                      : ingredient.measurementunit?.value;
+                  let conversions = '';
+
+                  if (ingredient.measurementunit.conversionfactor) {
+                    const convertedAmount = (
+                      ingredient.measurementamount * parseFloat(ingredient.measurementunit.conversionfactor)
+                    ).toFixed(2);
+
+                    // To millilitres
+                    if ([6, 7, 8, 9, 10, 17, 18].includes(ingredient.measurementunitid)) {
+                      conversions += ` (${convertedAmount} ml)`;
+                    }
+                    // To grams
+                    if ([19, 20].includes(ingredient.measurementunitid)) {
+                      conversions += ` (${convertedAmount} g)`;
+                    }
+                    // To fluid ounces
+                    if ([6, 7, 8, 9, 10, 12, 13].includes(ingredient.measurementunitid)) {
+                      conversions += ` (${convertedAmount} fl oz)`;
+                    }
+                    // To ounces
+                    if ([14, 15].includes(ingredient.measurementunitid)) {
+                      conversions += ` (${convertedAmount} oz)`;
+                    }
+                    // To Fahrenheit
+                    if (ingredient.measurementunitid === 11) {
+                      conversions += ` (${(ingredient.measurementamount - 32) * (5 / 9)} °F)`;
+                    }
+                    // To Celsius
+                    if (ingredient.measurementunitid === 16) {
+                      conversions += ` (${convertedAmount} °C)`;
+                    }
+                  }
+
+                  return (
+                    <Box key={`ingredient-${ingredient.id}`} className={`${isMD && 'px-4'}`}>
+                      <Box className="py-4">
+                        <Typography>{`${ingredient.measurementamount} ${measurementunit} ${ingredient.title}${conversions}`}</Typography>
+                      </Box>
+                      <Divider />
                     </Box>
-                    <Divider />
-                  </Box>
-                ))}
+                  );
+                })}
               </RecipeTabPanel>
               <RecipeTabPanel value={currentTab} index={1}>
                 {recipe.recipeinstruction.map((instruction, index) => (

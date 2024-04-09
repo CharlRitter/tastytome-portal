@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { AxiosResponse } from '@/api/axios';
+import { CustomAxiosResponse } from '@/api/axios';
 import * as api from '@/api/enumApi';
 import { StatusTypes } from '@/constants/general';
 import { CustomSerializedError, SuccessResponse } from '@/types/api';
@@ -37,12 +37,14 @@ const initialState: EnumState = {
 };
 
 export const getCategories = createAsyncThunk<
-  AxiosResponse<SuccessResponse<Category[]>>,
+  CustomAxiosResponse<SuccessResponse<Category[]>>,
   void,
   { rejectValue: CustomSerializedError }
 >('enum/getCategories', async (_, thunkAPI) => {
   try {
-    return await api.getCategories();
+    const response = await api.getCategories();
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -51,12 +53,14 @@ export const getCategories = createAsyncThunk<
 });
 
 export const getMeasurementSystems = createAsyncThunk<
-  AxiosResponse<SuccessResponse<MeasurementSystem[]>>,
+  CustomAxiosResponse<SuccessResponse<MeasurementSystem[]>>,
   void,
   { rejectValue: CustomSerializedError }
 >('enum/getMeasurementSystems', async (_, thunkAPI) => {
   try {
-    return await api.getMeasurementSystems();
+    const response = await api.getMeasurementSystems();
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -65,12 +69,14 @@ export const getMeasurementSystems = createAsyncThunk<
 });
 
 export const getMeasurementTypes = createAsyncThunk<
-  AxiosResponse<SuccessResponse<MeasurementType[]>>,
+  CustomAxiosResponse<SuccessResponse<MeasurementType[]>>,
   void,
   { rejectValue: CustomSerializedError }
 >('enum/getMeasurementTypes', async (_, thunkAPI) => {
   try {
-    return await api.getMeasurementTypes();
+    const response = await api.getMeasurementTypes();
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -79,12 +85,14 @@ export const getMeasurementTypes = createAsyncThunk<
 });
 
 export const getMeasurementUnits = createAsyncThunk<
-  AxiosResponse<SuccessResponse<MeasurementUnit[]>>,
+  CustomAxiosResponse<SuccessResponse<MeasurementUnit[]>>,
   void,
   { rejectValue: CustomSerializedError }
 >('enum/getMeasurementUnits', async (_, thunkAPI) => {
   try {
-    return await api.getMeasurementUnits();
+    const response = await api.getMeasurementUnits();
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -93,12 +101,14 @@ export const getMeasurementUnits = createAsyncThunk<
 });
 
 export const getThemes = createAsyncThunk<
-  AxiosResponse<SuccessResponse<Theme[]>>,
+  CustomAxiosResponse<SuccessResponse<Theme[]>>,
   void,
   { rejectValue: CustomSerializedError }
 >('enum/getThemes', async (_, thunkAPI) => {
   try {
-    return await api.getThemes();
+    const response = await api.getThemes();
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }

@@ -21,10 +21,9 @@ import {
   useTheme
 } from '@mui/material';
 import { DateTime } from 'luxon';
-import getConfig from 'next/config';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { JSX, useState } from 'react';
-import { FaBars, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
+import { FaBars, FaCoffee, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
 
 import { INFO_MODALS, PAGES } from '@/constants/navigationItems';
 import { NextLink } from '@/public/theme/globalStyled';
@@ -40,7 +39,6 @@ export function SideMenu(props: SideMenuProps): JSX.Element {
   const [openModal, setOpenModal] = useState<number>(INFO_MODALS.unsetModal);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const { drawerWidth } = props;
-  const { publicRuntimeConfig } = getConfig();
   const currentRoute = usePathname();
   const routeSections = currentRoute
     ? currentRoute
@@ -135,8 +133,14 @@ export function SideMenu(props: SideMenuProps): JSX.Element {
       </List>
       <Box className="flex items-end	text-center	h-full pb-1">
         <Box className="w-full">
-          <Typography variant="caption">version: {publicRuntimeConfig?.version}</Typography>
           <Box>
+            <IconButton
+              aria-label="buy me a coffee profile"
+              // TODO add link
+              // onClick={() => window.open('', '_blank')}
+            >
+              <FaCoffee />
+            </IconButton>
             <IconButton
               aria-label="github profile"
               onClick={() => window.open('https://github.com/CharlRitter', '_blank')}

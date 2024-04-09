@@ -1,5 +1,5 @@
 import { SliceItem } from '@/types/common';
-import { Category, MeasurementSystem, MeasurementType, MeasurementUnit } from '@/types/enum';
+import { Category, MeasurementType, MeasurementUnit } from '@/types/enum';
 
 export type RecipeCategory = {
   id: number;
@@ -65,7 +65,6 @@ export type RecipeBase = {
 };
 
 export type RecipeRequest = RecipeBase & {
-  measurementsystemid: number;
   recipecategories: number[];
   recipeingredients: RecipeIngredientRequest[];
   recipeinstructions: string[];
@@ -76,10 +75,8 @@ export type RecipeResponse = RecipeBase & {
   id: number;
   memberid: number;
   image: string | null;
-  measurementsystemid: number;
   createdat: string;
   editedat: string;
-  measurementsystem: MeasurementSystem;
   recipecategory: RecipeCategory[];
   recipeingredient: RecipeIngredientResponse[];
   recipeinstruction: RecipeInstructionResponse[];
@@ -90,7 +87,6 @@ export type ScrapedRecipeResponse = {
   title: string;
   description: string;
   image: string | null;
-  measurementsystemid: number;
   recipeingredients: string[];
   recipeinstructions: string[];
 };

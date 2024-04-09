@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { AxiosResponse } from '@/api/axios';
+import { CustomAxiosResponse } from '@/api/axios';
 import * as api from '@/api/memberApi';
 import { StatusTypes } from '@/constants/general';
 import { CustomSerializedError, SuccessResponse } from '@/types/api';
@@ -37,14 +37,8 @@ const initialState: MemberState = {
           id: 0,
           value: ''
         },
-        measurementsystemid: 0,
-        measurementsystem: {
-          id: 0,
-          value: ''
-        },
         usepantry: false,
         usenegativepantry: false,
-        displaynutritionalinformation: false,
         createdat: '',
         editedat: ''
       },
@@ -55,12 +49,14 @@ const initialState: MemberState = {
 };
 
 export const getMember = createAsyncThunk<
-  AxiosResponse<SuccessResponse<MemberResponse>>,
-  AxiosResponse<void>,
+  CustomAxiosResponse<SuccessResponse<MemberResponse>>,
+  void,
   { rejectValue: CustomSerializedError }
 >('member/getMember', async (_, thunkAPI) => {
   try {
-    return await withJWTSessionStorage(api.getMember());
+    const response = await withJWTSessionStorage(api.getMember());
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -69,12 +65,14 @@ export const getMember = createAsyncThunk<
 });
 
 export const createMember = createAsyncThunk<
-  AxiosResponse<void>,
+  CustomAxiosResponse<void>,
   CreateMemberData,
   { rejectValue: CustomSerializedError }
 >('member/createMember', async (data, thunkAPI) => {
   try {
-    return await api.createMember(data);
+    const response = await api.createMember(data);
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -83,12 +81,14 @@ export const createMember = createAsyncThunk<
 });
 
 export const updateMember = createAsyncThunk<
-  AxiosResponse<void>,
+  CustomAxiosResponse<void>,
   UpdateMemberData,
   { rejectValue: CustomSerializedError }
 >('member/updateMember', async (data, thunkAPI) => {
   try {
-    return await withJWTSessionStorage(api.updateMember(data));
+    const response = await withJWTSessionStorage(api.updateMember(data));
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -96,27 +96,30 @@ export const updateMember = createAsyncThunk<
   }
 });
 
-export const deleteMember = createAsyncThunk<
-  AxiosResponse<void>,
-  AxiosResponse<void>,
-  { rejectValue: CustomSerializedError }
->('member/deleteMember', async (_, thunkAPI) => {
-  try {
-    return await withJWTSessionStorage(api.deleteMember());
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
-    );
+export const deleteMember = createAsyncThunk<CustomAxiosResponse<void>, void, { rejectValue: CustomSerializedError }>(
+  'member/deleteMember',
+  async (_, thunkAPI) => {
+    try {
+      const response = await withJWTSessionStorage(api.deleteMember());
+
+      return { data: response.data, status: response.status, statusText: response.statusText };
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+      );
+    }
   }
-});
+);
 
 export const updateMemberPassword = createAsyncThunk<
-  AxiosResponse<void>,
+  CustomAxiosResponse<void>,
   UpdateMemberPasswordData,
   { rejectValue: CustomSerializedError }
 >('member/updateMemberPassword', async (data, thunkAPI) => {
   try {
-    return await withJWTSessionStorage(api.updateMemberPassword(data));
+    const response = await withJWTSessionStorage(api.updateMemberPassword(data));
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -125,12 +128,14 @@ export const updateMemberPassword = createAsyncThunk<
 });
 
 export const resetMemberPassword = createAsyncThunk<
-  AxiosResponse<void>,
+  CustomAxiosResponse<void>,
   ResetMemberPasswordData,
   { rejectValue: CustomSerializedError }
 >('member/resetMemberPassword', async (data, thunkAPI) => {
   try {
-    return await api.resetMemberPassword(data);
+    const response = await api.resetMemberPassword(data);
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -139,12 +144,14 @@ export const resetMemberPassword = createAsyncThunk<
 });
 
 export const confirmResetMemberPassword = createAsyncThunk<
-  AxiosResponse<void>,
+  CustomAxiosResponse<void>,
   ConfirmResetMemberPasswordData,
   { rejectValue: CustomSerializedError }
 >('member/confirmResetMemberPassword', async (data, thunkAPI) => {
   try {
-    return await api.confirmResetMemberPassword(data);
+    const response = await api.confirmResetMemberPassword(data);
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -153,12 +160,14 @@ export const confirmResetMemberPassword = createAsyncThunk<
 });
 
 export const loginMember = createAsyncThunk<
-  AxiosResponse<void>,
+  CustomAxiosResponse<void>,
   LoginMemberData,
   { rejectValue: CustomSerializedError }
 >('member/loginMember', async (data, thunkAPI) => {
   try {
-    return await withJWTSessionStorage(api.loginMember(data));
+    const response = await withJWTSessionStorage(api.loginMember(data));
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -166,27 +175,30 @@ export const loginMember = createAsyncThunk<
   }
 });
 
-export const logoutMember = createAsyncThunk<
-  AxiosResponse<void>,
-  AxiosResponse<void>,
-  { rejectValue: CustomSerializedError }
->('member/logoutMember', async (_, thunkAPI) => {
-  try {
-    return await withJWTSessionStorage(api.logoutMember());
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
-    );
+export const logoutMember = createAsyncThunk<CustomAxiosResponse<void>, void, { rejectValue: CustomSerializedError }>(
+  'member/logoutMember',
+  async (_, thunkAPI) => {
+    try {
+      const response = await withJWTSessionStorage(api.logoutMember());
+
+      return { data: response.data, status: response.status, statusText: response.statusText };
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+      );
+    }
   }
-});
+);
 
 export const updateMemberSettings = createAsyncThunk<
-  AxiosResponse<void>,
+  CustomAxiosResponse<void>,
   UpdateMemberSettingsData,
   { rejectValue: CustomSerializedError }
 >('member/updateMemberSettings', async (data, thunkAPI) => {
   try {
-    return await withJWTSessionStorage(api.updateMemberSettings(data));
+    const response = await withJWTSessionStorage(api.updateMemberSettings(data));
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }

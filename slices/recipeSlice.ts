@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { AxiosResponse } from '@/api/axios';
+import { CustomAxiosResponse } from '@/api/axios';
 import * as api from '@/api/recipeApi';
 import { StatusTypes } from '@/constants/general';
 import { CustomSerializedError, SuccessResponse } from '@/types/api';
@@ -31,13 +31,8 @@ const initialState: RecipeState = {
       id: 0,
       memberid: 0,
       image: null,
-      measurementsystemid: 0,
       createdat: '',
       editedat: '',
-      measurementsystem: {
-        id: 0,
-        value: ''
-      },
       recipecategory: [],
       recipeingredient: [],
       recipeinstruction: [],
@@ -55,7 +50,6 @@ const initialState: RecipeState = {
       title: '',
       description: '',
       image: null,
-      measurementsystemid: 0,
       recipeingredients: [],
       recipeinstructions: []
     }
@@ -63,12 +57,14 @@ const initialState: RecipeState = {
 };
 
 export const getRecipes = createAsyncThunk<
-  AxiosResponse<SuccessResponse<RecipeResponse[]>>,
+  CustomAxiosResponse<SuccessResponse<RecipeResponse[]>>,
   GetRecipesData,
   { rejectValue: CustomSerializedError }
 >('recipe/getRecipes', async (data, thunkAPI) => {
   try {
-    return await withJWTSessionStorage(api.getRecipes(data));
+    const response = await withJWTSessionStorage(api.getRecipes(data));
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -77,12 +73,14 @@ export const getRecipes = createAsyncThunk<
 });
 
 export const getRecipe = createAsyncThunk<
-  AxiosResponse<SuccessResponse<RecipeResponse>>,
+  CustomAxiosResponse<SuccessResponse<RecipeResponse>>,
   GetRecipeData,
   { rejectValue: CustomSerializedError }
 >('recipe/getRecipe', async (data, thunkAPI) => {
   try {
-    return await withJWTSessionStorage(api.getRecipe(data));
+    const response = await withJWTSessionStorage(api.getRecipe(data));
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
@@ -90,52 +88,63 @@ export const getRecipe = createAsyncThunk<
   }
 });
 
-export const createRecipe = createAsyncThunk<AxiosResponse<void>, CreateRecipeData, { rejectValue: CustomSerializedError }>(
-  'recipe/createRecipe',
-  async (data, thunkAPI) => {
-    try {
-      return await withJWTSessionStorage(api.createRecipe(data));
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(
-        { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
-      );
-    }
-  }
-);
+export const createRecipe = createAsyncThunk<
+  CustomAxiosResponse<void>,
+  CreateRecipeData,
+  { rejectValue: CustomSerializedError }
+>('recipe/createRecipe', async (data, thunkAPI) => {
+  try {
+    const response = await withJWTSessionStorage(api.createRecipe(data));
 
-export const updateRecipe = createAsyncThunk<AxiosResponse<void>, UpdateRecipeData, { rejectValue: CustomSerializedError }>(
-  'recipe/updateRecipe',
-  async (data, thunkAPI) => {
-    try {
-      return await withJWTSessionStorage(api.updateRecipe(data));
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(
-        { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
-      );
-    }
+    return { data: response.data, status: response.status, statusText: response.statusText };
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
-);
+});
 
-export const deleteRecipe = createAsyncThunk<AxiosResponse<void>, DeleteRecipeData, { rejectValue: CustomSerializedError }>(
-  'recipe/deleteRecipe',
-  async (data, thunkAPI) => {
-    try {
-      return await withJWTSessionStorage(api.deleteRecipe(data));
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(
-        { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
-      );
-    }
+export const updateRecipe = createAsyncThunk<
+  CustomAxiosResponse<void>,
+  UpdateRecipeData,
+  { rejectValue: CustomSerializedError }
+>('recipe/updateRecipe', async (data, thunkAPI) => {
+  try {
+    const response = await withJWTSessionStorage(api.updateRecipe(data));
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
   }
-);
+});
+
+export const deleteRecipe = createAsyncThunk<
+  CustomAxiosResponse<void>,
+  DeleteRecipeData,
+  { rejectValue: CustomSerializedError }
+>('recipe/deleteRecipe', async (data, thunkAPI) => {
+  try {
+    const response = await withJWTSessionStorage(api.deleteRecipe(data));
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(
+      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
+    );
+  }
+});
 
 export const scrapeRecipe = createAsyncThunk<
-  AxiosResponse<SuccessResponse<ScrapedRecipeResponse>>,
+  CustomAxiosResponse<SuccessResponse<ScrapedRecipeResponse>>,
   ScrapeRecipeData,
   { rejectValue: CustomSerializedError }
 >('recipe/scrapeRecipe', async (data, thunkAPI) => {
   try {
-    return await withJWTSessionStorage(api.scrapeRecipe(data));
+    const response = await withJWTSessionStorage(api.scrapeRecipe(data));
+
+    return { data: response.data, status: response.status, statusText: response.statusText };
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong', status: 500 });
   }

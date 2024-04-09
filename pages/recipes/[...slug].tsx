@@ -194,7 +194,6 @@ export default function RecipeAction(): JSX.Element {
       recipecategories: recipeCategories.map((recipeCategory) => recipeCategory.id),
       rating,
       effort,
-      measurementsystemid: 1,
       recipeingredients: recipeIngredients.map((recipeIngredient) => ({
         ...recipeIngredient,
         measurementtypeid: recipeIngredient.measurementtype?.id,
