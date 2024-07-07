@@ -40,7 +40,8 @@ const initialState: RecipeState = {
       title: '',
       description: '',
       rating: 0,
-      effort: 0
+      effort: 0,
+      bookmarked: false
     }
   },
   scrapedRecipe: {

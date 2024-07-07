@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import router from 'next/router';
 import React, { JSX, useEffect, useState } from 'react';
-import { FaChevronDown, FaChevronRight, FaCopy, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaBookmark, FaChevronDown, FaChevronRight, FaCopy, FaEdit, FaTrash } from 'react-icons/fa';
 import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 
 import { Toast } from '@/components/toast';
@@ -34,7 +34,7 @@ import { SliceItem } from '@/types/common';
 import { RecipeCategory, RecipeResponse } from '@/types/recipe';
 import { abbreviateTitle, formatDate, stringToColor } from '@/utils/common';
 
-import { RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon } from './styled';
+import { BookmarkedIcon, RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon } from './styled';
 
 export type RecipeCardProps = {
   isListLayout: boolean;
@@ -46,6 +46,7 @@ export type RecipeCardProps = {
   imagePath: string | null;
   rating: number;
   effort: number;
+  bookmarked: boolean;
 };
 
 export function RecipeCard(props: RecipeCardProps): JSX.Element {
@@ -58,6 +59,7 @@ export function RecipeCard(props: RecipeCardProps): JSX.Element {
     recipeId,
     rating,
     effort,
+    bookmarked,
     isListLayout: propIsListLayout
   } = props;
 
@@ -143,6 +145,11 @@ export function RecipeCard(props: RecipeCardProps): JSX.Element {
           }}
         >
           <Stack direction={isListLayout ? 'row' : 'column'} width="100%" height="100%">
+            {bookmarked && (
+              <BookmarkedIcon color="primary">
+                <FaBookmark />
+              </BookmarkedIcon>
+            )}
             {imagePath ? (
               <CardMedia
                 component="img"

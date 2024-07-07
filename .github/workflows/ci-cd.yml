@@ -41,6 +41,9 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
+      - name: Confirm repo builds
+        run: yarn build
+
   build_and_upload:
     name: Build and Upload Docker Image
     runs-on: ubuntu-latest

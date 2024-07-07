@@ -1,4 +1,4 @@
-import { SpeedDial, SpeedDialAction, SpeedDialIcon, styled } from '@mui/material';
+import { Icon, SpeedDial, SpeedDialAction, SpeedDialIcon, styled } from '@mui/material';
 
 export const RecipeSpeedDial = styled(SpeedDial)(() => ({
   '.MuiSpeedDial-fab': {
@@ -29,3 +29,10 @@ export const RecipeSpeedDialAction = styled(SpeedDialAction)(({ theme }) => ({
     backgroundColor: theme.palette.secondary.dark
   }
 })) as typeof SpeedDialAction;
+
+export const BookmarkedIcon = styled(Icon)(() => ({
+  position: 'absolute',
+  top: '5px',
+  left: '5px',
+  zIndex: 100
+}));

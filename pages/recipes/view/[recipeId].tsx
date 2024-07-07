@@ -32,7 +32,7 @@ import { StatusTypes } from '@/constants/general';
 import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { RootState } from '@/reducers/store';
-import { clearRecipe, deleteRecipe, getRecipe, removeRecipes } from '@/slices/recipeSlice';
+import { clearRecipe, deleteRecipe, getRecipe, removeRecipes, updateRecipe } from '@/slices/recipeSlice';
 import { SliceItem } from '@/types/common';
 import { RecipeResponse } from '@/types/recipe';
 import { formatDate } from '@/utils/common';
@@ -56,8 +56,6 @@ export default function RecipeView(): JSX.Element {
 
   const isLoadingRecipe = statusRecipe === StatusTypes.Pending;
   const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
-  //  TODO: implement bookmarking
-  const isBookmarked = true;
 
   useEffect(() => {
     if (isErrorRecipe) {
@@ -95,6 +93,13 @@ export default function RecipeView(): JSX.Element {
       } finally {
         setIsDeleting(false);
       }
+    }
+  }
+
+  async function dispatchUpdate() {
+    if (recipe.id) {
+      await dispatch(updateRecipe({ recipeId: recipe.id, body: { bookmarked: !recipe.bookmarked } }));
+      dispatch(getRecipe({ recipeId: recipe.id }));
     }
   }
 
@@ -151,8 +156,8 @@ export default function RecipeView(): JSX.Element {
                 </IconButton>
               </Stack>
               <Stack direction="row">
-                <IconButton color="primary" aria-label="edit" onClick={() => {}}>
-                  {isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
+                <IconButton color="primary" aria-label="edit" onClick={() => dispatchUpdate()}>
+                  {recipe.bookmarked ? <FaBookmark /> : <FaRegBookmark />}
                 </IconButton>
                 <IconButton color="primary" aria-label="edit" onClick={() => router.push(`/recipes/edit/${recipe.id}`)}>
                   <FaEdit />
@@ -219,29 +224,49 @@ export default function RecipeView(): JSX.Element {
                       ingredient.measurementamount * parseFloat(ingredient.measurementunit.conversionfactor)
                     ).toFixed(2);
 
-                    // To millilitres
-                    if ([6, 7, 8, 9, 10, 17, 18].includes(ingredient.measurementunitid)) {
-                      conversions += ` (${convertedAmount} ml)`;
+                    // Volume
+                    if (ingredient.measurementtypeid === 4) {
+                      // To millilitres
+                      if (ingredient.measurementunit.measurementsystemid === 2) {
+                        conversions = ` (${convertedAmount} ml)`;
+                      }
+                      // To fluid ounces
+                      else if (ingredient.measurementunit.measurementsystemid === 1) {
+                        conversions = ` (${convertedAmount} fl oz)`;
+                      }
+                      // To millilitres & fluid ounces
+                      else {
+                        const convertedFluidOunceAmount = (
+                          ingredient.measurementamount *
+                          parseFloat(ingredient.measurementunit.conversionfactor) *
+                          0.033814
+                        ) // TODO Get this from database
+                          .toFixed(2);
+
+                        conversions = ` (${convertedAmount} ml) (${convertedFluidOunceAmount} fl oz)`;
+                      }
                     }
-                    // To grams
-                    if ([19, 20].includes(ingredient.measurementunitid)) {
-                      conversions += ` (${convertedAmount} g)`;
+                    // Weight
+                    else if (ingredient.measurementtypeid === 5) {
+                      // To grams
+                      if (ingredient.measurementunit.measurementsystemid === 2) {
+                        conversions = ` (${convertedAmount} g)`;
+                      }
+                      // To ounces
+                      else if (ingredient.measurementunit.measurementsystemid === 1) {
+                        conversions = ` (${convertedAmount} oz)`;
+                      }
                     }
-                    // To fluid ounces
-                    if ([6, 7, 8, 9, 10, 12, 13].includes(ingredient.measurementunitid)) {
-                      conversions += ` (${convertedAmount} fl oz)`;
-                    }
-                    // To ounces
-                    if ([14, 15].includes(ingredient.measurementunitid)) {
-                      conversions += ` (${convertedAmount} oz)`;
-                    }
-                    // To Fahrenheit
-                    if (ingredient.measurementunitid === 11) {
-                      conversions += ` (${(ingredient.measurementamount - 32) * (5 / 9)} °F)`;
-                    }
-                    // To Celsius
-                    if (ingredient.measurementunitid === 16) {
-                      conversions += ` (${convertedAmount} °C)`;
+                    // Temperature
+                    else if (ingredient.measurementtypeid === 2) {
+                      // To Celsius
+                      if (ingredient.measurementunit.measurementsystemid === 2) {
+                        conversions = ` (${convertedAmount} °C)`;
+                      }
+                      // To Fahrenheit
+                      else if (ingredient.measurementunit.measurementsystemid === 1) {
+                        conversions = ` (${(ingredient.measurementamount - 32) * (5 / 9)} °F)`;
+                      }
                     }
                   }
 

@@ -16,6 +16,7 @@ import { useRouter } from 'next/router';
 import React, { JSX, useEffect, useState } from 'react';
 import { FileRejection, useDropzone } from 'react-dropzone';
 import { BiSend } from 'react-icons/bi';
+import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { TbCircleCheck, TbCircleOff, TbRectangle, TbRectangleFilled, TbUpload } from 'react-icons/tb';
 
 import { EllipsisLoader } from '@/components/ellipsis-loader';
@@ -67,6 +68,7 @@ export default function RecipeAction(): JSX.Element {
   const [rejectedImage, setRejectedImage] = useState<FileRejection | null>(null);
   const [rating, setRating] = useState<number>(0);
   const [effort, setEffort] = useState<number>(0);
+  const [bookmarked, setBookmarked] = useState<boolean>(false);
   const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredientRequest[]>([]);
   const [recipeInstructions, setRecipeInstructions] = useState<RecipeInstructionRequest[]>([]);
   const [recipeTimers, setRecipeTimers] = useState<RecipeTimerRequest[]>([]);
@@ -80,6 +82,7 @@ export default function RecipeAction(): JSX.Element {
   const isLoadingScrapedRecipe = statusScrapedRecipe === StatusTypes.Pending;
   const isErrorScrapedRecipe = statusScrapedRecipe === StatusTypes.Rejected;
   const isEditMode = query.action === Mode.Edit;
+  // TODO Upload image to s3 or something
   const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
     accept: {
       'image/*': ['.jpeg', '.png']
@@ -132,6 +135,7 @@ export default function RecipeAction(): JSX.Element {
     setDescription(recipe.description);
     setRating(recipe.rating);
     setEffort(recipe.effort);
+    setBookmarked(recipe.bookmarked);
     setImagePath(recipe.image ?? '');
     setRecipeCategories(
       recipe.recipecategory.map((recipeCategory) => ({
@@ -194,6 +198,7 @@ export default function RecipeAction(): JSX.Element {
       recipecategories: recipeCategories.map((recipeCategory) => recipeCategory.id),
       rating,
       effort,
+      bookmarked,
       recipeingredients: recipeIngredients.map((recipeIngredient) => ({
         ...recipeIngredient,
         measurementtypeid: recipeIngredient.measurementtype?.id,
@@ -410,6 +415,14 @@ export default function RecipeAction(): JSX.Element {
                 alignItems={isMediumScreen ? 'baseline' : 'center'}
                 justifyContent="space-between"
               >
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography component="legend" color={theme.palette.text.secondary}>
+                    Bookmark
+                  </Typography>
+                  <IconButton color="primary" aria-label="edit" onClick={() => setBookmarked(!bookmarked ?? false)}>
+                    {bookmarked ? <FaBookmark /> : <FaRegBookmark />}
+                  </IconButton>
+                </Stack>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <Typography component="legend" color={theme.palette.text.secondary}>
                     Rating

@@ -1,9 +1,8 @@
 # TastyTome Portal
 
 TODO
-- Add dependabot
-- Add Bookmark Functionality
 - Add Semantic versioning used in docker release and tags
+- Add & unify custom breakpoints
 - Add confirm email
 - Add reset password
 - Add Google Login/Register

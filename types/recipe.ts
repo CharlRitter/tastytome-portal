@@ -62,6 +62,7 @@ export type RecipeBase = {
   image: string | File | null;
   rating: number;
   effort: number;
+  bookmarked: boolean;
 };
 
 export type RecipeRequest = RecipeBase & {
@@ -121,8 +122,16 @@ export type CreateRecipeData = {
   };
 };
 
-export type UpdateRecipeData = CreateRecipeData & {
+export type UpdateRecipeData = {
   recipeId: number;
+  body: Partial<
+    RecipeRequest & {
+      recipecategories: number[];
+      recipeingredients: Partial<RecipeIngredientRequest[]>;
+      recipeinstructions: string[];
+      recipetimers: Partial<RecipeTimerRequest[]>;
+    }
+  >;
 };
 
 export type DeleteRecipeData = {

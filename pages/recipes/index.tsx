@@ -245,6 +245,7 @@ export default function Recipes(): JSX.Element {
                 imagePath={recipe.image}
                 rating={recipe.rating}
                 effort={recipe.effort}
+                bookmarked={recipe.bookmarked}
               />
             </Grid>
           ))}
