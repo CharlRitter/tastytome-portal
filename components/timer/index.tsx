@@ -25,7 +25,7 @@ export function Timer(props: TimerProps): JSX.Element {
   const { totalSeconds, seconds, minutes, hours, isRunning, start, pause, resume, restart } = useTimer({
     expiryTimestamp,
     autoStart: false,
-    onExpire: () => console.log('onExpire called') // TODO change
+    onExpire: () => console.log('onExpire called') // TODO change to real notification
   });
   const totalTime = timer.hours * 3600 + timer.minutes * 60;
   const hasStarted = totalSeconds < totalTime;

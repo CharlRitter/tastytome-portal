@@ -11,7 +11,7 @@ export default function Contact(): JSX.Element {
   const [message, setMessage] = useState<string>('');
 
   function handleSubmit() {
-    // TODO
+    // TODO Handle contact us
 
     if (!isCaptchaVerified) {
       // Captcha not verified, display error or prevent form submission
