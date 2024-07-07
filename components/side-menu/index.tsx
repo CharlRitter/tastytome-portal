@@ -22,8 +22,9 @@ import {
 } from '@mui/material';
 import { DateTime } from 'luxon';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { JSX, useState } from 'react';
+import React, { JSX, useEffect, useState } from 'react';
 import { FaBars, FaCoffee, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
+import Markdown from 'react-markdown';
 
 import { INFO_MODALS, PAGES } from '@/constants/navigationItems';
 import { NextLink } from '@/public/theme/globalStyled';
@@ -37,6 +38,7 @@ export type SideMenuProps = {
 export function SideMenu(props: SideMenuProps): JSX.Element {
   const router = useRouter();
   const [openModal, setOpenModal] = useState<number>(INFO_MODALS.unsetModal);
+  const [modalContent, setModalContent] = useState<string>('');
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const { drawerWidth } = props;
   const currentRoute = usePathname();
@@ -86,37 +88,33 @@ export function SideMenu(props: SideMenuProps): JSX.Element {
     </ListItem>
   ));
 
-  const infoModals = INFO_MODALS.modals.map((modal: InfoModal) => {
-    const Content = () => import(`@/public/files/${modal.title.toLowerCase()}.mdx`);
-
-    return (
-      <ListItem key={modal.title} disablePadding>
-        <ListItemButton onClick={() => setOpenModal(modal.id)}>
-          <ListItemIcon>{modal.icon}</ListItemIcon>
-          <ListItemText primary={modal.title} />
-        </ListItemButton>
-        <Dialog
-          open={openModal === modal.id}
-          onClose={() => setOpenModal(INFO_MODALS.unsetModal)}
-          fullWidth
-          maxWidth="md"
-          fullScreen={isSM}
-          aria-labelledby={`${modal.title}-dialog-title`}
-          aria-describedby={`${modal.title}-dialog-description`}
-        >
-          <DialogTitle id={`${modal.title}-dialog-title`}>{modal.title}</DialogTitle>
-          <DialogContent>
-            <Content />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenModal(INFO_MODALS.unsetModal)} autoFocus>
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </ListItem>
-    );
-  });
+  const infoModals = INFO_MODALS.modals.map((modal: InfoModal) => (
+    <ListItem key={modal.title} disablePadding>
+      <ListItemButton onClick={() => setOpenModal(modal.id)}>
+        <ListItemIcon>{modal.icon}</ListItemIcon>
+        <ListItemText primary={modal.title} />
+      </ListItemButton>
+      <Dialog
+        open={openModal === modal.id}
+        onClose={() => setOpenModal(INFO_MODALS.unsetModal)}
+        fullWidth
+        maxWidth="md"
+        fullScreen={isSM}
+        aria-labelledby={`${modal.title}-dialog-title`}
+        aria-describedby={`${modal.title}-dialog-description`}
+      >
+        <DialogTitle id={`${modal.title}-dialog-title`}>{modal.title}</DialogTitle>
+        <DialogContent>
+          <Markdown>{modalContent}</Markdown>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenModal(INFO_MODALS.unsetModal)} autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </ListItem>
+  ));
 
   const drawer = (
     <>
@@ -159,6 +157,21 @@ export function SideMenu(props: SideMenuProps): JSX.Element {
       </Box>
     </>
   );
+
+  useEffect(() => {
+    async function fetchModalContent(title: string) {
+      const response = await import(`@/public/files/${title.toLowerCase().split(' ').join('-')}.md`);
+      setModalContent(response.default);
+    }
+
+    if (openModal !== INFO_MODALS.unsetModal) {
+      const modal = INFO_MODALS.modals.find((item) => item.id === openModal);
+
+      if (modal) {
+        fetchModalContent(modal.title);
+      }
+    }
+  }, [openModal]);
 
   return (
     <>

@@ -5,6 +5,7 @@ import {
   FaBox,
   FaCog,
   FaInfoCircle,
+  FaLock,
   FaRegEnvelope,
   FaRegFileAlt,
   FaRegUser,
@@ -62,6 +63,11 @@ export const INFO_MODALS: InfoModals = {
       id: 2,
       title: 'Terms',
       icon: <FaRegFileAlt />
+    },
+    {
+      id: 3,
+      title: 'Privacy Policy',
+      icon: <FaLock />
     }
   ]
 };
