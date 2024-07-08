@@ -2383,12 +2383,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^20.12.13":
+"@types/node@npm:*":
   version: 20.12.13
   resolution: "@types/node@npm:20.12.13"
   dependencies:
     undici-types: ~5.26.4
   checksum: 9ec8971a76b2435379c10689c639ba1bbf4451075709bdf4bf23b7972a63f7d966947914410f2d3711a315e1157d782b76cfadc32944e29db9dd444221aea699
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.14.10":
+  version: 20.14.10
+  resolution: "@types/node@npm:20.14.10"
+  dependencies:
+    undici-types: ~5.26.4
+  checksum: 2f397d393de8cddb126e0b7999402ea450215ac69d49666ddef4f730a73325054499ce7345f86095e7b935c55b2e02139f3b8b9afc72fb978ed29edf6bb956b0
   languageName: node
   linkType: hard
 
@@ -12789,7 +12798,7 @@ __metadata:
     "@testing-library/user-event": ^14.5.2
     "@types/lodash": ^4.17.6
     "@types/luxon": ^3.4.2
-    "@types/node": ^20.12.13
+    "@types/node": ^20.14.10
     "@types/react": ^18.3.3
     "@types/react-beautiful-dnd": ^13.1.8
     "@types/react-dom": ^18.3.0
