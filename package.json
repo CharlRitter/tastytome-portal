@@ -106,7 +106,7 @@
     "prettier": "^3.2.5",
     "raw-loader": "^4.0.2",
     "sass-loader": "^14.2.1",
-    "semantic-release": "^23.1.1",
+    "semantic-release": "^24.0.0",
     "sort-package-json": "^2.10.0",
     "source-map-loader": "^5.0.0",
     "style-loader": "^4.0.0",
