@@ -26,7 +26,12 @@ export default function Home(): JSX.Element {
         <Paper elevation={3}>
           <Box>
             <AppBar position="static">
-              <Tabs value={tabValue} onChange={(_, newValue: number) => setTabValue(newValue)}>
+              <Tabs
+                value={tabValue}
+                onChange={(_, newValue: number) => setTabValue(newValue)}
+                variant="scrollable"
+                allowScrollButtonsMobile
+              >
                 <Tab label="Login" />
                 <Tab label="Register" />
               </Tabs>

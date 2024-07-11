@@ -57,7 +57,7 @@ export function LoginForm(): JSX.Element {
         onChange={(event) => setPassword(event.target.value)}
       />
       <Box>
-        <Button className="float-right w-fit" variant="text">
+        <Button className="float-right w-fit" variant="text" onClick={() => router.push('/reset-password')}>
           Forgot password?
         </Button>
       </Box>

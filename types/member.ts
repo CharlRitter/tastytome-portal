@@ -51,7 +51,7 @@ export type UpdateMemberPasswordData = {
 };
 
 export type ResetMemberPasswordData = {
-  body: { emailAddress: string };
+  body: { emailaddress: string };
 };
 
 export type ConfirmResetMemberPasswordData = {
