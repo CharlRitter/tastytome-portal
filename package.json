@@ -56,7 +56,7 @@
     "react-dom": "latest",
     "react-dropzone": "^14.2.3",
     "react-google-recaptcha": "^3.1.0",
-    "react-icons": "^5.2.1",
+    "react-icons": "^5.3.0",
     "react-infinite-scroll-component": "^6.1.0",
     "react-markdown": "^9.0.1",
     "react-redux": "^9.1.2",

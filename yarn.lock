@@ -11469,12 +11469,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-icons@npm:^5.2.1":
-  version: 5.2.1
-  resolution: "react-icons@npm:5.2.1"
+"react-icons@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "react-icons@npm:5.3.0"
   peerDependencies:
     react: "*"
-  checksum: f084ea7409a3986c03b7805d0787d8526e2c988439a39f485cc526ec1b2eb6ec78e7b69345478151ce94bca8522737c6569203c8ab8b8ff08542b496f954bdfb
+  checksum: 3aa5f50e05aafc6d31e0d995fe0d98560069aa88717b24ce8aaa082a7e7b20ca95e1e19d847ed6e52d658a5a30e15826af20d7554bf993a743edd55586db62e3
   languageName: node
   linkType: hard
 
@@ -13240,7 +13240,7 @@ __metadata:
     react-dom: latest
     react-dropzone: ^14.2.3
     react-google-recaptcha: ^3.1.0
-    react-icons: ^5.2.1
+    react-icons: ^5.3.0
     react-infinite-scroll-component: ^6.1.0
     react-markdown: ^9.0.1
     react-redux: ^9.1.2
