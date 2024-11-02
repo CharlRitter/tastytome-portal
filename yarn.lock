@@ -6318,12 +6318,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"file-selector@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "file-selector@npm:1.2.0"
+"file-selector@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "file-selector@npm:2.1.0"
   dependencies:
     tslib: ^2.7.0
-  checksum: 85276bb842b21fbef4e649dcd42d281f277692be4cc50c7c68f3b4f00d6696b8aaaaf4ad3841af291aab0a9732efe9c0019cc55dbe3fd69ef2657514015a3999
+  checksum: f15203e72483ba263424540ca6ad672973f3ede03e73ff16de75325e4bbf93594ad0ea63e464e784e3b4f72762ed07aab31fbcd6cc571141a3d5860e436d584c
   languageName: node
   linkType: hard
 
@@ -11707,16 +11707,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dropzone@npm:^14.3.1":
-  version: 14.3.1
-  resolution: "react-dropzone@npm:14.3.1"
+"react-dropzone@npm:^14.3.2":
+  version: 14.3.2
+  resolution: "react-dropzone@npm:14.3.2"
   dependencies:
     attr-accept: ^2.2.4
-    file-selector: ^1.2.0
+    file-selector: ^2.1.0
     prop-types: ^15.8.1
   peerDependencies:
     react: ">= 16.8 || 18.0.0"
-  checksum: 95af3da99952a8357beb053ecd2a8e07ae369aed3459b7e3f421980097819f1c2fc24551e1f6b378896bab9e062b5356b31a582203054ebd4e80d6c838dd4255
+  checksum: dedc3a5a083eb6d9b3398d04c1406e72c83d5a2109fb849cbeefef8797bc6b0f773b26f4ce6ea09cf848c41c730628198e297d19555db675f45f0fa1b511d2ff
   languageName: node
   linkType: hard
 
@@ -13510,7 +13510,7 @@ __metadata:
     react: latest
     react-beautiful-dnd: ^13.1.1
     react-dom: latest
-    react-dropzone: ^14.3.1
+    react-dropzone: ^14.3.2
     react-google-recaptcha: ^3.1.0
     react-icons: ^5.3.0
     react-infinite-scroll-component: ^6.1.0
