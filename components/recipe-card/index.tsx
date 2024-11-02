@@ -26,7 +26,7 @@ import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 
 import { Toast } from '@/components/toast';
 import { StatusTypes } from '@/constants/general';
-import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
+import { EffortRating, StyledRating } from '@/components/styled-components';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { RootState } from '@/reducers/store';
 import { deleteRecipe, removeRecipes } from '@/slices/recipeSlice';
@@ -72,8 +72,8 @@ export function RecipeCard(props: RecipeCardProps): JSX.Element {
   const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
   const [openErrorToast, setOpenErrorToast] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const isListLayout = useMediaQuery('(max-width: 899px)') ? false : propIsListLayout;
-
+  const isLG = useMediaQuery(theme.breakpoints.down('lg'));
+  const isListLayout = isLG ? false : propIsListLayout;
   const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
 
   useEffect(() => {

@@ -29,7 +29,7 @@ import { RecipeTabPanel } from '@/components/recipe-tab-panel';
 import { Timer } from '@/components/timer';
 import { Toast } from '@/components/toast';
 import { StatusTypes } from '@/constants/general';
-import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
+import { EffortRating, StyledRating } from '@/components/styled-components';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { RootState } from '@/reducers/store';
 import { clearRecipe, deleteRecipe, getRecipe, removeRecipes, updateRecipe } from '@/slices/recipeSlice';

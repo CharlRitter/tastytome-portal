@@ -17,6 +17,7 @@ import { getMember, logoutMember } from '@/slices/memberSlice';
 import { SliceItem } from '@/types/common';
 import { EnumState } from '@/types/enum';
 import { MemberResponse } from '@/types/member';
+import { googleLogout } from '@react-oauth/google';
 
 export type PageContainerProps = {
   children: ReactNode;
@@ -32,33 +33,40 @@ export function PageContainer(props: PageContainerProps): JSX.Element {
   );
 
   useEffect(() => {
-    const hasToken = sessionStorage.getItem('jwtToken');
+    const fetchData = async () => {
+      const hasToken = sessionStorage.getItem('jwtToken');
 
-    if (!hasToken) {
-      dispatch(logoutMember());
+      if (!hasToken) {
+        await dispatch(logoutMember());
+        googleLogout();
 
-      router.push('/');
-    } else {
-      // TODO Add error handling for this.
-      if (member.id === 0) {
-        dispatch(getMember());
+        router.push('/');
+      } else {
+        // TODO: Add error handling for this.
+        if (member.id === 0) {
+          dispatch(getMember());
+        }
+        if (categories.data.length === 0) {
+          dispatch(getCategories());
+        }
+        if (measurementsystems.data.length === 0) {
+          dispatch(getMeasurementSystems());
+        }
+        if (measurementtypes.data.length === 0) {
+          dispatch(getMeasurementTypes());
+        }
+        if (measurementunits.data.length === 0) {
+          dispatch(getMeasurementUnits());
+        }
+        if (themes.data.length === 0) {
+          dispatch(getThemes());
+        }
       }
-      if (categories.data.length === 0) {
-        dispatch(getCategories());
-      }
-      if (measurementsystems.data.length === 0) {
-        dispatch(getMeasurementSystems());
-      }
-      if (measurementtypes.data.length === 0) {
-        dispatch(getMeasurementTypes());
-      }
-      if (measurementunits.data.length === 0) {
-        dispatch(getMeasurementUnits());
-      }
-      if (themes.data.length === 0) {
-        dispatch(getThemes());
-      }
-    }
+    };
+
+    fetchData();
+
+    return () => {};
   }, [
     categories.data.length,
     dispatch,

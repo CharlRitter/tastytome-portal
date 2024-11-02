@@ -12,6 +12,7 @@ import { MemberResponse } from '@/types/member';
 import { interpolateColor } from '@/utils/common';
 import { FormControl, Typography, TextField, LinearProgress, useTheme, Snackbar, Slide, Alert } from '@mui/material';
 import { passwordStrength } from 'check-password-strength';
+import { googleLogout } from '@react-oauth/google';
 
 export default function Account(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -41,6 +42,7 @@ export default function Account(): JSX.Element {
     try {
       setIsLoadingLogout(true);
       await dispatch(logoutMember());
+      googleLogout();
 
       if (memberStatus === StatusTypes.Fulfilled) {
         router.push('/');

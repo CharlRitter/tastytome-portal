@@ -1,5 +1,5 @@
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, FormControl, TextField, Typography } from '@mui/material';
+import { Box, Button, Divider, FormControl, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { FormEvent, JSX, useState } from 'react';
 
@@ -9,6 +9,9 @@ import { RootState } from '@/reducers/store';
 import { loginMember } from '@/slices/memberSlice';
 import { SliceItem } from '@/types/common';
 import { MemberResponse } from '@/types/member';
+import { GoogleLogin } from '@react-oauth/google';
+import { GoogleDecodedCredentials } from '@/types/google';
+import { jwtDecode } from 'jwt-decode';
 
 export function LoginForm(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -22,8 +25,7 @@ export function LoginForm(): JSX.Element {
 
   const canSubmit = emailAddress && password;
 
-  async function handleLogin(event: FormEvent) {
-    event.preventDefault();
+  async function dispatchLogin(emailAddress: string, password: string) {
     try {
       setIsLoading(true);
       await dispatch(loginMember({ body: { emailaddress: emailAddress, password } }));
@@ -34,6 +36,18 @@ export function LoginForm(): JSX.Element {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function handleLogin(event: FormEvent) {
+    event.preventDefault();
+
+    dispatchLogin(emailAddress, password);
+  }
+
+  async function handleGoogleLogin(credential: string) {
+    const decodedCredential: GoogleDecodedCredentials = jwtDecode(credential);
+
+    dispatchLogin(decodedCredential.email, credential);
   }
 
   return (
@@ -72,6 +86,12 @@ export function LoginForm(): JSX.Element {
       >
         Login
       </LoadingButton>
+      <Divider className="my-3">OR</Divider>
+      <GoogleLogin
+        auto_select
+        text="signin_with"
+        onSuccess={(response) => response.credential && handleGoogleLogin(response.credential)}
+      />
     </FormControl>
   );
 }

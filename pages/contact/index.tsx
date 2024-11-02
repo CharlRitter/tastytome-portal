@@ -1,4 +1,4 @@
-import { Button, Grid, Paper, TextField } from '@mui/material';
+import { Button, Grid2, Paper, TextField } from '@mui/material';
 import React, { ChangeEvent, JSX, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 
@@ -23,8 +23,8 @@ export default function Contact(): JSX.Element {
   return (
     <PageContainer>
       <Paper classes={{ root: 'main' }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+        <Grid2 container spacing={2}>
+          <Grid2 size={{ xs: 12, sm: 6 }}>
             <TextField
               label="Name"
               variant="outlined"
@@ -32,8 +32,8 @@ export default function Contact(): JSX.Element {
               fullWidth
               onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setName(event.target.value)}
             />
-          </Grid>
-          <Grid item xs={12} sm={6}>
+          </Grid2>
+          <Grid2 size={{ xs: 12, sm: 6 }}>
             <TextField
               label="Email"
               variant="outlined"
@@ -42,8 +42,8 @@ export default function Contact(): JSX.Element {
               fullWidth
               onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setEmail(event.target.value)}
             />
-          </Grid>
-          <Grid item xs={12}>
+          </Grid2>
+          <Grid2 size={{ xs: 12 }}>
             <TextField
               label="Message"
               variant="outlined"
@@ -53,11 +53,11 @@ export default function Contact(): JSX.Element {
               fullWidth
               onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setMessage(event.target.value)}
             />
-          </Grid>
-          <Grid item xs={12}>
+          </Grid2>
+          <Grid2 size={{ xs: 12 }}>
             <ReCAPTCHA sitekey="YOUR_RECAPTCHA_SITE_KEY" size="invisible" onChange={() => setIsCaptchaVerified(true)} />
-          </Grid>
-          <Grid item xs={12}>
+          </Grid2>
+          <Grid2 size={{ xs: 12 }}>
             <Button
               type="button"
               variant="contained"
@@ -67,8 +67,8 @@ export default function Contact(): JSX.Element {
             >
               Submit
             </Button>
-          </Grid>
-        </Grid>
+          </Grid2>
+        </Grid2>
       </Paper>
     </PageContainer>
   );

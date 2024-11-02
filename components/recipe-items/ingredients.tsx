@@ -27,7 +27,7 @@ export function RecipeIngredients(props: RecipeIngredientsProps): JSX.Element {
   const { data: measurementunits } = useAppSelector(
     (state: RootState): SliceItem<MeasurementUnit[]> => state.enumSlice.measurementunits
   );
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isMD = useMediaQuery(theme.breakpoints.down('md'));
 
   const { items, handleSetItems } = props;
   const label = 'ingredient';
@@ -170,9 +170,9 @@ export function RecipeIngredients(props: RecipeIngredientsProps): JSX.Element {
                               onChange={(event) => setFieldText(event.target.value, index)}
                             />
                             <Stack
-                              direction={isMediumScreen ? 'column' : 'row'}
+                              direction={isMD ? 'column' : 'row'}
                               spacing={1}
-                              alignItems={isMediumScreen ? 'stretch' : 'center'}
+                              alignItems={isMD ? 'stretch' : 'center'}
                               width="100%"
                             >
                               <AdditionalInputAutocomplete

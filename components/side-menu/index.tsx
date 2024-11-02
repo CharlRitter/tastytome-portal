@@ -27,7 +27,7 @@ import { FaBars, FaCoffee, FaGithubSquare, FaLinkedin } from 'react-icons/fa';
 import Markdown from 'react-markdown';
 
 import { INFO_MODALS, PAGES } from '@/constants/navigationItems';
-import { NextLink } from '@/public/theme/globalStyled';
+import { NextLink } from '@/components/styled-components';
 import { InfoModal, Page } from '@/types/constants';
 import { capitaliseFirstLetter } from '@/utils/common';
 
@@ -72,7 +72,7 @@ export function SideMenu(props: SideMenuProps): JSX.Element {
         key={routeSection}
         variant="h6"
         noWrap
-        sx={{ color: lastItem ? theme.palette.common.white : theme.palette.grey.A400 }}
+        sx={{ color: lastItem ? theme.palette.common.white : theme.palette.common.gray_400 }}
       >
         {content}
       </Typography>

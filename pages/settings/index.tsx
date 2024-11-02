@@ -1,5 +1,5 @@
 import { LoadingButton } from '@mui/lab';
-import { Autocomplete, Grid, Paper, Switch, TextField, Typography } from '@mui/material';
+import { Autocomplete, Grid2, Paper, Switch, TextField, Typography } from '@mui/material';
 import { isEqual } from 'lodash';
 import getConfig from 'next/config';
 import React, { JSX, useEffect, useState } from 'react';
@@ -90,11 +90,11 @@ export default function Settings(): JSX.Element {
         message={errorMember?.message ?? ''}
       />
       <Paper classes={{ root: 'main' }}>
-        <Grid container spacing={2} alignItems="center" className="mb-3">
-          <Grid item xs={6}>
+        <Grid2 container spacing={2} alignItems="center" className="mb-3">
+          <Grid2 size={{ xs: 6 }}>
             <Typography variant="body1">Theme</Typography>
-          </Grid>
-          <Grid item xs={6}>
+          </Grid2>
+          <Grid2 size={{ xs: 6 }}>
             <Autocomplete
               className="w-full"
               options={themes}
@@ -104,30 +104,30 @@ export default function Settings(): JSX.Element {
               disableClearable
               onChange={(_, selectedOption) => setTheme(selectedOption)}
             />
-          </Grid>
-        </Grid>
+          </Grid2>
+        </Grid2>
         {publicRuntimeConfig?.ENABLE_PANTRY && (
           <>
-            <Grid container spacing={2} alignItems="center" className="mb-3">
-              <Grid item xs={6}>
+            <Grid2 container spacing={2} alignItems="center" className="mb-3">
+              <Grid2 size={{ xs: 6 }}>
                 <Typography variant="body1">Use Pantry Stock</Typography>
-              </Grid>
-              <Grid item xs={6}>
+              </Grid2>
+              <Grid2 size={{ xs: 6 }}>
                 <Switch aria-label="pantry stock" checked={usePantry} onChange={() => setUsePantry(!usePantry)} />
-              </Grid>
-            </Grid>
-            <Grid container spacing={2} alignItems="center" className="mb-3">
-              <Grid item xs={6}>
+              </Grid2>
+            </Grid2>
+            <Grid2 container spacing={2} alignItems="center" className="mb-3">
+              <Grid2 size={{ xs: 6 }}>
                 <Typography variant="body1">Allow Negative Pantry Stock</Typography>
-              </Grid>
-              <Grid item xs={6}>
+              </Grid2>
+              <Grid2 size={{ xs: 6 }}>
                 <Switch
                   aria-label="negative pantry stock"
                   checked={useNegativePantry}
                   onChange={() => setUseNegativePantry(!useNegativePantry)}
                 />
-              </Grid>
-            </Grid>
+              </Grid2>
+            </Grid2>
           </>
         )}
         <LoadingButton

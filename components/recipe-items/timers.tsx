@@ -17,7 +17,7 @@ export type RecipeTimersProps = {
 
 export function RecipeTimers(props: RecipeTimersProps): JSX.Element {
   const theme = useTheme();
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isMD = useMediaQuery(theme.breakpoints.down('md'));
 
   const { items, handleSetItems } = props;
   const label = 'timer';
@@ -144,9 +144,9 @@ export function RecipeTimers(props: RecipeTimersProps): JSX.Element {
                               onChange={(event) => setFieldText(event.target.value, index)}
                             />
                             <Stack
-                              direction={isMediumScreen ? 'column' : 'row'}
+                              direction={isMD ? 'column' : 'row'}
                               spacing={1}
-                              alignItems={isMediumScreen ? 'stretch' : 'center'}
+                              alignItems={isMD ? 'stretch' : 'center'}
                               width="100%"
                             >
                               <AdditionalInputAutocomplete

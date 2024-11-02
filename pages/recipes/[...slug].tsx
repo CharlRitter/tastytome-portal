@@ -25,7 +25,7 @@ import { RecipeIngredients, RecipeInstructions, RecipeTimers } from '@/component
 import { Toast } from '@/components/toast';
 import { Mode, ScrapableSites, StatusTypes } from '@/constants/general';
 import { SuccessHTTPCodes } from '@/constants/httpStatusCodes';
-import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
+import { EffortRating, StyledRating } from '@/components/styled-components';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { RootState } from '@/reducers/store';
 import { clearRecipe, createRecipe, getRecipe, scrapeRecipe, updateRecipe } from '@/slices/recipeSlice';
@@ -75,7 +75,7 @@ export default function RecipeAction(): JSX.Element {
   const [openErrorToast, setOpenErrorToast] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [recipeUrl, setRecipeUrl] = useState<string>('');
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isMD = useMediaQuery(theme.breakpoints.down('md'));
 
   const isLoadingRecipe = statusRecipe === StatusTypes.Pending;
   const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
@@ -364,7 +364,7 @@ export default function RecipeAction(): JSX.Element {
               )}
             </DropzoneBox>
             <Divider>OR</Divider>
-            <Stack direction={isMediumScreen ? 'column' : 'row'} spacing={1} justifyContent="space-between">
+            <Stack direction={isMD ? 'column' : 'row'} spacing={1} justifyContent="space-between">
               <Stack direction="column" className="w-full" spacing={1}>
                 <TextField
                   label="Title"
@@ -379,11 +379,11 @@ export default function RecipeAction(): JSX.Element {
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
                   multiline
-                  rows={isMediumScreen ? 2 : 11}
+                  rows={isMD ? 2 : 11}
                   required
                 />
               </Stack>
-              <DropzoneBox sx={{ minWidth: isMediumScreen ? 'unset' : '403px' }}>
+              <DropzoneBox sx={{ minWidth: isMD ? 'unset' : '403px' }}>
                 <Typography variant="h6">Image</Typography>
                 {dropzoneContent}
                 <Divider className="mb-3">OR</Divider>
@@ -398,7 +398,7 @@ export default function RecipeAction(): JSX.Element {
                 </Stack>
               </DropzoneBox>
             </Stack>
-            <Stack direction={isMediumScreen ? 'column' : 'row'} spacing={1} justifyContent="space-between">
+            <Stack direction={isMD ? 'column' : 'row'} spacing={1} justifyContent="space-between">
               <Autocomplete
                 multiple
                 limitTags={3}
@@ -410,16 +410,16 @@ export default function RecipeAction(): JSX.Element {
                 onChange={(_, value: Category[]) => setRecipeCategories(value)}
               />
               <RatingStack
-                direction={isMediumScreen ? 'column' : 'row'}
+                direction={isMD ? 'column' : 'row'}
                 spacing={1}
-                alignItems={isMediumScreen ? 'baseline' : 'center'}
+                alignItems={isMD ? 'baseline' : 'center'}
                 justifyContent="space-between"
               >
                 <Stack direction="row" spacing={1} alignItems="center">
                   <Typography component="legend" color={theme.palette.text.secondary}>
                     Bookmark
                   </Typography>
-                  <IconButton color="primary" aria-label="edit" onClick={() => setBookmarked(!bookmarked ?? false)}>
+                  <IconButton color="primary" aria-label="edit" onClick={() => setBookmarked(!bookmarked)}>
                     {bookmarked ? <FaBookmark /> : <FaRegBookmark />}
                   </IconButton>
                 </Stack>

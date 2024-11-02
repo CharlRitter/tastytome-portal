@@ -4,8 +4,9 @@ import { StyledEngineProvider, ThemeProvider } from '@mui/system';
 import { AppProps } from 'next/app';
 import getConfig from 'next/config';
 import Head from 'next/head';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { JSX, ReactNode, useEffect, useState } from 'react';
+import React, { JSX, ReactNode, useEffect, useState, StrictMode } from 'react';
 import { Provider } from 'react-redux';
 
 import { ThemeStates } from '@/constants/general';
@@ -14,7 +15,7 @@ import { useAppSelector } from '@/reducers/hooks';
 import { RootState, storeWrapper } from '@/reducers/store';
 import { SliceItem } from '@/types/common';
 import { MemberResponse } from '@/types/member';
-import '@/public/theme/global.scss';
+import '@/public/theme/extensions.scss';
 import '@/public/theme/tailwind.css';
 
 export type StatefulThemeProviderProps = {
@@ -101,11 +102,15 @@ export default function TastyTome({ Component, ...rest }: AppProps): JSX.Element
         <meta property="og:image" content="URL of the shared image" />
       </Head>
       <Provider store={store}>
-        <StatefulThemeProvider>
-          <CssBaseline />
-          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-          <Component {...pageProps} />
-        </StatefulThemeProvider>
+        <GoogleOAuthProvider clientId="884039361463-bj3hl4eisqb6esemsle269k4pbams3oc.apps.googleusercontent.com">
+          <StrictMode>
+            <StatefulThemeProvider>
+              <CssBaseline />
+              {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+              <Component {...pageProps} />
+            </StatefulThemeProvider>
+          </StrictMode>
+        </GoogleOAuthProvider>
       </Provider>
     </>
   );

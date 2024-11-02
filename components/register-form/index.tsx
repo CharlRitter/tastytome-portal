@@ -1,8 +1,9 @@
 import { LoadingButton } from '@mui/lab';
-import { FormControl, LinearProgress, TextField, Typography, useTheme } from '@mui/material';
+import { Divider, FormControl, LinearProgress, TextField, Typography, useTheme } from '@mui/material';
 import { passwordStrength } from 'check-password-strength';
 import { useRouter } from 'next/router';
 import React, { FormEvent, JSX, useState } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 import { StatusTypes } from '@/constants/general';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
@@ -11,6 +12,8 @@ import { createMember } from '@/slices/memberSlice';
 import { SliceItem } from '@/types/common';
 import { MemberResponse } from '@/types/member';
 import { interpolateColor } from '@/utils/common';
+import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
+import { GoogleDecodedCredentials } from '@/types/google';
 
 export function RegisterForm(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -37,9 +40,7 @@ export function RegisterForm(): JSX.Element {
   );
   const canSubmit = emailAddress && firstName && lastName && password && confirmPassword;
 
-  async function handleRegister(event: FormEvent) {
-    event.preventDefault();
-
+  async function dispatchRegister(emailAddress: string, firstName: string, lastName: string, password: string) {
     try {
       setIsLoading(true);
       await dispatch(
@@ -59,6 +60,18 @@ export function RegisterForm(): JSX.Element {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function handleRegister(event: FormEvent) {
+    event.preventDefault();
+
+    dispatchRegister(emailAddress, firstName, lastName, password);
+  }
+
+  async function handleGoogleRegister(credential: string) {
+    const decodedCredential: GoogleDecodedCredentials = jwtDecode(credential);
+
+    dispatchRegister(decodedCredential.email, decodedCredential.given_name, decodedCredential.family_name, credential);
   }
 
   return (
@@ -127,6 +140,14 @@ export function RegisterForm(): JSX.Element {
       >
         Register
       </LoadingButton>
+      <Divider className="my-3">OR</Divider>
+      <GoogleLogin
+        auto_select
+        text="signup_with"
+        onSuccess={(credentialResponse: CredentialResponse) =>
+          credentialResponse.credential && handleGoogleRegister(credentialResponse.credential)
+        }
+      />
     </FormControl>
   );
 }

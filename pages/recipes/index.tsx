@@ -3,7 +3,7 @@ import {
   AccordionSummary,
   Autocomplete,
   Fab,
-  Grid,
+  Grid2,
   IconButton,
   Paper,
   Stack,
@@ -27,7 +27,7 @@ import { PageContainer } from '@/components/page-container';
 import { RecipeCard } from '@/components/recipe-card';
 import { Toast } from '@/components/toast';
 import { StatusTypes } from '@/constants/general';
-import { EffortRating, StyledRating } from '@/public/theme/globalStyled';
+import { EffortRating, StyledRating } from '@/components/styled-components';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { RootState } from '@/reducers/store';
 import { clearRecipes, getRecipes } from '@/slices/recipeSlice';
@@ -232,9 +232,9 @@ export default function Recipes(): JSX.Element {
           </Stack>
         }
       >
-        <Grid container spacing={2} className="mb-5">
+        <Grid2 container spacing={2} className="mb-5">
           {recipes.map((recipe) => (
-            <Grid key={recipe.id} item xs={12} lg={isListLayout ? 12 : 6} xl={isListLayout ? 12 : 4}>
+            <Grid2 key={recipe.id} size={{ xs: 12, lg: isListLayout ? 12 : 6, xl: isListLayout ? 12 : 4 }}>
               <RecipeCard
                 recipeId={recipe.id}
                 isListLayout={isListLayout}
@@ -247,9 +247,9 @@ export default function Recipes(): JSX.Element {
                 effort={recipe.effort}
                 bookmarked={recipe.bookmarked}
               />
-            </Grid>
+            </Grid2>
           ))}
-        </Grid>
+        </Grid2>
       </InfiniteScroll>
     </PageContainer>
   );
