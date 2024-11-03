@@ -22,9 +22,8 @@ import { TbCircleCheck, TbCircleOff, TbRectangle, TbRectangleFilled, TbUpload } 
 import { EllipsisLoader } from '@/components/ellipsis-loader';
 import { PageContainer } from '@/components/page-container';
 import { RecipeIngredients, RecipeInstructions, RecipeTimers } from '@/components/recipe-items';
-import { Toast } from '@/components/toast';
-import { Mode, ScrapableSites, StatusTypes } from '@/constants/general';
-import { SuccessHTTPCodes } from '@/constants/httpStatusCodes';
+import { Toast, ToastParams } from '@/components/toast';
+import { Mode, ScrapableSites } from '@/constants/general';
 import { EffortRating, StyledRating } from '@/components/styled-components';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { RootState } from '@/reducers/store';
@@ -40,22 +39,17 @@ import {
 } from '@/types/recipe';
 
 import { DropBox, DropzoneBox, LoadingStack, RatingStack } from './styled';
+import { isRejectedWithValue } from '@reduxjs/toolkit';
 
 export default function RecipeAction(): JSX.Element {
   const router = useRouter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const { data: categories } = useAppSelector((state: RootState): SliceItem<Category[]> => state.enumSlice.categories);
-  const {
-    data: recipe,
-    status: statusRecipe,
-    error: errorRecipe
-  } = useAppSelector((state: RootState): SliceItem<RecipeResponse> => state.recipeSlice.recipe);
-  const {
-    data: scrapedRecipe,
-    status: statusScrapedRecipe,
-    error: errorScrapedRecipe
-  } = useAppSelector((state: RootState): SliceItem<ScrapedRecipeResponse> => state.recipeSlice.scrapedRecipe);
+  const { data: recipe } = useAppSelector((state: RootState): SliceItem<RecipeResponse> => state.recipeSlice.recipe);
+  const { data: scrapedRecipe } = useAppSelector(
+    (state: RootState): SliceItem<ScrapedRecipeResponse> => state.recipeSlice.scrapedRecipe
+  );
   const [query, setQuery] = useState<{ action: null | string; recipeId: null | number }>({
     action: null,
     recipeId: null
@@ -72,15 +66,13 @@ export default function RecipeAction(): JSX.Element {
   const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredientRequest[]>([]);
   const [recipeInstructions, setRecipeInstructions] = useState<RecipeInstructionRequest[]>([]);
   const [recipeTimers, setRecipeTimers] = useState<RecipeTimerRequest[]>([]);
-  const [openErrorToast, setOpenErrorToast] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isLoadingRecipe, setIsLoadingRecipe] = useState<boolean>(false);
+  const [isLoadingScrapedRecipe, setIsLoadingScrapedRecipe] = useState<boolean>(false);
   const [recipeUrl, setRecipeUrl] = useState<string>('');
+  const [toast, setToast] = useState<ToastParams>({ open: false, message: '', severity: 'error' });
   const isMD = useMediaQuery(theme.breakpoints.down('md'));
 
-  const isLoadingRecipe = statusRecipe === StatusTypes.Pending;
-  const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
-  const isLoadingScrapedRecipe = statusScrapedRecipe === StatusTypes.Pending;
-  const isErrorScrapedRecipe = statusScrapedRecipe === StatusTypes.Rejected;
   const isEditMode = query.action === Mode.Edit;
   // TODO Upload image to s3 or something
   const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
@@ -104,12 +96,6 @@ export default function RecipeAction(): JSX.Element {
     ) ||
     isEmpty(recipeInstructions) ||
     (recipeTimers && recipeTimers.some((item) => item.hours === null && item.minutes === null));
-
-  useEffect(() => {
-    if (isErrorRecipe || isErrorScrapedRecipe) {
-      setOpenErrorToast(true);
-    }
-  }, [isErrorRecipe, isErrorScrapedRecipe]);
 
   useEffect(() => {
     setTitle(scrapedRecipe.title);
@@ -179,11 +165,27 @@ export default function RecipeAction(): JSX.Element {
   }, [router]);
 
   useEffect(() => {
-    const { recipeId } = query;
+    async function handleGetRecipe() {
+      const { recipeId } = query;
 
-    if (recipeId) {
-      dispatch(getRecipe({ recipeId }));
+      if (recipeId) {
+        const action = await dispatch(getRecipe({ recipeId }));
+
+        if (isRejectedWithValue(action)) {
+          setToast({
+            open: true,
+            message: `Error retriving recipe - ${action.error.message}`,
+            severity: 'error'
+          });
+        }
+
+        router.push('/recipes');
+      }
     }
+
+    setIsLoadingRecipe(true);
+    handleGetRecipe();
+    setIsLoadingRecipe(false);
 
     return () => {
       dispatch(clearRecipe());
@@ -209,23 +211,40 @@ export default function RecipeAction(): JSX.Element {
     };
 
     setIsSubmitting(true);
-    let call;
+    let action;
 
     if (isEditMode && query.recipeId) {
-      call = await dispatch(updateRecipe({ recipeId: query.recipeId, body }));
+      action = await dispatch(updateRecipe({ recipeId: query.recipeId, body }));
     } else {
-      call = await dispatch(createRecipe({ body }));
+      action = await dispatch(createRecipe({ body }));
+    }
+
+    if (isRejectedWithValue(action)) {
+      setToast({
+        open: true,
+        message: `Error ${isEditMode ? 'updating' : 'creating'} recipe - ${action.error.message}`,
+        severity: 'error'
+      });
+    } else {
+      router.push('/recipes');
     }
 
     setIsSubmitting(false);
-
-    if (call.payload?.status && SuccessHTTPCodes.includes(call.payload.status)) {
-      router.push('/recipes');
-    }
   }
 
   async function handleScrapeRecipe() {
-    await dispatch(scrapeRecipe({ body: { recipeUrl } }));
+    setIsLoadingScrapedRecipe(true);
+    const action = await dispatch(scrapeRecipe({ body: { recipeUrl } }));
+
+    if (isRejectedWithValue(action)) {
+      setToast({
+        open: true,
+        message: `Error scraping recipe - ${action.error.message}`,
+        severity: 'error'
+      });
+    }
+
+    setIsLoadingScrapedRecipe(false);
   }
 
   function isInURLList(url: string): boolean {
@@ -320,10 +339,10 @@ export default function RecipeAction(): JSX.Element {
   return (
     <PageContainer>
       <Toast
-        open={openErrorToast}
-        onClose={() => setOpenErrorToast(false)}
-        severity="error"
-        message={(errorRecipe?.message || errorScrapedRecipe?.message) ?? ''}
+        open={toast.open}
+        onClose={() => setToast({ open: false, message: '', severity: 'error' })}
+        severity={toast.severity}
+        message={toast.message}
       />
       <Paper classes={{ root: 'main' }}>
         {isLoadingRecipe ? (

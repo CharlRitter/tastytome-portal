@@ -1,10 +1,6 @@
-/* eslint-disable no-param-reassign */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { CustomAxiosResponse } from '@/api/axios';
 import * as api from '@/api/recipeApi';
-import { StatusTypes } from '@/constants/general';
-import { CustomSerializedError, SuccessResponse } from '@/types/api';
 import {
   CreateRecipeData,
   DeleteRecipeData,
@@ -16,17 +12,13 @@ import {
   ScrapedRecipeResponse,
   UpdateRecipeData
 } from '@/types/recipe';
-import { withJWTSessionStorage } from '@/utils/common';
+import { createThunk, withJWTSessionStorage } from '@/utils/common';
 
 const initialState: RecipeState = {
   recipes: {
-    error: {},
-    status: StatusTypes.Fulfilled,
     data: []
   },
   recipe: {
-    error: {},
-    status: StatusTypes.Fulfilled,
     data: {
       id: 0,
       memberid: 0,
@@ -45,8 +37,6 @@ const initialState: RecipeState = {
     }
   },
   scrapedRecipe: {
-    error: {},
-    status: StatusTypes.Fulfilled,
     data: {
       title: '',
       description: '',
@@ -57,99 +47,30 @@ const initialState: RecipeState = {
   }
 };
 
-export const getRecipes = createAsyncThunk<
-  CustomAxiosResponse<SuccessResponse<RecipeResponse[]>>,
-  GetRecipesData,
-  { rejectValue: CustomSerializedError }
->('recipe/getRecipes', async (data, thunkAPI) => {
-  try {
-    const response = await withJWTSessionStorage(api.getRecipes(data));
-
-    return { data: response.data, status: response.status, statusText: response.statusText };
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
-    );
-  }
-});
-
-export const getRecipe = createAsyncThunk<
-  CustomAxiosResponse<SuccessResponse<RecipeResponse>>,
-  GetRecipeData,
-  { rejectValue: CustomSerializedError }
->('recipe/getRecipe', async (data, thunkAPI) => {
-  try {
-    const response = await withJWTSessionStorage(api.getRecipe(data));
-
-    return { data: response.data, status: response.status, statusText: response.statusText };
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
-    );
-  }
-});
-
-export const createRecipe = createAsyncThunk<
-  CustomAxiosResponse<void>,
-  CreateRecipeData,
-  { rejectValue: CustomSerializedError }
->('recipe/createRecipe', async (data, thunkAPI) => {
-  try {
-    const response = await withJWTSessionStorage(api.createRecipe(data));
-
-    return { data: response.data, status: response.status, statusText: response.statusText };
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
-    );
-  }
-});
-
-export const updateRecipe = createAsyncThunk<
-  CustomAxiosResponse<void>,
-  UpdateRecipeData,
-  { rejectValue: CustomSerializedError }
->('recipe/updateRecipe', async (data, thunkAPI) => {
-  try {
-    const response = await withJWTSessionStorage(api.updateRecipe(data));
-
-    return { data: response.data, status: response.status, statusText: response.statusText };
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
-    );
-  }
-});
-
-export const deleteRecipe = createAsyncThunk<
-  CustomAxiosResponse<void>,
-  DeleteRecipeData,
-  { rejectValue: CustomSerializedError }
->('recipe/deleteRecipe', async (data, thunkAPI) => {
-  try {
-    const response = await withJWTSessionStorage(api.deleteRecipe(data));
-
-    return { data: response.data, status: response.status, statusText: response.statusText };
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      { status: error?.response.status, ...error?.response?.data } ?? { message: 'Something went wrong', status: 500 }
-    );
-  }
-});
-
-export const scrapeRecipe = createAsyncThunk<
-  CustomAxiosResponse<SuccessResponse<ScrapedRecipeResponse>>,
-  ScrapeRecipeData,
-  { rejectValue: CustomSerializedError }
->('recipe/scrapeRecipe', async (data, thunkAPI) => {
-  try {
-    const response = await withJWTSessionStorage(api.scrapeRecipe(data));
-
-    return { data: response.data, status: response.status, statusText: response.statusText };
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: 'Something went wrong', status: 500 });
-  }
-});
+export const getRecipes = createThunk<RecipeResponse[], GetRecipesData>(
+  (data) => withJWTSessionStorage(api.getRecipes(data)),
+  'recipe/getRecipes'
+);
+export const getRecipe = createThunk<RecipeResponse, GetRecipeData>(
+  (data) => withJWTSessionStorage(api.getRecipe(data)),
+  'recipe/getRecipe'
+);
+export const createRecipe = createThunk<void, CreateRecipeData>(
+  (data) => withJWTSessionStorage(api.createRecipe(data)),
+  'recipe/createRecipe'
+);
+export const updateRecipe = createThunk<void, UpdateRecipeData>(
+  (data) => withJWTSessionStorage(api.updateRecipe(data)),
+  'recipe/updateRecipe'
+);
+export const deleteRecipe = createThunk<void, DeleteRecipeData>(
+  (data) => withJWTSessionStorage(api.deleteRecipe(data)),
+  'recipe/deleteRecipe'
+);
+export const scrapeRecipe = createThunk<ScrapedRecipeResponse, ScrapeRecipeData>(
+  (data) => withJWTSessionStorage(api.scrapeRecipe(data)),
+  'recipe/scrapeRecipe'
+);
 
 const recipeSlice = createSlice({
   name: 'recipeSlice',
@@ -166,10 +87,6 @@ const recipeSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(getRecipes.pending, (state) => {
-      state.recipes.error = {};
-      state.recipes.status = StatusTypes.Pending;
-    });
     builder.addCase(getRecipes.fulfilled, (state, action) => {
       const {
         data: {
@@ -180,18 +97,6 @@ const recipeSlice = createSlice({
 
       state.recipes.data.push(...data);
       state.recipes.totalCount = totalCount;
-      state.recipes.status = StatusTypes.Fulfilled;
-    });
-    builder.addCase(getRecipes.rejected, (state, action) => {
-      if (action.payload) {
-        state.recipes.error = action.payload;
-        state.recipes.error.message = `Error while retrieving recipes - ${action.payload.message}`;
-      }
-      state.recipes.status = StatusTypes.Rejected;
-    });
-    builder.addCase(getRecipe.pending, (state) => {
-      state.recipes.error = {};
-      state.recipe.status = StatusTypes.Pending;
     });
     builder.addCase(getRecipe.fulfilled, (state, action) => {
       const {
@@ -199,60 +104,6 @@ const recipeSlice = createSlice({
       } = action.payload;
 
       state.recipe.data = data;
-      state.recipe.status = StatusTypes.Fulfilled;
-    });
-    builder.addCase(getRecipe.rejected, (state, action) => {
-      if (action.payload) {
-        state.recipe.error = action.payload;
-        state.recipe.error.message = `Error while retrieving recipe - ${action.payload.message}`;
-      }
-      state.recipe.status = StatusTypes.Rejected;
-    });
-    builder.addCase(createRecipe.pending, (state) => {
-      state.recipes.error = {};
-      state.recipe.status = StatusTypes.Pending;
-    });
-    builder.addCase(createRecipe.fulfilled, (state) => {
-      state.recipe.status = StatusTypes.Fulfilled;
-    });
-    builder.addCase(createRecipe.rejected, (state, action) => {
-      if (action.payload) {
-        state.recipe.error = action.payload;
-        state.recipe.error.message = `Error while adding recipe - ${action.payload.message}`;
-      }
-      state.recipe.status = StatusTypes.Rejected;
-    });
-    builder.addCase(updateRecipe.pending, (state) => {
-      state.recipes.error = {};
-      state.recipe.status = StatusTypes.Pending;
-    });
-    builder.addCase(updateRecipe.fulfilled, (state) => {
-      state.recipe.status = StatusTypes.Fulfilled;
-    });
-    builder.addCase(updateRecipe.rejected, (state, action) => {
-      if (action.payload) {
-        state.recipe.error = action.payload;
-        state.recipe.error.message = `Error while updating recipe - ${action.payload.message}`;
-      }
-      state.recipe.status = StatusTypes.Rejected;
-    });
-    builder.addCase(deleteRecipe.pending, (state) => {
-      state.recipes.error = {};
-      state.recipe.status = StatusTypes.Pending;
-    });
-    builder.addCase(deleteRecipe.fulfilled, (state) => {
-      state.recipe.status = StatusTypes.Fulfilled;
-    });
-    builder.addCase(deleteRecipe.rejected, (state, action) => {
-      if (action.payload) {
-        state.recipe.error = action.payload;
-        state.recipe.error.message = `Error while deleting recipe - ${action.payload.message}`;
-      }
-      state.recipe.status = StatusTypes.Rejected;
-    });
-    builder.addCase(scrapeRecipe.pending, (state) => {
-      state.scrapedRecipe.error = {};
-      state.scrapedRecipe.status = StatusTypes.Pending;
     });
     builder.addCase(scrapeRecipe.fulfilled, (state, action) => {
       const {
@@ -260,14 +111,6 @@ const recipeSlice = createSlice({
       } = action.payload;
 
       state.scrapedRecipe.data = data;
-      state.scrapedRecipe.status = StatusTypes.Fulfilled;
-    });
-    builder.addCase(scrapeRecipe.rejected, (state, action) => {
-      if (action.payload) {
-        state.scrapedRecipe.error = action.payload;
-        state.scrapedRecipe.error.message = `Error while scraping recipe - ${action.payload.message}`;
-      }
-      state.scrapedRecipe.status = StatusTypes.Rejected;
     });
   }
 });

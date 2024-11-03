@@ -1,12 +1,15 @@
 import { Alert, Snackbar, Typography } from '@mui/material';
 import React, { JSX } from 'react';
 
-export type ToastProps = {
+export type ToastParams = {
   open: boolean;
-  onClose: () => void;
   message: string;
   severity: 'error' | 'info' | 'success' | 'warning';
 };
+
+export type ToastProps = {
+  onClose: () => void;
+} & ToastParams;
 
 export function Toast(props: ToastProps): JSX.Element {
   const { open, onClose, message, severity } = props;

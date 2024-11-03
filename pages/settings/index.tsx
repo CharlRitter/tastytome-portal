@@ -5,39 +5,29 @@ import getConfig from 'next/config';
 import React, { JSX, useEffect, useState } from 'react';
 
 import { PageContainer } from '@/components/page-container';
-import { Toast } from '@/components/toast';
-import { StatusTypes } from '@/constants/general';
+import { Toast, ToastParams } from '@/components/toast';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { RootState } from '@/reducers/store';
 import { getMember, updateMemberSettings } from '@/slices/memberSlice';
 import { SliceItem } from '@/types/common';
 import { Theme } from '@/types/enum';
 import { MemberResponse } from '@/types/member';
+import { isRejectedWithValue } from '@reduxjs/toolkit';
 
 export default function Settings(): JSX.Element {
   const dispatch = useAppDispatch();
   const { publicRuntimeConfig } = getConfig();
   const {
-    data: { membersettings },
-    status: statusMember,
-    error: errorMember
+    data: { membersettings }
   } = useAppSelector((state: RootState): SliceItem<MemberResponse> => state.memberSlice.member);
   const { data: themes } = useAppSelector((state: RootState): SliceItem<Theme[]> => state.enumSlice.themes);
-  const [openErrorToast, setOpenErrorToast] = useState<boolean>(false);
   const [theme, setTheme] = useState<Theme>(themes[0]);
   const [usePantry, setUsePantry] = useState<boolean>(false);
   const [useNegativePantry, setUseNegativePantry] = useState<boolean>(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [hasContentChanged, setHasContentChanged] = useState<boolean>(false);
-
-  const isLoadingMember = statusMember === StatusTypes.Pending;
-  const isErrorMember = statusMember === StatusTypes.Rejected;
-
-  useEffect(() => {
-    if (isErrorMember) {
-      setOpenErrorToast(true);
-    }
-  }, [isErrorMember]);
+  const [isLoadingMember, setIsLoadingMember] = useState<boolean>(false);
+  const [toast, setToast] = useState<ToastParams>({ open: false, message: '', severity: 'error' });
 
   useEffect(() => {
     setTheme(membersettings.theme);
@@ -71,23 +61,41 @@ export default function Settings(): JSX.Element {
       usenegativepantry: useNegativePantry
     };
 
-    try {
-      setIsUpdating(true);
+    setIsUpdating(true);
 
-      await dispatch(updateMemberSettings({ body }));
-      dispatch(getMember());
-    } finally {
-      setIsUpdating(false);
+    const action = await dispatch(updateMemberSettings({ body }));
+
+    if (isRejectedWithValue(action)) {
+      setToast({
+        open: true,
+        message: `Error updating settings - ${action.error.message}`,
+        severity: 'error'
+      });
+    } else {
+      setIsLoadingMember(true);
+      const secondaryAction = await dispatch(getMember());
+
+      if (isRejectedWithValue(secondaryAction)) {
+        setToast({
+          open: true,
+          message: `Error retrieving member - ${secondaryAction.error.message}`,
+          severity: 'error'
+        });
+      }
+
+      setIsLoadingMember(false);
     }
+
+    setIsUpdating(false);
   }
 
   return (
     <PageContainer>
       <Toast
-        open={openErrorToast}
-        onClose={() => setOpenErrorToast(false)}
-        severity="error"
-        message={errorMember?.message ?? ''}
+        open={toast.open}
+        onClose={() => setToast({ open: false, message: '', severity: 'error' })}
+        severity={toast.severity}
+        message={toast.message}
       />
       <Paper classes={{ root: 'main' }}>
         <Grid2 container spacing={2} alignItems="center" className="mb-3">

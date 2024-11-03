@@ -1,5 +1,6 @@
-/* eslint-disable no-bitwise */
 import { AxiosResponse } from '@/api/axios';
+import { SuccessResponse, CustomSerializedError } from '@/types/api';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
 export function capitaliseFirstLetter(word: string, seperator?: string): string {
   let words: string[] = [word];
@@ -77,7 +78,9 @@ export function interpolateColor(color1: string, color2: string, percentage: num
   return color2;
 }
 
-export async function withJWTSessionStorage<T>(promise: Promise<AxiosResponse<T>>): Promise<AxiosResponse<T>> {
+export async function withJWTSessionStorage<T = void>(
+  promise: Promise<AxiosResponse<SuccessResponse<T>>>
+): Promise<AxiosResponse<SuccessResponse<T>>> {
   const response = await promise;
   const jwtToken = response.headers.authorization;
 
@@ -86,4 +89,27 @@ export async function withJWTSessionStorage<T>(promise: Promise<AxiosResponse<T>
   }
 
   return response;
+}
+
+export function createThunk<T, A = void>(
+  apiCall: (arg: A) => Promise<AxiosResponse<SuccessResponse<T>>>,
+  actionType: string
+) {
+  return createAsyncThunk<
+    { data: SuccessResponse<T>; status: number; statusText: string },
+    A,
+    { rejectValue: CustomSerializedError }
+  >(actionType, async (arg, thunkAPI) => {
+    try {
+      const { data, status, statusText } = await apiCall(arg);
+
+      return { data, status, statusText };
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error?.response
+          ? { status: error.response.status, ...error.response.data }
+          : { message: 'Something went wrong', status: 500 }
+      );
+    }
+  });
 }

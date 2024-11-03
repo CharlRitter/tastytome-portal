@@ -19,5 +19,4 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 export { axiosInstance };
-export type { AxiosError };
-export type CustomAxiosResponse<T> = Omit<AxiosResponse<T>, 'headers' | 'config' | 'request'>;
+export type { AxiosError, AxiosResponse };

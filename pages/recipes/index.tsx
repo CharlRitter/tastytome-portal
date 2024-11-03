@@ -25,8 +25,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { EllipsisLoader } from '@/components/ellipsis-loader';
 import { PageContainer } from '@/components/page-container';
 import { RecipeCard } from '@/components/recipe-card';
-import { Toast } from '@/components/toast';
-import { StatusTypes } from '@/constants/general';
+import { Toast, ToastParams } from '@/components/toast';
 import { EffortRating, StyledRating } from '@/components/styled-components';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { RootState } from '@/reducers/store';
@@ -36,6 +35,7 @@ import { Category } from '@/types/enum';
 import { RecipeResponse } from '@/types/recipe';
 
 import { ActionsAccordion, StickyWrapper } from './styled';
+import { isRejectedWithValue } from '@reduxjs/toolkit';
 
 export default function Recipes(): JSX.Element {
   const theme = useTheme();
@@ -43,12 +43,9 @@ export default function Recipes(): JSX.Element {
   const { data: recipeCategories } = useAppSelector(
     (state: RootState): SliceItem<Category[]> => state.enumSlice.categories
   );
-  const {
-    data: recipes,
-    status: statusRecipes,
-    totalCount: recipeTotalCount,
-    error: errorRecipes
-  } = useAppSelector((state: RootState): SliceItem<RecipeResponse[]> => state.recipeSlice.recipes);
+  const { data: recipes, totalCount: recipeTotalCount } = useAppSelector(
+    (state: RootState): SliceItem<RecipeResponse[]> => state.recipeSlice.recipes
+  );
 
   const [isListLayout, setIsListLayout] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
@@ -56,12 +53,12 @@ export default function Recipes(): JSX.Element {
   const [rating, setRating] = useState<number>(0);
   const [effort, setEffort] = useState<number>(0);
   const [isDateAscending, setIsDateAscending] = useState<boolean>(false);
-  const [openErrorToast, setOpenErrorToast] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [toast, setToast] = useState<ToastParams>({ open: false, message: '', severity: 'error' });
   const [page, setPage] = useState<number>(1);
 
   const pageSize = 12;
   const isMoreRecipes = recipeTotalCount ? recipeTotalCount > page * pageSize : false;
-  const isErrorRecipes = statusRecipes === StatusTypes.Rejected;
 
   useEffect(
     () => () => {
@@ -71,25 +68,33 @@ export default function Recipes(): JSX.Element {
   );
 
   useEffect(() => {
-    dispatch(
-      getRecipes({
-        params: {
-          categories: categories.map((category) => category.id).join(','),
-          orderBy: isDateAscending ? 'asc' : 'desc',
-          effort,
-          rating,
-          page,
-          pageSize
-        }
-      })
-    );
-  }, [categories, dispatch, effort, isDateAscending, page, rating]);
+    async function handleGetRecipes() {
+      const action = await dispatch(
+        getRecipes({
+          params: {
+            categories: categories.map((category) => category.id).join(','),
+            orderBy: isDateAscending ? 'asc' : 'desc',
+            effort,
+            rating,
+            page,
+            pageSize
+          }
+        })
+      );
 
-  useEffect(() => {
-    if (isErrorRecipes) {
-      setOpenErrorToast(true);
+      if (isRejectedWithValue(action)) {
+        setToast({
+          open: true,
+          message: `Error retriving recipes - ${action.error.message}`,
+          severity: 'error'
+        });
+      }
     }
-  }, [isErrorRecipes]);
+
+    setIsLoading(true);
+    handleGetRecipes();
+    setIsLoading(false);
+  }, [categories, dispatch, effort, isDateAscending, page, rating]);
 
   function handleClearFilters() {
     dispatch(clearRecipes());
@@ -103,10 +108,10 @@ export default function Recipes(): JSX.Element {
   return (
     <PageContainer>
       <Toast
-        open={openErrorToast}
-        onClose={() => setOpenErrorToast(false)}
-        severity="error"
-        message={errorRecipes?.message ?? ''}
+        open={toast.open}
+        onClose={() => setToast({ open: false, message: '', severity: 'error' })}
+        severity={toast.severity}
+        message={toast.message}
       />
       <StickyWrapper>
         <Paper className="p-3">
@@ -217,40 +222,46 @@ export default function Recipes(): JSX.Element {
           </AccordionDetails>
         </ActionsAccordion>
       </StickyWrapper>
-      <InfiniteScroll
-        dataLength={recipes.length}
-        next={() => setPage((prevPage) => prevPage + 1)}
-        hasMore={isMoreRecipes}
-        loader={
-          <Stack className="w-full mt-6 mb-5" alignItems="center">
-            <EllipsisLoader />
-          </Stack>
-        }
-        endMessage={
-          <Stack className="w-full mt-6 mb-5" alignItems="center">
-            <Typography>No more recipes</Typography>
-          </Stack>
-        }
-      >
-        <Grid2 container spacing={2} className="mb-5">
-          {recipes.map((recipe) => (
-            <Grid2 key={recipe.id} size={{ xs: 12, lg: isListLayout ? 12 : 6, xl: isListLayout ? 12 : 4 }}>
-              <RecipeCard
-                recipeId={recipe.id}
-                isListLayout={isListLayout}
-                title={recipe.title}
-                dateCreated={recipe.createdat}
-                description={recipe.description}
-                recipeCategories={recipe.recipecategory}
-                imagePath={recipe.image}
-                rating={recipe.rating}
-                effort={recipe.effort}
-                bookmarked={recipe.bookmarked}
-              />
-            </Grid2>
-          ))}
-        </Grid2>
-      </InfiniteScroll>
+      {isLoading ? (
+        <Stack className="w-full mt-6 mb-5" alignItems="center">
+          <EllipsisLoader />
+        </Stack>
+      ) : (
+        <InfiniteScroll
+          dataLength={recipes.length}
+          next={() => setPage((prevPage) => prevPage + 1)}
+          hasMore={isMoreRecipes}
+          loader={
+            <Stack className="w-full mt-6 mb-5" alignItems="center">
+              <EllipsisLoader />
+            </Stack>
+          }
+          endMessage={
+            <Stack className="w-full mt-6 mb-5" alignItems="center">
+              <Typography>No more recipes</Typography>
+            </Stack>
+          }
+        >
+          <Grid2 container spacing={2} className="mb-5">
+            {recipes.map((recipe) => (
+              <Grid2 key={recipe.id} size={{ xs: 12, lg: isListLayout ? 12 : 6, xl: isListLayout ? 12 : 4 }}>
+                <RecipeCard
+                  recipeId={recipe.id}
+                  isListLayout={isListLayout}
+                  title={recipe.title}
+                  dateCreated={recipe.createdat}
+                  description={recipe.description}
+                  recipeCategories={recipe.recipecategory}
+                  imagePath={recipe.image}
+                  rating={recipe.rating}
+                  effort={recipe.effort}
+                  bookmarked={recipe.bookmarked}
+                />
+              </Grid2>
+            ))}
+          </Grid2>
+        </InfiniteScroll>
+      )}
     </PageContainer>
   );
 }

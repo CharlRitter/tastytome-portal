@@ -27,8 +27,7 @@ import { EllipsisLoader } from '@/components/ellipsis-loader';
 import { PageContainer } from '@/components/page-container';
 import { RecipeTabPanel } from '@/components/recipe-tab-panel';
 import { Timer } from '@/components/timer';
-import { Toast } from '@/components/toast';
-import { StatusTypes } from '@/constants/general';
+import { Toast, ToastParams } from '@/components/toast';
 import { EffortRating, StyledRating } from '@/components/styled-components';
 import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
 import { RootState } from '@/reducers/store';
@@ -38,32 +37,33 @@ import { RecipeResponse } from '@/types/recipe';
 import { formatDate } from '@/utils/common';
 
 import { LoadingStack } from '../styled';
+import { isRejectedWithValue } from '@reduxjs/toolkit';
 
 export default function RecipeView(): JSX.Element {
   const router = useRouter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
-  const {
-    data: recipe,
-    status: statusRecipe,
-    error: errorRecipe
-  } = useAppSelector((state: RootState): SliceItem<RecipeResponse> => state.recipeSlice.recipe);
-  const [openErrorToast, setOpenErrorToast] = useState<boolean>(false);
+  const { data: recipe } = useAppSelector((state: RootState): SliceItem<RecipeResponse> => state.recipeSlice.recipe);
   const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [currentTab, setCurrentTab] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [toast, setToast] = useState<ToastParams>({ open: false, message: '', severity: 'error' });
   const isMD = useMediaQuery(theme.breakpoints.down('md'));
 
-  const isLoadingRecipe = statusRecipe === StatusTypes.Pending;
-  const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
-
   useEffect(() => {
-    if (isErrorRecipe) {
-      setOpenErrorToast(true);
+    async function handleGetRecipe(recipeId: string) {
+      const action = await dispatch(getRecipe({ recipeId: parseInt(recipeId, 10) }));
+
+      if (isRejectedWithValue(action)) {
+        setToast({
+          open: true,
+          message: `Error retriving recipe - ${action.error.message}`,
+          severity: 'error'
+        });
+      }
     }
-  }, [isErrorRecipe]);
 
-  useEffect(() => {
     if (!router.isReady) {
       return;
     }
@@ -72,7 +72,9 @@ export default function RecipeView(): JSX.Element {
     if (!recipeId || Array.isArray(recipeId) || Number.isNaN(parseInt(recipeId, 10))) {
       router.push('/recipes');
     } else {
-      dispatch(getRecipe({ recipeId: parseInt(recipeId, 10) }));
+      setIsLoading(true);
+      handleGetRecipe(recipeId);
+      setIsLoading(false);
     }
   }, [dispatch, router]);
 
@@ -85,31 +87,58 @@ export default function RecipeView(): JSX.Element {
 
   async function dispatchDelete() {
     if (recipe.id) {
-      try {
-        setIsDeleting(true);
-        setDeleteConfirmation(false);
-        await dispatch(deleteRecipe({ recipeId: recipe.id }));
+      setIsDeleting(true);
+      setDeleteConfirmation(false);
+
+      const action = await dispatch(deleteRecipe({ recipeId: recipe.id }));
+
+      if (isRejectedWithValue(action)) {
+        setToast({
+          open: true,
+          message: `Error deleting recipe - ${action.error.message}`,
+          severity: 'error'
+        });
+      } else {
         dispatch(removeRecipes(recipe.id));
-      } finally {
-        setIsDeleting(false);
       }
+      setIsDeleting(false);
     }
   }
 
   async function dispatchUpdate() {
     if (recipe.id) {
-      await dispatch(updateRecipe({ recipeId: recipe.id, body: { bookmarked: !recipe.bookmarked } }));
-      dispatch(getRecipe({ recipeId: recipe.id }));
+      setIsLoading(true);
+      const action = await dispatch(updateRecipe({ recipeId: recipe.id, body: { bookmarked: !recipe.bookmarked } }));
+
+      if (isRejectedWithValue(action)) {
+        setToast({
+          open: true,
+          message: `Error updating recipe - ${action.error.message}`,
+          severity: 'error'
+        });
+      } else {
+        const secondaryAction = await dispatch(getRecipe({ recipeId: recipe.id }));
+
+        if (isRejectedWithValue(secondaryAction)) {
+          setToast({
+            open: true,
+            message: `Error retriving recipe - ${secondaryAction.error.message}`,
+            severity: 'error'
+          });
+        }
+      }
+
+      setIsLoading(false);
     }
   }
 
   return (
     <PageContainer>
       <Toast
-        open={openErrorToast}
-        onClose={() => setOpenErrorToast(false)}
-        severity="error"
-        message={errorRecipe?.message ?? ''}
+        open={toast.open}
+        onClose={() => setToast({ open: false, message: '', severity: 'error' })}
+        severity={toast.severity}
+        message={toast.message}
       />
       <Dialog
         open={deleteConfirmation}
@@ -133,7 +162,7 @@ export default function RecipeView(): JSX.Element {
         </DialogActions>
       </Dialog>
       <Paper classes={{ root: 'main' }}>
-        {isLoadingRecipe ? (
+        {isLoading ? (
           <LoadingStack className="w-full" justifyContent="center" alignItems="center">
             <EllipsisLoader />
           </LoadingStack>

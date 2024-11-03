@@ -3,29 +3,24 @@ import { useRouter } from 'next/router';
 import React, { FormEvent, JSX, useState } from 'react';
 
 import { PageContainer } from '@/components/page-container';
-import { StatusTypes } from '@/constants/general';
-import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
-import { RootState } from '@/reducers/store';
+import { useAppDispatch } from '@/reducers/hooks';
 import { logoutMember, updateMemberPassword } from '@/slices/memberSlice';
-import { SliceItem } from '@/types/common';
-import { MemberResponse } from '@/types/member';
 import { interpolateColor } from '@/utils/common';
 import { FormControl, Typography, TextField, LinearProgress, useTheme, Snackbar, Slide, Alert } from '@mui/material';
 import { passwordStrength } from 'check-password-strength';
 import { googleLogout } from '@react-oauth/google';
+import { Toast, ToastParams } from '@/components/toast';
+import { isRejectedWithValue } from '@reduxjs/toolkit';
 
 export default function Account(): JSX.Element {
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const router = useRouter();
-  const { status: memberStatus } = useAppSelector(
-    (state: RootState): SliceItem<MemberResponse> => state.memberSlice.member
-  );
   const [currentPassword, setCurrentPassword] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
   const [isLoadingLogout, setIsLoadingLogout] = useState<boolean>(false);
   const [isLoadingPasswordUpdate, setIsLoadingPasswordUpdate] = useState<boolean>(false);
-  const [openToast, setOpenToast] = React.useState<boolean>(false);
+  const [toast, setToast] = useState<ToastParams>({ open: false, message: '', severity: 'error' });
 
   const strength = passwordStrength(newPassword);
   const strengthPercentage = strength.id / 3;
@@ -39,45 +34,52 @@ export default function Account(): JSX.Element {
   const canSubmit = newPassword && currentPassword;
 
   async function logout() {
-    try {
-      setIsLoadingLogout(true);
-      await dispatch(logoutMember());
-      googleLogout();
+    setIsLoadingLogout(true);
+    const action = await dispatch(logoutMember());
 
-      if (memberStatus === StatusTypes.Fulfilled) {
-        router.push('/');
-      }
-    } finally {
-      setIsLoadingLogout(false);
+    if (isRejectedWithValue(action)) {
+      setToast({
+        open: true,
+        message: `Error logging out - ${action.error.message}`,
+        severity: 'error'
+      });
+    } else {
+      googleLogout();
+      router.push('/');
     }
+    setIsLoadingLogout(false);
   }
 
   async function handleUpdatePassword(event: FormEvent) {
     event.preventDefault();
-    try {
-      setIsLoadingPasswordUpdate(true);
-      await dispatch(updateMemberPassword({ body: { currentPassword, newPassword } }));
+    setIsLoadingPasswordUpdate(true);
+    const action = await dispatch(updateMemberPassword({ body: { currentPassword, newPassword } }));
 
-      if (memberStatus === StatusTypes.Fulfilled) {
-        setOpenToast(true);
-      }
-    } finally {
-      setIsLoadingPasswordUpdate(false);
+    if (isRejectedWithValue(action)) {
+      setToast({
+        open: true,
+        message: `Error updating password - ${action.error.message}`,
+        severity: 'error'
+      });
+    } else {
+      setToast({
+        open: true,
+        message: 'Password updated successfully',
+        severity: 'success'
+      });
     }
+
+    setIsLoadingPasswordUpdate(false);
   }
 
   return (
     <PageContainer>
-      <Snackbar
-        open={openToast}
-        autoHideDuration={5000}
-        onClose={() => setOpenToast(false)}
-        TransitionComponent={Slide}
-      >
-        <Alert onClose={() => setOpenToast(false)} severity="success">
-          Password Updated
-        </Alert>
-      </Snackbar>
+      <Toast
+        open={toast.open}
+        onClose={() => setToast({ open: false, message: '', severity: 'error' })}
+        severity={toast.severity}
+        message={toast.message}
+      />
       <LoadingButton type="button" variant="contained" color="error" loading={isLoadingLogout} onClick={() => logout()}>
         Logout
       </LoadingButton>

@@ -20,21 +20,19 @@ import {
   useTheme
 } from '@mui/material';
 import router from 'next/router';
-import React, { JSX, useEffect, useState } from 'react';
+import React, { JSX, useState } from 'react';
 import { FaBookmark, FaChevronDown, FaChevronRight, FaCopy, FaEdit, FaTrash } from 'react-icons/fa';
 import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 
-import { Toast } from '@/components/toast';
-import { StatusTypes } from '@/constants/general';
+import { Toast, ToastParams } from '@/components/toast';
 import { EffortRating, StyledRating } from '@/components/styled-components';
-import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
-import { RootState } from '@/reducers/store';
+import { useAppDispatch } from '@/reducers/hooks';
 import { deleteRecipe, removeRecipes } from '@/slices/recipeSlice';
-import { SliceItem } from '@/types/common';
-import { RecipeCategory, RecipeResponse } from '@/types/recipe';
+import { RecipeCategory } from '@/types/recipe';
 import { abbreviateTitle, formatDate, stringToColor } from '@/utils/common';
 
 import { BookmarkedIcon, RecipeSpeedDial, RecipeSpeedDialAction, RecipeSpeedDialIcon } from './styled';
+import { isRejectedWithValue } from '@reduxjs/toolkit';
 
 export type RecipeCardProps = {
   isListLayout: boolean;
@@ -65,22 +63,13 @@ export function RecipeCard(props: RecipeCardProps): JSX.Element {
 
   const theme = useTheme();
   const dispatch = useAppDispatch();
-  const { status: statusRecipe, error: errorRecipe } = useAppSelector(
-    (state: RootState): SliceItem<RecipeResponse> => state.recipeSlice.recipe
-  );
   const [openSpeedDial, setOpenSpeedDial] = useState<boolean>(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
-  const [openErrorToast, setOpenErrorToast] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [toast, setToast] = useState<ToastParams>({ open: false, message: '', severity: 'error' });
   const isLG = useMediaQuery(theme.breakpoints.down('lg'));
-  const isListLayout = isLG ? false : propIsListLayout;
-  const isErrorRecipe = statusRecipe === StatusTypes.Rejected;
 
-  useEffect(() => {
-    if (isErrorRecipe) {
-      setOpenErrorToast(true);
-    }
-  }, [isErrorRecipe]);
+  const isListLayout = isLG ? false : propIsListLayout;
 
   const buttonActions = [
     {
@@ -99,23 +88,30 @@ export function RecipeCard(props: RecipeCardProps): JSX.Element {
   ];
 
   async function dispatchDelete() {
-    try {
-      setIsDeleting(true);
-      setDeleteConfirmation(false);
-      await dispatch(deleteRecipe({ recipeId }));
-      dispatch(removeRecipes(recipeId));
-    } finally {
-      setIsDeleting(false);
+    setIsDeleting(true);
+    setDeleteConfirmation(false);
+
+    const action = await dispatch(deleteRecipe({ recipeId }));
+    dispatch(removeRecipes(recipeId));
+
+    if (isRejectedWithValue(action)) {
+      setToast({
+        open: true,
+        message: `Error while deleting recipe - ${action.error.message}`,
+        severity: 'error'
+      });
     }
+
+    setIsDeleting(false);
   }
 
   return (
     <Card>
       <Toast
-        open={openErrorToast}
-        onClose={() => setOpenErrorToast(false)}
-        severity="error"
-        message={`Error while deleting recipe — ${errorRecipe?.message}`}
+        open={toast.open}
+        onClose={() => setToast({ open: false, message: '', severity: 'error' })}
+        severity={toast.severity}
+        message={toast.message}
       />
       <Dialog
         open={deleteConfirmation}

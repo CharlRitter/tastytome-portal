@@ -14,27 +14,23 @@ import {
 import { useRouter } from 'next/router';
 import React, { FormEvent, JSX, useEffect, useState } from 'react';
 
-import { useAppDispatch, useAppSelector } from '@/reducers/hooks';
+import { useAppDispatch } from '@/reducers/hooks';
 import { confirmResetMemberPassword } from '@/slices/memberSlice';
-import { StatusTypes } from '@/constants/general';
 import { LoadingButton } from '@mui/lab';
 import { passwordStrength } from 'check-password-strength';
 import { interpolateColor } from '@/utils/common';
-import { RootState } from '@/reducers/store';
-import { SliceItem } from '@/types/common';
-import { MemberResponse } from '@/types/member';
+import { Toast, ToastParams } from '@/components/toast';
+import { isRejectedWithValue } from '@reduxjs/toolkit';
 
 export default function ResetPassword(): JSX.Element {
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const router = useRouter();
-  const { status: memberStatus } = useAppSelector(
-    (state: RootState): SliceItem<MemberResponse> => state.memberSlice.member
-  );
   const [token, setToken] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [toast, setToast] = useState<ToastParams>({ open: false, message: '', severity: 'error' });
 
   const strength = passwordStrength(newPassword);
   const strengthPercentage = strength.id / 3;
@@ -63,25 +59,36 @@ export default function ResetPassword(): JSX.Element {
 
   async function handleResetPassword(event: FormEvent) {
     event.preventDefault();
-    try {
-      setIsLoading(true);
-      await dispatch(
-        confirmResetMemberPassword({
-          token,
-          body: { newPassword }
-        })
-      );
+    setIsLoading(true);
 
-      if (memberStatus === StatusTypes.Fulfilled) {
-        router.push('/recipes');
-      }
-    } finally {
-      setIsLoading(false);
+    const action = await dispatch(
+      confirmResetMemberPassword({
+        token,
+        body: { newPassword }
+      })
+    );
+
+    if (isRejectedWithValue(action)) {
+      setToast({
+        open: true,
+        message: `Error ressting password - ${action.error.message}`,
+        severity: 'error'
+      });
+    } else {
+      router.push('/recipes');
     }
+
+    setIsLoading(false);
   }
 
   return (
     <Container sx={{ height: '100vh' }} maxWidth="sm">
+      <Toast
+        open={toast.open}
+        onClose={() => setToast({ open: false, message: '', severity: 'error' })}
+        severity={toast.severity}
+        message={toast.message}
+      />
       <Stack height="100%" justifyContent="center">
         <Paper elevation={3}>
           <Box>
