@@ -44,7 +44,7 @@
     "@playwright/test": "^1.48.2",
     "@react-oauth/google": "latest",
     "@reduxjs/toolkit": "^2.3.0",
-    "axios": "^1.7.7",
+    "axios": "^1.12.2",
     "check-password-strength": "^2.0.10",
     "convert-units": "^2.3.4",
     "framer-motion": "^11.11.11",
